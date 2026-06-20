@@ -68,7 +68,7 @@
             // 攻速流: 100波后 每20秒给本行 2秒无敌护盾
             if(p.skillCd==null) p.skillCd=20;
             p.skillCd -= dt;
-            if(p.skillCd<=0){ p.skillCd=20; rowShield[p.r]=Math.max(rowShield[p.r],2); showBanner("🌻 终极向日葵(攻速) · 无敌护盾！");
+            if(p.skillCd<=0){ p.skillCd=20; rowShield[p.r]=Math.max(rowShield[p.r],2);
               // 全行金色护盾扫光特效 + 金光笼罩本行植物
               const cy = cellCenterY(p.r);
               for(let gx=GRID.x+20; gx<GRID.x+COLS*GRID.cw; gx+=44){
@@ -97,7 +97,6 @@
               explosions.push({ x:p.x, y:p.y-8, r:0, max:60, t:0, life:0.55, color:"#ffe680" });
               spawnShards(p.x, p.y-10, 8, ["#ffe680","#a7ecb8"], "tri");
               SFX.play("heal");
-              showBanner("🌻 终极向日葵(血量) · 本行回血 +20%！");
             }
           }
         }
