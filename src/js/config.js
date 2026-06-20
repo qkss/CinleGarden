@@ -55,7 +55,7 @@
 
   // ---------- Waves ----------
   // ---------- State ----------
-  let state, plants, zombies, peas, suns, particles, explosions, mowers, debris, mashes, beams;
+  let state, plants, zombies, peas, suns, particles, explosions, mowers, debris, mashes, beams, floats;
   let rowShield;   // 每行无敌护盾剩余秒数(终极向日葵技能)
   let sun, selected, lastCardUse, gameTime, shovelMode;
   let running = false, lastTs = 0;

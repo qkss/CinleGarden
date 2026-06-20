@@ -38,6 +38,7 @@
     for(const p of plants){
       p.t += dt;
       if(p.recoil>0) p.recoil -= dt;
+      if(p.glowT>0) p.glowT -= dt;
       const def = PLANTS[p.type];
 
       // 血量光环(血量分支 + 钢化) × 自身升级(土豆盾)：动态调整最大血量
@@ -67,22 +68,32 @@
             if(p.skillCd==null) p.skillCd=20;
             p.skillCd -= dt;
             if(p.skillCd<=0){ p.skillCd=20; rowShield[p.r]=Math.max(rowShield[p.r],2); showBanner("🌻 终极向日葵(攻速) · 无敌护盾！");
-              // 全行金色护盾扫光特效
+              // 全行金色护盾扫光特效 + 金光笼罩本行植物
               const cy = cellCenterY(p.r);
               for(let gx=GRID.x+20; gx<GRID.x+COLS*GRID.cw; gx+=44){
                 explosions.push({ x:gx, y:cy, r:0, max:30, t:0, life:0.5, color:"#fff0a0" });
                 spawnParticles(gx, cy, "#ffe680", 4, 120);
               }
+              for(const q of plants){ if(q.r===p.r && q.hp>0) q.glowT = 2; }
             }
           } else if(p.branch==="hp"){
             // 血量流: 每10秒给本行所有植物回血 20% 最大血量
             if(p.healCd==null) p.healCd=10;
             p.healCd -= dt;
             if(p.healCd<=0){ p.healCd=10;
-              for(const q of plants){ if(q.r===p.r && q.hp>0 && q.hp<q.maxHp){ q.hp=Math.min(q.maxHp, q.hp + q.maxHp*0.2); spawnParticles(q.x, q.y-10, "#7fd07a", 10, 180); } }
-              // 中心绿色光环
-              explosions.push({ x:p.x, y:p.y-8, r:0, max:60, t:0, life:0.55, color:"#a7ecb8" });
-              spawnShards(p.x, p.y-10, 8, ["#a7ecb8","#7fd07a"], "tri");
+              for(const q of plants){ if(q.r===p.r && q.hp>0){
+                q.glowT = 1.4;                                       // 金光笼罩本行植物
+                const heal = q.maxHp*0.2;
+                if(q.hp<q.maxHp){
+                  const before=q.hp; q.hp=Math.min(q.maxHp, q.hp+heal);
+                  const gained=Math.round(q.hp-before);
+                  if(gained>0){ floats.push({ x:q.x, y:q.y-26, vy:-34, t:0, life:1.1, text:"+"+gained, color:"#7fe88a" }); }
+                  spawnParticles(q.x, q.y-10, "#ffe680", 10, 180);
+                }
+              }}
+              // 中心金色光环
+              explosions.push({ x:p.x, y:p.y-8, r:0, max:60, t:0, life:0.55, color:"#ffe680" });
+              spawnShards(p.x, p.y-10, 8, ["#ffe680","#a7ecb8"], "tri");
               showBanner("🌻 终极向日葵(血量) · 本行回血 +20%！");
             }
           }
@@ -389,5 +400,8 @@
     debris = debris.filter(d=>d.t < d.life);
     for(const e of explosions){ e.t+=dt; e.r = e.max*Math.min(1,e.t/0.18); }
     explosions = explosions.filter(e=>e.t<e.life);
+    // 漂浮数字(回血等)
+    for(const f of floats){ f.t+=dt; f.y+=f.vy*dt; f.vy*=(1-1.2*dt); }
+    floats = floats.filter(f=>f.t<f.life);
     // endless: no win condition — survive as long as possible
   }

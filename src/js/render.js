@@ -14,6 +14,7 @@
     drawSuns();
     drawExplosions();
     drawParticles();
+    drawFloats();
     drawShields();
     drawSelectionGhost();
     drawPlantInfo();
@@ -376,6 +377,21 @@
     ctx.translate(p.x, p.y);
     const bob = Math.sin(p.t*2 + p.c)*2;
     ctx.translate(0, bob);
+    // 终极向日葵: 金光笼罩
+    if(p.glowT>0){
+      const a = Math.min(1, p.glowT/1.4);
+      const pulse = 0.55+0.45*Math.sin(p.t*9);
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
+      const g = ctx.createRadialGradient(0,0,4, 0,0,40);
+      g.addColorStop(0, "rgba(255,238,150,"+(0.55*a).toFixed(3)+")");
+      g.addColorStop(0.6, "rgba(255,215,80,"+(0.28*a*pulse).toFixed(3)+")");
+      g.addColorStop(1, "rgba(255,215,80,0)");
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,40,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle="rgba(255,245,180,"+(0.5*a*pulse).toFixed(3)+")"; ctx.lineWidth=2.5;
+      ctx.beginPath(); ctx.arc(0,0,32+3*pulse,0,Math.PI*2); ctx.stroke();
+      ctx.restore();
+    }
     if((p.type==="cherrybomb"||p.type==="jalapeno") && p.fuse<0.5){ const s=1+(0.5-p.fuse)*0.6; ctx.scale(s,s); }
     if(p.type==="potatomine") drawMineArt(0,0,false,p.armed);
     else if(p.type==="sunflower") drawSunflowerArt(0,0,p.t,p.up,p.branch);
@@ -1025,6 +1041,20 @@
       }
     }
     ctx.globalAlpha=1;
+  }
+  function drawFloats(){
+    ctx.save();
+    ctx.font="bold 16px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
+    for(const f of floats){
+      const a = Math.max(0, 1 - f.t/f.life);
+      ctx.globalAlpha = a;
+      ctx.lineWidth=3; ctx.strokeStyle="rgba(20,40,20,"+(0.6*a).toFixed(3)+")";
+      ctx.strokeText(f.text, f.x, f.y);
+      ctx.fillStyle=f.color||"#7fe88a";
+      ctx.fillText(f.text, f.x, f.y);
+    }
+    ctx.globalAlpha=1;
+    ctx.restore();
   }
 
   function drawSelectionGhost(){

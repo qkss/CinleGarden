@@ -1,7 +1,7 @@
 "use strict";
   function reset(){
     state = "playing";
-    plants = []; zombies = []; peas = []; suns = []; particles = []; explosions = []; debris = []; mashes = []; beams = [];
+    plants = []; zombies = []; peas = []; suns = []; particles = []; explosions = []; debris = []; mashes = []; beams = []; floats = [];
     rowShield = [0,0,0,0,0];
     mowers = [];
     for(let r=0;r<ROWS;r++) mowers.push({ r, x:GRID.x-34, y:cellCenterY(r)+20, active:false, used:false, t:0 });
