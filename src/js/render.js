@@ -20,6 +20,7 @@
     drawPlantInfo();
     drawUpgradeHint();
     drawUpgradeMenu();
+    for(const p of plants) if(p.type==="potatoshield" && (p.up||0)>=10) drawPotatoSkillUI(p);
     drawHUD();
     drawControlButtons();
     drawWaveBanner();
@@ -1119,6 +1120,42 @@
     }
   }
 
+  function drawPotatoSkillUI(p){
+    const rc = potatoSkillRects(p);
+    const t = performance.now()/1000;
+    // 自动/手动 小开关
+    const m = rc.mode;
+    ctx.save();
+    ctx.fillStyle = autoSkill ? "rgba(60,150,90,.9)" : "rgba(40,40,55,.82)";
+    roundRect(m.x, m.y, m.w, m.h, 7); ctx.fill();
+    ctx.strokeStyle="rgba(255,255,255,.35)"; ctx.lineWidth=1; ctx.stroke();
+    ctx.fillStyle="#fff"; ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
+    ctx.fillText(autoSkill?"⚙ 自动":"✋ 手动", m.x+m.w/2, m.y+m.h/2+0.5);
+    ctx.restore();
+    // 技能图标 / 蓄力进度
+    const ic = rc.icon, cx=ic.x+ic.w/2, cy=ic.y+ic.h/2, r=ic.w/2;
+    ctx.save();
+    if(p.skillReady){
+      const pulse=0.5+0.5*Math.sin(t*6);
+      ctx.save(); ctx.globalCompositeOperation="lighter";
+      ctx.fillStyle="rgba(150,210,255,"+(0.3+0.3*pulse).toFixed(3)+")"; ctx.beginPath(); ctx.arc(cx,cy,r+5+2*pulse,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+      ctx.fillStyle="rgba(40,90,150,.94)"; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle="#bfe0ff"; ctx.lineWidth=2; ctx.stroke();
+      ctx.font="16px Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
+      ctx.fillText("🛡", cx, cy+1);
+      ctx.fillStyle="rgba(190,224,255,.95)"; ctx.font="bold 9px 'PingFang SC',Arial";
+      ctx.fillText("点击释放", cx, cy-r-7);
+    } else {
+      const frac = 1 - Math.max(0, Math.min(1, p.skillCd/20));
+      ctx.fillStyle="rgba(20,30,45,.5)"; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle="rgba(150,200,255,.3)"; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(cx,cy,r-1,0,Math.PI*2); ctx.stroke();
+      ctx.strokeStyle="#7fc0ff"; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(cx,cy,r-1,-Math.PI/2, -Math.PI/2 + frac*Math.PI*2); ctx.stroke();
+      ctx.globalAlpha=0.7; ctx.fillStyle="#cfe3ff"; ctx.font="13px Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
+      ctx.fillText("🛡", cx, cy+1);
+    }
+    ctx.restore();
+  }
   function drawHUD(){
     const best = Math.max(bestScore, Math.round(score));
     ctx.save();

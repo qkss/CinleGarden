@@ -21,6 +21,16 @@
     // while paused, any other click resumes
     if(paused){ paused=false; return; }
 
+    // 土豆盾技能图标: 点击释放 / 切换自动模式 (优先于其它格子操作)
+    for(const p of plants){
+      if(p.type==="potatoshield" && (p.up||0)>=10){
+        const rc = potatoSkillRects(p);
+        const inR=(b)=>mx>=b.x&&mx<=b.x+b.w&&my>=b.y&&my<=b.y+b.h;
+        if(inR(rc.mode)){ autoSkill=!autoSkill; showBanner(autoSkill?"🛡 土豆盾技能 · 自动释放":"🛡 土豆盾技能 · 手动释放"); return; }
+        if(p.skillReady && inR(rc.icon)){ firePotatoSkill(p); return; }
+      }
+    }
+
     for(let i=suns.length-1;i>=0;i--){
       const s=suns[i];
       if(Math.hypot(mx-s.x,my-s.y)<24){ sun+=s.value; suns.splice(i,1); spawnParticles(s.x,s.y,"#ffe680",8); SFX.play("sun"); return; }

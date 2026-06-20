@@ -43,19 +43,11 @@
       if(p.glowT>0) p.glowT -= dt;
       const def = PLANTS[p.type];
 
-      // 终极土豆盾(Lv10): 每20秒给本行 2秒无敌护盾
+      // 终极土豆盾(Lv10): 蓄力20秒 -> 技能就绪(身上出现图标)。手动点击释放, 或开启自动释放
       if(p.type==="potatoshield" && (p.up||0)>=10){
         if(p.skillCd==null) p.skillCd=20;
-        p.skillCd -= dt;
-        if(p.skillCd<=0){ p.skillCd=20; rowShield[p.r]=Math.max(rowShield[p.r],2);
-          const cy = cellCenterY(p.r);
-          for(let gx=GRID.x+20; gx<GRID.x+COLS*GRID.cw; gx+=44){
-            explosions.push({ x:gx, y:cy, r:0, max:30, t:0, life:0.5, color:"#bfe0ff" });
-            spawnParticles(gx, cy, "#9fd8f5", 4, 120);
-          }
-          for(const q of plants){ if(q.r===p.r && q.hp>0) q.glowT = 2; }
-          SFX.play("shield");
-        }
+        if(!p.skillReady){ p.skillCd -= dt; if(p.skillCd<=0){ p.skillCd=0; p.skillReady=true; } }
+        if(p.skillReady && autoSkill) firePotatoSkill(p);   // 自动释放
       }
 
       // 血量光环(血量分支 + 钢化) × 自身升级(土豆盾)：动态调整最大血量

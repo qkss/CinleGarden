@@ -46,6 +46,28 @@
     if(spike) pea.hit = new Set();   // 穿透: 记录已命中的僵尸, 避免重复
     peas.push(pea);
   }
+  // 终极土豆盾技能: 释放本行 2 秒无敌护盾
+  function firePotatoSkill(p){
+    if(!p || p.dead) return;
+    rowShield[p.r] = Math.max(rowShield[p.r], 2);
+    const cy = cellCenterY(p.r);
+    for(let gx=GRID.x+20; gx<GRID.x+COLS*GRID.cw; gx+=44){
+      explosions.push({ x:gx, y:cy, r:0, max:30, t:0, life:0.5, color:"#bfe0ff" });
+      spawnParticles(gx, cy, "#9fd8f5", 4, 120);
+    }
+    for(const q of plants){ if(q.r===p.r && q.hp>0) q.glowT = 2; }
+    SFX.play("shield");
+    p.skillCd = 20; p.skillReady = false;
+  }
+  // 土豆盾技能图标 / 自动开关 的点击热区 (悬浮在土豆盾上方)
+  function potatoSkillRects(p){
+    const cx = p.x, top = p.y - 40;
+    return {
+      icon: { x:cx-16, y:top-16, w:32, h:32 },     // 技能图标(就绪时点击释放)
+      mode: { x:cx-24, y:top-34, w:48, h:16 },     // 自动/手动 小开关
+    };
+  }
+
   // 点燃僵尸: 持续5秒灼伤 (冰冻会熄火)
   function ignite(z){
     if(!z || z.hp<=0 || z.freezeT>0) return;
