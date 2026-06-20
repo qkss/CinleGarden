@@ -514,6 +514,9 @@
       ctx.save(); ctx.translate(0,(1-gs)*22); ctx.scale(gs,gs);   // 以根部为锚, 向上长高
       drawSunflowerArt(0,0,p.t,p.up,p.branch);
       ctx.restore();
+      // 等级标签紧贴花头顶部(花头最高花瓣约在 local -47, 随生长缩放)
+      const topY = (1-gs)*22 + (-47)*gs;
+      drawSunflowerBadge(p, topY);
     }
     else if(p.type==="potatoshield") drawPotatoShieldArt(0,0,p.hp/p.maxHp,p.up);
     else drawPlantArt(p.type, 0,0, p.t, p.recoil||0, p.hp/p.maxHp, false);
@@ -589,22 +592,26 @@
       ctx.beginPath(); ctx.arc(0,-12,21,0,Math.PI*2); ctx.stroke();
       ctx.setLineDash&&ctx.setLineDash([]);
       // 流派角标(右上): 矢量闪电(攻速) / 爱心(血量)
-      ctx.translate(15,-26);
+      ctx.translate(11,-23);
       ctx.fillStyle="rgba(10,22,34,.85)"; ctx.beginPath(); ctx.arc(0,0,8,0,Math.PI*2); ctx.fill();
       ctx.strokeStyle=bcol; ctx.lineWidth=2; ctx.stroke();
       if(branch==="atk") drawBoltIcon(0,0,5); else drawHeartIcon(0,0,4.6);
       ctx.restore();
     }
-    // level badge
-    if(up>0){
-      const suffix = (up>=6 && branch) ? (branch==="atk"?"·攻速":"·血量") : "";
-      const lbl = up>=7?("终极"+suffix):(up>=6?("钢化"+suffix):((branch==="hp"?"血":"攻")+"Lv"+up));
-      ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
-      const bw=ctx.measureText(lbl).width+10;
-      ctx.fillStyle="rgba(0,0,0,.62)"; roundRect(-bw/2,-48,bw,13,5); ctx.fill();
-      ctx.fillStyle = up>=6 ? (branch==="atk"?"#9fe4ff":"#a7ecb8") : (branch==="hp"?"#bfe0ff":"#ffd2a0");
-      ctx.fillText(lbl, 0, -41);
-    }
+    ctx.restore();
+  }
+  // 向日葵等级标签(在生长缩放之外绘制, 紧贴花头顶部)
+  function drawSunflowerBadge(p, topY){
+    if(!(p.up>0)) return;
+    const up=p.up, branch=p.branch;
+    const suffix = (up>=6 && branch) ? (branch==="atk"?"·攻速":"·血量") : "";
+    const lbl = up>=7?("终极"+suffix):(up>=6?("钢化"+suffix):((branch==="hp"?"血":"攻")+"Lv"+up));
+    ctx.save();
+    ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
+    const bw=ctx.measureText(lbl).width+10;
+    ctx.fillStyle="rgba(0,0,0,.62)"; roundRect(-bw/2, topY-13, bw, 13, 5); ctx.fill();
+    ctx.fillStyle = up>=6 ? (branch==="atk"?"#9fe4ff":"#a7ecb8") : (branch==="hp"?"#bfe0ff":"#ffd2a0");
+    ctx.fillText(lbl, 0, topY-6);
     ctx.restore();
   }
 
