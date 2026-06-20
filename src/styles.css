@@ -1,0 +1,51 @@
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    background: #2d1b3d;
+    font-family: "Comic Sans MS", "PingFang SC", "Microsoft YaHei", sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; color: #fff;
+  }
+  #wrap { position: relative; box-shadow: 0 20px 60px rgba(0,0,0,.6); border-radius: 12px; overflow: hidden; max-width: 100vw; max-height: 100vh; }
+  canvas { display: block; background: #000; cursor: pointer; max-width: 100vw; max-height: 100vh; }
+  /* 手机/平板全屏时铺满并等比缩放 */
+  #wrap:fullscreen, #wrap:-webkit-full-screen {
+    width: 100vw; height: 100vh; border-radius: 0; background: #2d1b3d;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #wrap:fullscreen canvas, #wrap:-webkit-full-screen canvas { max-width: 100vw; max-height: 100vh; }
+  /* 竖屏手机/平板提示横屏(iOS 无法程序锁定方向时的兜底) */
+  #rotateHint { display: none; }
+  @media (orientation: portrait) and (pointer: coarse) {
+    #rotateHint {
+      display: flex; position: fixed; inset: 0; z-index: 9999;
+      background: #2d1b3d; color: #fff; align-items: center; justify-content: center;
+      text-align: center; font-size: 28px; line-height: 1.8; font-weight: bold; padding: 24px;
+    }
+  }
+  #overlay {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start; background: rgba(20,10,30,.9);
+    text-align: center; gap: 14px; backdrop-filter: blur(3px); padding: 28px 24px;
+    overflow-y: auto;            /* scroll when the guide is taller than the canvas */
+  }
+  #overlay > * { flex-shrink: 0; }
+  /* auto-center vertically only when content fits, else allow scroll from top */
+  #overlay::before, #overlay::after { content: ""; margin: auto; }
+  #overlay.hidden { display: none; }
+  #overlay h1 { font-size: 40px; text-shadow: 3px 3px 0 #000; letter-spacing: 2px; margin-top: 4px; }
+  #overlay p { font-size: 16px; max-width: 640px; line-height: 1.7; opacity: .92; }
+  .btn {
+    background: linear-gradient(#7ed957,#4a9e2f); border: 3px solid #2f6b1c; border-radius: 14px;
+    padding: 12px 34px; font-size: 22px; font-weight: bold; color: #fff;
+    cursor: pointer; text-shadow: 1px 1px 0 #2f6b1c; box-shadow: 0 5px 0 #2f6b1c;
+    transition: transform .08s; font-family: inherit;
+  }
+  .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #2f6b1c; }
+  .small { font-size: 13px; opacity: .75; }
+  .legend { font-size: 14px; opacity: .9; max-width: 720px; line-height: 1.9; text-align: left; }
+  .btn2 { background: linear-gradient(#5aa0e0,#3a6fb0); border-color:#274d80; box-shadow:0 5px 0 #274d80; text-shadow:1px 1px 0 #274d80; }
+  .btn2:active { box-shadow:0 1px 0 #274d80; }
+  .author { font-size: 13px; opacity: .7; margin-top: 6px; letter-spacing: 1px; }
+  .menuRow { display:flex; gap:16px; flex-wrap:wrap; justify-content:center; }
+  #overlay h1.big { font-size: 52px; }
