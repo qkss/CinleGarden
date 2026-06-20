@@ -46,6 +46,7 @@
     football:  { name:"橄榄球", hp:1100, body:200, speed:23,  accessory:"football" },  // 头盔护甲加厚, 本体也更厚
     gargantuar:{ name:"巨人", hp:3400, body:3400, speed:8,    accessory:"garg", big:true, eat:70 },
     irongarg:  { name:"钢盔巨人", hp:13600, body:13600, speed:8, accessory:"irongarg", big:true, eat:70 },  // 100波后, 血量再翻倍
+    shieldgiant:{ name:"盾牌巨人", hp:1500, body:1500, speed:8, accessory:"shieldgiant", big:true, eat:70, shield:600 },  // 盾牌只能被穿刺打破, 免疫豌豆, 破盾后才可击杀
     spider:    { name:"蜘蛛", hp:150,  body:150,  speed:0,    accessory:"spider", fly:true },   // 空降偷植物 — 判定空中, 仅对空可击
     balloon:   { name:"气球", hp:90,   body:90,   speed:17,   accessory:"balloon", fly:true },     // 飞行,需对空
     screendoor:{ name:"铁门", hp:110,  body:110,  speed:11,   accessory:"screendoor", door:420 },  // 铁门挡豌豆,怕火/爆炸
@@ -78,4 +79,4 @@
   const RESTARTBTN = { x: W-300, y: H-44, w: 84, h: 30 };
   const PAUSEBTN   = { x: W-208, y: H-44, w: 84, h: 30 };
   const SPEEDBTN   = { x: W-116, y: H-44, w: 108, h: 30 };
-  const KILLPTS = { basic:10, cone:25, polevault:30, bucket:60, football:140, ironclad:120, gargantuar:400, irongarg:800, spider:60, balloon:45, screendoor:70, mingzombie:2000, witch:450 };
+  const KILLPTS = { basic:10, cone:25, polevault:30, bucket:60, football:140, ironclad:120, gargantuar:400, irongarg:800, shieldgiant:300, spider:60, balloon:45, screendoor:70, mingzombie:2000, witch:450 };

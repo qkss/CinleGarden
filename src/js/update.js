@@ -147,7 +147,7 @@
         p.fuse -= dt;
         if(p.fuse<=0){
           const cy = cellCenterY(p.r);
-          for(const z of zombies){ if(z.r===p.r) z.hp = 0; }
+          for(const z of zombies){ if(z.r===p.r && !(z.shieldHp>0)) z.hp = 0; }   // 盾牌巨人未破盾免疫
           // 火线特效
           for(let gx=GRID.x+20; gx<GRID.x+COLS*GRID.cw; gx+=46){
             explosions.push({ x:gx, y:cy, r:0, max:40, t:0, life:0.45, color:"#ff5a1e" });
@@ -194,18 +194,34 @@
       }
       // 尖刺：贯穿整行, 命中每只僵尸一次, 不消失 (无视铁门, 直接打本体)
       if(pea.spike){
+        let blocked=false;
         for(const z of zombies){
           if(z.r===pea.r && z.hp>0 && Math.abs(z.x-pea.x)<26 && !pea.hit.has(z) && (pea.air || !z.fly)){
+            if(z.shieldHp>0){
+              // 盾牌巨人: 盾牌挡住穿刺并吸收伤害, 尖刺被消耗(不再穿透)
+              pea.hit.add(z);
+              z.shieldHp -= pea.dmg;
+              spawnParticles(pea.x, pea.y, "#cdd3da", 5);
+              if(z.shieldHp<=0){ spawnShards(z.x-22, z.y-8, 13, ["#c2c7cf","#9aa0aa"], "square"); SFX.play("break", 0.05); }
+              blocked=true; break;
+            }
             pea.hit.add(z);
             z.hp -= pea.dmg;
             spawnParticles(pea.x, pea.y, pea.fire?"#ff7a1e":"#cfe6a0", 4);
           }
         }
+        if(blocked){ pea.dead = true; continue; }
         if(pea.x>W+20 || pea.x<-20) pea.dead = true;
         continue;
       }
       for(const z of zombies){
         if(z.r===pea.r && Math.abs(z.x-pea.x)<26 && z.hp>0 && (pea.air || !z.fly)){
+          // 盾牌巨人: 盾牌未破时免疫一切豌豆(含火焰), 只能被穿刺打破
+          if(z.shieldHp>0){
+            spawnParticles(pea.x, pea.y, "#cfd4da", 4);
+            SFX.play("hit", 0.12);
+            pea.dead = true; break;
+          }
           // 铁门完全免疫普通/冰冻豌豆(火焰豌豆仍可击穿) — 仙人掌穿刺走 spike 分支
           if(z.doorHp>0 && !pea.fire){
             spawnParticles(pea.x, pea.y, "#cfd4da", 4);

@@ -1085,6 +1085,32 @@
         ctx.fillStyle="#c0392b"; ctx.beginPath();
         ctx.moveTo(0,-42); ctx.quadraticCurveTo(12,-56,5,-62); ctx.quadraticCurveTo(2,-50,-2,-44); ctx.closePath(); ctx.fill();
       }
+    } else if(z.type==="shieldgiant"){
+      // 怒眉
+      ctx.strokeStyle="#2a1a10"; ctx.lineWidth=2.5;
+      ctx.beginPath(); ctx.moveTo(-10,-28); ctx.lineTo(-2,-25); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(10,-28); ctx.lineTo(2,-25); ctx.stroke();
+      // 右肩甲
+      ctx.fillStyle="#7c828c"; ctx.beginPath(); ctx.ellipse(15,-6,9,8,0,0,Math.PI*2); ctx.fill();
+      if(z.shieldHp>0){
+        const frac = Math.max(0, z.shieldHp/(z.shieldMax||1));
+        // 大盾(heater shield)挡在身前左侧, 只能被穿刺打破
+        ctx.save(); ctx.translate(-30,-4);
+        ctx.fillStyle="#8a929e";
+        ctx.beginPath();
+        ctx.moveTo(-12,-32); ctx.lineTo(12,-32); ctx.lineTo(12,12);
+        ctx.quadraticCurveTo(12,30,0,38); ctx.quadraticCurveTo(-12,30,-12,12); ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle="#5b626c"; ctx.lineWidth=3; ctx.stroke();
+        ctx.fillStyle="#aab1bb"; ctx.fillRect(-2,-30,4,60);                              // 中脊
+        ctx.fillStyle="#c7ccd4"; ctx.beginPath(); ctx.arc(0,-2,5,0,Math.PI*2); ctx.fill(); // 盾心
+        ctx.fillStyle="#6b7079"; ctx.beginPath(); ctx.arc(0,-2,2.4,0,Math.PI*2); ctx.fill();
+        // 裂纹随耐久下降
+        ctx.strokeStyle="#3a3f47"; ctx.lineWidth=1.4;
+        if(frac<0.66){ ctx.beginPath(); ctx.moveTo(-6,-24); ctx.lineTo(2,-8); ctx.lineTo(-4,6); ctx.stroke(); }
+        if(frac<0.33){ ctx.beginPath(); ctx.moveTo(8,-18); ctx.lineTo(0,-2); ctx.lineTo(8,16); ctx.stroke(); }
+        ctx.restore();
+      }
     } else if(z.type==="screendoor" && z.doorHp>0){
       // 铁门挡在身前(僵尸朝左走, 左侧迎着豌豆) — 免疫豌豆射击, 仅穿刺/火焰/爆炸可破
       ctx.fillStyle="#aab0b8"; roundRect(-26,-30,12,52,3); ctx.fill();
@@ -1160,6 +1186,7 @@
     }
     ctx.restore();
     drawHealthBar(z.x, z.y - (z.big?98:50), z.hp/z.maxHp, z.big?64:34, "#c0392b");
+    if(z.shieldHp>0) drawHealthBar(z.x, z.y - (z.big?108:60), z.shieldHp/z.shieldMax, z.big?64:34, "#8aa6c8");
   }
 
   function drawHealthBar(cx, cy, frac, w, color){

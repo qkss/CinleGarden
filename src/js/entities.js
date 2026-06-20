@@ -32,6 +32,7 @@
       z.phase = "drop"; z.targetY = cellCenterY(row); z.grabT = 0.6; z.carry = null;
     }
     if(d.door!=null){ z.doorHp = d.door; }                                             // 铁门护盾值
+    if(d.shield!=null){ z.shieldHp = Math.round(d.shield*mult); z.shieldMax = z.shieldHp; }   // 盾牌巨人: 只能被穿刺打破
     if(d.beam){ z.beam = true; z.beamCd = 3.5; z.invulnT = 10; }                        // 鸣人: 能量极光 + 出场10秒无敌
     if(d.buff){ z.buff = true; z.buffCd = 5; }                                         // 女巫: 群体增益
   }
@@ -85,6 +86,7 @@
     explosions.push({ x:px, y:py, r:0, max:50, t:0, life:0.4, color:"#9fd8f5" });
     for(const z of zombies){
       // 小范围冻结(只冻命中点附近1格), 不再整片锁场
+      if(z.shieldHp>0) continue;   // 盾牌巨人: 未破盾免疫冰冻弹
       if(z.hp>0 && Math.hypot(z.x-px, z.y-py) < 50){
         z.hp -= 15;
         if(z.freezeT<=0 && (z.freezeImmune||0)<=0){ z.freezeT = dur; z.slowT = 0; }  // 解冻后免疫期内不可再冻, 杜绝无限冰冻
@@ -194,6 +196,7 @@
     if(dmg>0) SFX.play("explode", 0.05);
     explosions.push({ x, y, r:0, max:radius, t:0, life:0.5, color:color||"#ff8a1e" });
     for(const z of zombies){
+      if(z.shieldHp>0) continue;   // 盾牌巨人: 未破盾免疫爆炸
       if(Math.hypot(z.x-x, z.y-y) < radius){ z.hp -= dmg; }
     }
     spawnParticles(x,y,"#ffb14e",24,300);
