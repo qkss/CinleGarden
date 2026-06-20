@@ -997,8 +997,54 @@
     ctx.restore();
     drawHealthBar(z.x, z.y-24, z.hp/z.maxHp, 30, "#c0392b");
   }
+  function drawPangolin(z){
+    const cy = cellCenterY(z.r), ground = cy + 30;
+    const frozen = z.freezeT>0;
+    const scale = (c1,c2)=> frozen ? c2 : c1;
+    if(z.burrowing){
+      // 地底潜行: 移动的土堆 + 土屑
+      ctx.save(); ctx.translate(z.x, ground);
+      ctx.fillStyle="#7a5c34"; ctx.beginPath(); ctx.ellipse(0,0,26,12,0,Math.PI,0); ctx.fill();
+      ctx.fillStyle="#9c7a4a"; ctx.beginPath(); ctx.ellipse(-2,-2,20,9,0,Math.PI,0); ctx.fill();
+      // 拱起的甲背尖端
+      ctx.fillStyle="#6b5230"; ctx.beginPath(); ctx.moveTo(-8,-4); ctx.lineTo(0,-12); ctx.lineTo(8,-4); ctx.closePath(); ctx.fill();
+      ctx.restore();
+      return;
+    }
+    ctx.save(); ctx.translate(z.x, z.y);
+    const emerge = z.phase==="surface" ? (1 - z.surfT/0.5) : 1;   // 出土升起
+    ctx.translate(0, (1-emerge)*26);
+    const walk = z.phase==="walk" ? Math.sin(z.t*7) : 0;
+    // 腿
+    ctx.strokeStyle=scale("#6b4f2e","#7fa6b8"); ctx.lineWidth=5; ctx.lineCap="round";
+    ctx.beginPath(); ctx.moveTo(-8,14); ctx.lineTo(-12+walk*4,30); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(8,14); ctx.lineTo(12-walk*4,30); ctx.stroke();
+    // 尾巴(右后)
+    ctx.strokeStyle=scale("#8a6a3c","#8fb6c8"); ctx.lineWidth=7; ctx.lineCap="round";
+    ctx.beginPath(); ctx.moveTo(14,8); ctx.quadraticCurveTo(30,10,34,-6); ctx.stroke();
+    // 头(左前, 尖吻)
+    ctx.fillStyle=scale("#caa46a","#b6cdd6"); ctx.beginPath(); ctx.ellipse(-16,-2,11,8,-0.2,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=scale("#9c7a4a","#9ec0cc"); ctx.beginPath(); ctx.moveTo(-22,-2); ctx.lineTo(-30,1); ctx.lineTo(-22,4); ctx.closePath(); ctx.fill();  // 尖吻
+    ctx.fillStyle="#2a1a10"; ctx.beginPath(); ctx.arc(-18,-4,1.8,0,Math.PI*2); ctx.fill();   // 眼
+    // 厚甲背壳(层叠鳞片)
+    const shellAlive = z.hp > z.bodyMax+0.5;
+    ctx.save();
+    ctx.fillStyle=scale(shellAlive?"#7a5c34":"#b08a52", "#8aa6b2");
+    ctx.beginPath(); ctx.ellipse(2,-6,20,16,0,0,Math.PI*2); ctx.fill();
+    if(shellAlive){
+      ctx.strokeStyle="#5a4222"; ctx.lineWidth=1.6;
+      for(let i=0;i<4;i++){ const rr=18-i*3.6; ctx.beginPath(); ctx.arc(2,-6+i*1.5,rr,Math.PI*0.9,Math.PI*0.1,true); ctx.stroke(); }
+      // 鳞片高光
+      ctx.fillStyle="rgba(255,235,180,.25)"; ctx.beginPath(); ctx.ellipse(-4,-12,8,5,-0.4,0,Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+    if(frozen){ ctx.fillStyle="rgba(150,220,250,.38)"; roundRect(-30,-26,60,52,8); ctx.fill(); }
+    ctx.restore();
+    drawHealthBar(z.x, z.y-30, z.hp/z.maxHp, 38, "#c0392b");
+  }
   function drawZombie(z){
     if(z.type==="spider"){ drawSpider(z); return; }
+    if(z.type==="pangolin"){ drawPangolin(z); return; }
     ctx.save(); ctx.translate(z.x, z.y);
     if(z.big) ctx.scale(1.95,1.95);               // 巨人放大
     if(z.slowT>0||z.freezeT>0){ ctx.save(); } // marker; tint handled per part via slow flag

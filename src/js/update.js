@@ -164,7 +164,7 @@
         p.fuse -= dt;
         if(p.fuse<=0){
           const cy = cellCenterY(p.r);
-          for(const z of zombies){ if(z.r===p.r && !(z.shieldHp>0)) z.hp = 0; }   // 盾牌巨人未破盾免疫
+          for(const z of zombies){ if(z.r===p.r && !(z.shieldHp>0) && !z.burrowing) z.hp = 0; }   // 盾牌巨人未破盾 / 地底潜行免疫
           // 火线特效
           for(let gx=GRID.x+20; gx<GRID.x+COLS*GRID.cw; gx+=46){
             explosions.push({ x:gx, y:cy, r:0, max:40, t:0, life:0.45, color:"#ff5a1e" });
@@ -219,7 +219,7 @@
       if(pea.spike){
         let blocked=false;
         for(const z of zombies){
-          if(z.r===pea.r && z.hp>0 && Math.abs(z.x-pea.x)<26 && !pea.hit.has(z) && (pea.air || !z.fly)){
+          if(z.r===pea.r && z.hp>0 && !z.burrowing && Math.abs(z.x-pea.x)<26 && !pea.hit.has(z) && (pea.air || !z.fly)){
             if(z.shieldHp>0){
               // 盾牌巨人: 盾牌挡住穿刺并吸收伤害, 尖刺被消耗(不再穿透)
               pea.hit.add(z);
@@ -238,7 +238,7 @@
         continue;
       }
       for(const z of zombies){
-        if(z.r===pea.r && Math.abs(z.x-pea.x)<26 && z.hp>0 && (pea.air || !z.fly)){
+        if(z.r===pea.r && Math.abs(z.x-pea.x)<26 && z.hp>0 && !z.burrowing && (pea.air || !z.fly)){
           // 盾牌巨人: 盾牌未破时免疫一切豌豆(含火焰), 只能被穿刺打破
           if(z.shieldHp>0){
             spawnParticles(pea.x, pea.y, "#cfd4da", 4);
@@ -308,8 +308,9 @@
       if(!z.armorBroken && z.maxHp>z.bodyMax && z.hp<=z.bodyMax){
         z.armorBroken = true;
         const a = {cone:{c:["#e08a2e","#b96d1c"],s:"tri"}, bucket:{c:["#c2c7cf","#9aa0aa"],s:"square"},
-                   ironclad:{c:["#aab0b8","#7e848c"],s:"square"}, football:{c:["#c64b4b","#7a2b2b"],s:"square"}}[z.type];
-        if(a){ spawnShards(z.x, z.y-34, 13, a.c, a.s); spawnHelmet(z); SFX.play("break", 0.05); }
+                   ironclad:{c:["#aab0b8","#7e848c"],s:"square"}, football:{c:["#c64b4b","#7a2b2b"],s:"square"},
+                   pangolin:{c:["#9c7a4a","#7a5c34"],s:"tri"}}[z.type];
+        if(a){ spawnShards(z.x, z.y-34, 13, a.c, a.s); if(z.type!=="pangolin") spawnHelmet(z); SFX.play("break", 0.05); }
       }
       if(z.vaultAnim>0) z.vaultAnim -= dt;
       // 女巫增益到期 -> 还原血量(+500%临时血)
@@ -356,6 +357,21 @@
           }
         }
         continue;   // 蜘蛛不走地面、不触发推车
+      }
+
+      // 盾穿山甲：从地底潜行(不可被攻击/无视植物)，最多钻到第5格后出土
+      if(z.type==="pangolin" && z.phase!=="walk"){
+        if(!frozen){
+          if(z.phase==="dig"){
+            z.x -= z.baseSpeed*1.4*dt;
+            if(Math.random()<0.5) spawnParticles(z.x+10, cellCenterY(z.r)+30, "#9c7a4a", 1, 80);  // 土屑
+            if(z.x <= z.surfaceX){ z.x = z.surfaceX; z.phase = "surface"; z.surfT = 0.5; z.burrowing = false;
+              spawnParticles(z.x, cellCenterY(z.r)+12, "#b9a06a", 18, 240); SFX.play("chomp", 0.1); }
+          } else { // surface 出土动画
+            z.surfT -= dt; if(z.surfT<=0) z.phase = "walk";
+          }
+        }
+        continue;   // 钻地/出土期间不做常规移动
       }
 
       const speed = frozen ? 0 : z.baseSpeed * (z.slowT>0 ? 0.45 : 1) * (z.mireT>0 ? 0.22 : 1);
