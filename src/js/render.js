@@ -396,7 +396,13 @@
     }
     if((p.type==="cherrybomb"||p.type==="jalapeno") && p.fuse<0.5){ const s=1+(0.5-p.fuse)*0.6; ctx.scale(s,s); }
     if(p.type==="potatomine") drawMineArt(0,0,false,p.armed);
-    else if(p.type==="sunflower") drawSunflowerArt(0,0,p.t,p.up,p.branch);
+    else if(p.type==="sunflower"){
+      // 初始幼苗较小, 随升级逐步长大到满级最大形态
+      const gs = 0.62 + 0.38*Math.min(p.up||0,7)/7;
+      ctx.save(); ctx.translate(0,(1-gs)*22); ctx.scale(gs,gs);   // 以根部为锚, 向上长高
+      drawSunflowerArt(0,0,p.t,p.up,p.branch);
+      ctx.restore();
+    }
     else if(p.type==="potatoshield") drawPotatoShieldArt(0,0,p.hp/p.maxHp,p.up);
     else drawPlantArt(p.type, 0,0, p.t, p.recoil||0, p.hp/p.maxHp, false);
     // 三豆射手 / 寒冰 升级等级角标
