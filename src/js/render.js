@@ -113,11 +113,12 @@
     if(selected||shovelMode || mouse.y<GRID.y) return;
     const c=colAtX(mouse.x), r=rowAtY(mouse.y);
     if(c<0||r<0) return;
-    const sp=plants.find(p=>p.r===r&&p.c===c&&(p.type==="sunflower"||p.type==="potatoshield"||p.type==="snowpea"||p.type==="threepeater"));
+    const sp=plants.find(p=>p.r===r&&p.c===c&&(p.type==="sunflower"||p.type==="potatoshield"||p.type==="snowpea"||p.type==="threepeater"||p.type==="campfire"));
     if(!sp) return;
     const cx=cellCenterX(c), cy=cellY(r);
+    const minW = upgradeMinWave(sp);
     let txt, ok=false;
-    if(waveNum<UPGRADE_WAVE){ txt="第"+UPGRADE_WAVE+"波后可升级"; }
+    if(waveNum<minW){ txt="第"+minW+"波后可升级"; }
     else { const cost=nextUpgradeCost(sp);
       if(cost==null) txt="已满级 MAX";
       else {
@@ -126,6 +127,7 @@
         if(sp.type==="potatoshield") nxt="Lv"+(sp.up+1)+"(+50%血)";
         else if(sp.type==="snowpea") nxt="Lv"+(sp.up+1)+"(冻"+(1.5+0.2*(sp.up+1)).toFixed(1)+"s)";
         else if(sp.type==="threepeater") nxt="Lv"+(sp.up+1)+"(攻速 x"+(1+0.4*(sp.up+1)).toFixed(1)+")";
+        else if(sp.type==="campfire") nxt = (sp.up+1>=5) ? "Lv5(点燃灼伤)" : ("Lv"+(sp.up+1)+"(火伤 x"+(1.3+0.2*(sp.up+1)).toFixed(1)+")");
         else if(sp.up===0) nxt="选择分支";
         else if(sp.up<5) nxt=(sp.branch==="hp"?"血量":"攻速")+"Lv"+(sp.up+1);
         else if(sp.up===5) nxt="钢化";
@@ -424,6 +426,14 @@
       ctx.fillStyle="rgba(0,0,0,.6)"; roundRect(-bw/2,-46,bw,13,5); ctx.fill();
       ctx.fillStyle = p.type==="threepeater" ? "#caff9a" : "#bfe9fb";
       ctx.fillText(lbl, 0, -39);
+    }
+    // 篝火 升级等级角标
+    if(p.up>0 && p.type==="campfire"){
+      const lbl = p.up>=5 ? "🔥Lv5" : ("Lv"+p.up);
+      ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
+      const bw=ctx.measureText(lbl).width+10;
+      ctx.fillStyle="rgba(0,0,0,.6)"; roundRect(-bw/2,-46,bw,13,5); ctx.fill();
+      ctx.fillStyle="#ffc78a"; ctx.fillText(lbl, 0, -39);
     }
     ctx.restore();
     if(p.kind!=="bomb") drawHealthBar(p.x, p.y+40, p.hp/p.maxHp, 40);
@@ -1012,6 +1022,22 @@
       ctx.fillText("❄", 0, -30);
     }
     if(z.slowT>0||z.freezeT>0){ ctx.restore(); }
+    // 灼伤火焰: 跳动的火舌 + 橙色光晕
+    if(z.burnT>0 && z.freezeT<=0){
+      ctx.save();
+      ctx.globalCompositeOperation="lighter";
+      const fl = performance.now()/90;
+      ctx.fillStyle="rgba(255,120,30,.18)"; ctx.beginPath(); ctx.arc(0,-14,26,0,Math.PI*2); ctx.fill();
+      for(let i=0;i<3;i++){
+        const fx=(i-1)*9, sw=1+0.4*Math.sin(fl*1.7+i), h=20+8*Math.sin(fl+i*2);
+        const grd=ctx.createLinearGradient(fx,-20-h,fx,4);
+        grd.addColorStop(0,"rgba(255,238,120,0)"); grd.addColorStop(0.4,"rgba(255,180,40,.85)"); grd.addColorStop(1,"rgba(255,90,20,.9)");
+        ctx.fillStyle=grd; ctx.beginPath();
+        ctx.moveTo(fx-6*sw,4); ctx.quadraticCurveTo(fx-7*sw,-12,fx,-20-h);
+        ctx.quadraticCurveTo(fx+7*sw,-12,fx+6*sw,4); ctx.closePath(); ctx.fill();
+      }
+      ctx.restore();
+    }
     ctx.restore();
     drawHealthBar(z.x, z.y - (z.big?98:50), z.hp/z.maxHp, z.big?64:34, "#c0392b");
   }

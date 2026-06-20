@@ -46,6 +46,12 @@
     if(spike) pea.hit = new Set();   // 穿透: 记录已命中的僵尸, 避免重复
     peas.push(pea);
   }
+  // 点燃僵尸: 持续5秒灼伤 (冰冻会熄火)
+  function ignite(z){
+    if(!z || z.hp<=0 || z.freezeT>0) return;
+    z.burnT = 5; z.burnDps = 45;          // 5秒 × 45/s = 225 灼伤总量
+    spawnParticles(z.x, z.y-16, "#ff7a1e", 8, 140);
+  }
   function iceBurst(px, py, r, dur){
     dur = dur||1.5;
     SFX.play("freeze", 0.08);
@@ -100,8 +106,14 @@
     if(p.type==="potatoshield"){ return p.up<10 ? 250 : null; }   // 每级+50%血, 最高Lv10
     if(p.type==="snowpea"){ return p.up<5 ? 250 : null; }          // 每级+0.2s冰冻, 最高Lv5
     if(p.type==="threepeater"){ return p.up<10 ? 300 : null; }     // 每级+0.4x攻速, 最高Lv10 (5x)
+    if(p.type==="campfire"){ return p.up<5 ? 250 : null; }          // 每级+火焰伤害, Lv5点燃灼伤(50波后解锁)
     return null;
   }
+  // 各类植物可升级的最早波数 (篝火需50波, 其余沿用 UPGRADE_WAVE)
+  function upgradeMinWave(p){ return (p && p.type==="campfire") ? 50 : UPGRADE_WAVE; }
+  // 篝火火焰伤害倍率(随等级) 与 是否点燃(Lv5)
+  function torchFireMult(lvl){ return 1.3 + 0.2*(lvl||0); }   // Lv0=1.3 ... Lv5=2.3
+  function torchIgnites(lvl){ return (lvl||0) >= 5; }
   // 三豆射手自身攻速倍率: Lv0=1, Lv10=5
   function threepeaterAtkMult(p){ return 1 + 0.4 * Math.min(p.up||0, 10); }
   function upgradeLabel(p){

@@ -63,10 +63,10 @@
     // upgrade a sunflower / potato-shield (unlocked after wave UPGRADE_WAVE) — click it to level up
     if(!selected){
       const c=colAtX(mx), r=rowAtY(my);
-      const sp = plants.find(p=>p.r===r&&p.c===c&&(p.type==="sunflower"||p.type==="potatoshield"||p.type==="snowpea"||p.type==="threepeater"));
+      const sp = plants.find(p=>p.r===r&&p.c===c&&(p.type==="sunflower"||p.type==="potatoshield"||p.type==="snowpea"||p.type==="threepeater"||p.type==="campfire"));
       if(sp){
         const cost = nextUpgradeCost(sp);
-        if(waveNum>=UPGRADE_WAVE && cost!=null && sun>=cost){
+        if(waveNum>=upgradeMinWave(sp) && cost!=null && sun>=cost){
           if(sp.type==="sunflower" && sp.up===0){ upgradeMenu = { p:sp }; }   // choose a branch first
           else {
             sun -= cost; sp.up++;
@@ -81,6 +81,9 @@
             } else if(sp.type==="threepeater"){
               spawnParticles(sp.x, sp.y, "#9be36b", 18, 220);
               showBanner("🌿 三豆 Lv"+sp.up+" (攻速 x"+threepeaterAtkMult(sp).toFixed(1)+")");
+            } else if(sp.type==="campfire"){
+              spawnParticles(sp.x, sp.y, "#ff9a3c", 18, 220);
+              showBanner(sp.up>=5 ? "🔥 篝火 Lv5 · 火焰点燃灼伤！" : ("🔥 篝火 Lv"+sp.up+" (火伤 x"+torchFireMult(sp.up).toFixed(1)+")"));
             } else {
               spawnParticles(sp.x, sp.y, sp.up>=7?"#ffe680":(sp.up>=6?"#9fd0ff":(sp.branch==="hp"?"#7fd0ff":"#ff9a3c")), 18, 220);
               showBanner("🌻 "+upgradeLabel(sp)+"！");

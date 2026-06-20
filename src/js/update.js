@@ -193,9 +193,11 @@
       if(!pea.fire && !pea.freeze){
         const torch = plants.find(p=>p.kind==="torch" && p.hp>0 && p.r===pea.r && Math.abs(p.x-pea.x)<26);
         if(torch){
+          const lvl = torch.up||0;
           pea.fire = true;
-          pea.dmg = Math.round(pea.dmg * 1.3);         // +30% damage
-          spawnParticles(pea.x, pea.y, "#ff9a3c", 6, 90);
+          pea.dmg = Math.round(pea.dmg * torchFireMult(lvl));   // 火焰伤害随篝火等级提升
+          pea.ignite = torchIgnites(lvl);                       // Lv5: 点燃灼伤
+          spawnParticles(pea.x, pea.y, "#ff9a3c", lvl>=5?9:6, 90);
         }
       }
       // 尖刺：贯穿整行, 命中每只僵尸一次, 不消失 (无视铁门, 直接打本体)
@@ -223,8 +225,9 @@
             // 爆裂(范围)伤害：溅射到同行附近的僵尸
             explosions.push({ x:pea.x, y:pea.y, r:0, max:44, t:0, life:0.3, color:"#ff7a1e" });
             for(const z2 of zombies){
-              if(z2!==z && z2.r===pea.r && Math.abs(z2.x-pea.x)<48 && z2.hp>0) z2.hp -= pea.dmg*0.5;
+              if(z2!==z && z2.r===pea.r && Math.abs(z2.x-pea.x)<48 && z2.hp>0){ z2.hp -= pea.dmg*0.5; if(pea.ignite) ignite(z2); }
             }
+            if(pea.ignite) ignite(z);                    // Lv5篝火: 点燃, 持续5秒灼伤
             spawnParticles(pea.x, pea.y, "#ff7a1e", 9, 170);
           } else if(pea.freeze){
             // 投掷冰冻弹命中：范围冰冻1.5秒(完全停滞)
@@ -258,6 +261,16 @@
       if(z.freezeT>0) z.freezeT -= dt;
       if(z.freezeImmune>0) z.freezeImmune -= dt;
       if(wasFrozen && z.freezeT<=0){ spawnShards(z.x, z.y-18, 12, ["#dff4fc","#bfe9fb","#9fd8f5"]); z.freezeImmune = 1.5; }  // 解冻→碎裂+免疫1.5s
+      // 灼伤(篝火Lv5点燃): 持续掉血 + 火焰余烬粒子; 冰冻会熄火
+      if(z.burnT>0){
+        if(z.freezeT>0){ z.burnT = 0; }
+        else {
+          z.burnT -= dt; z.hp -= z.burnDps*dt;
+          if(Math.random()<0.5) particles.push({ x:z.x+(Math.random()*16-8), y:z.y-10-Math.random()*14,
+            vx:(Math.random()-.5)*30, vy:-60-Math.random()*50, life:.4+Math.random()*.3, t:0,
+            color: Math.random()<0.5?"#ff7a1e":"#ffb14e", size:2.5+Math.random()*2.5 });
+        }
+      }
       // 护甲被打掉的碎裂动画
       if(!z.armorBroken && z.maxHp>z.bodyMax && z.hp<=z.bodyMax){
         z.armorBroken = true;
