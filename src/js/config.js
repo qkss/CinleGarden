@@ -21,7 +21,7 @@
   const PLANTS = {
     sunflower: { name:"向日葵", cost:50,  cooldown:5,  hp:60,  kind:"producer", color:"#ffd23f" },
     peashooter:{ name:"豌豆",  cost:100, cooldown:5,  hp:60,  kind:"shooter",  color:"#5cb85c", dmg:25, rate:1.2, shots:1 },
-    snowpea:   { name:"寒冰",  cost:175, cooldown:8,  hp:60,  kind:"shooter",  color:"#4fb6e0", dmg:25, rate:2.6, shots:1, freeze:true, unlock:15 },
+    snowpea:   { name:"寒冰",  cost:175, cooldown:8,  hp:60,  kind:"shooter",  color:"#4fb6e0", dmg:25, rate:2.6, shots:1, freeze:true, unlock:40 },
     repeater:  { name:"双发",  cost:200, cooldown:10, hp:60,  kind:"shooter",  color:"#3f9e3f", dmg:25, rate:1.3, shots:2 },
     threepeater:{name:"三豆",  cost:325, cooldown:12, hp:60,  kind:"shooter",  color:"#3f9e3f", dmg:25, rate:1.6, shots:3, unlock:50 },
     cactus:    { name:"仙人掌", cost:125, cooldown:6,  hp:60, kind:"shooter", color:"#5aa84a", dmg:20, rate:1.4, shots:1, spike:true, back:true },  // 穿透尖刺(仅地面)·可向后射击
