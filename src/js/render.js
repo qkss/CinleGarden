@@ -552,6 +552,16 @@
       ctx.fillStyle = p.type==="threepeater" ? "#caff9a" : "#bfe9fb";
       ctx.fillText(lbl, 0, -39);
     }
+    // 巨仙掌 地刺就绪: 脚下泛起地刺微光
+    if(p.type==="bigcactus" && (p.up||0)>=10 && p.spikeCd<=0){
+      const pl=0.5+0.5*Math.sin(p.t*6);
+      ctx.save();
+      ctx.fillStyle="rgba(120,200,90,"+(0.18+0.14*pl).toFixed(3)+")";
+      ctx.beginPath(); ctx.ellipse(0,40,22,7,0,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle="rgba(180,240,150,"+(0.5+0.3*pl).toFixed(3)+")";
+      for(let i=-1;i<=1;i++){ ctx.beginPath(); ctx.moveTo(i*9-2,40); ctx.lineTo(i*9,40-5-3*pl); ctx.lineTo(i*9+2,40); ctx.closePath(); ctx.fill(); }
+      ctx.restore();
+    }
     // 篝火 / 巨仙掌 升级等级角标
     if(p.up>0 && (p.type==="campfire" || p.type==="bigcactus")){
       const lbl = p.type==="campfire" ? (p.up>=5?"🔥Lv5":("Lv"+p.up)) : (p.up>=10?"Lv10":("Lv"+p.up));

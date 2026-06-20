@@ -56,8 +56,9 @@
       // 巨仙掌(Lv10): 每20秒发动地刺, 击退本行前方僵尸2格
       if(p.type==="bigcactus" && (p.up||0)>=10){
         if(p.spikeCd==null) p.spikeCd=20;
-        p.spikeCd -= dt;
-        if(p.spikeCd<=0){ p.spikeCd = fireGroundSpikes(p) ? 20 : 2; }   // 无目标则2秒后重试
+        if(p.spikeCd>0) p.spikeCd -= dt;
+        // 冷却完毕进入"就绪": 仅在本行有目标时才发动, 否则保持就绪不触发
+        if(p.spikeCd<=0 && fireGroundSpikes(p)) p.spikeCd = 20;
       }
 
       // 终极土豆盾(Lv10): 蓄力20秒 -> 技能就绪(身上出现图标)。手动点击释放, 或开启自动释放
