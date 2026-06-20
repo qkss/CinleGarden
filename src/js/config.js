@@ -23,7 +23,7 @@
     peashooter:{ name:"豌豆",  cost:100, cooldown:5,  hp:60,  kind:"shooter",  color:"#5cb85c", dmg:25, rate:1.2, shots:1 },
     snowpea:   { name:"寒冰",  cost:175, cooldown:8,  hp:60,  kind:"shooter",  color:"#4fb6e0", dmg:25, rate:2.6, shots:1, freeze:true, unlock:15 },
     repeater:  { name:"双发",  cost:200, cooldown:10, hp:60,  kind:"shooter",  color:"#3f9e3f", dmg:25, rate:1.3, shots:2 },
-    threepeater:{name:"三豆",  cost:325, cooldown:12, hp:60,  kind:"shooter",  color:"#3f9e3f", dmg:25, rate:1.6, shots:3, unlock:10 },
+    threepeater:{name:"三豆",  cost:325, cooldown:12, hp:60,  kind:"shooter",  color:"#3f9e3f", dmg:25, rate:1.6, shots:3, unlock:50 },
     cactus:    { name:"仙人掌", cost:125, cooldown:6,  hp:60, kind:"shooter", color:"#5aa84a", dmg:20, rate:1.4, shots:1, spike:true, back:true },  // 穿透尖刺(仅地面)·可向后射击
     bigcactus: { name:"巨仙掌", cost:225, cooldown:10, hp:80, kind:"shooter", color:"#3f7e33", dmg:25, rate:1.4, shots:1, spike:true, air:true, unlock:10 },  // 穿透尖刺·可打空中(10波解锁)
     jalapeno:  { name:"辣椒",  cost:150, cooldown:25, hp:60,  kind:"rowbomb",   color:"#d23f3f", unlock:20 },
