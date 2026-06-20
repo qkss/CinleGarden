@@ -4,10 +4,17 @@
     ctx.fillStyle = "#7cc3e8"; ctx.fillRect(0,0,W,H);
     drawTopBar();
     drawLawn();
+    if(frostRainT>0){   // 冰霜雪雨: 大范围淡蓝霜冻覆盖
+      ctx.save();
+      ctx.fillStyle="rgba(150,210,250,"+(0.12+0.06*Math.sin(performance.now()/120)).toFixed(3)+")";
+      ctx.fillRect(GRID.x, GRID.y, COLS*GRID.cw, ROWS*GRID.ch);
+      ctx.restore();
+    }
     drawMashes();
     drawMowers();
     drawDebris();
     for(const p of plants) drawPlant(p);
+    drawGroundSpikes();
     for(const pea of peas) drawPea(pea);
     [...zombies].sort((a,b)=>a.y-b.y).forEach(drawZombie);
     drawBeams();
@@ -158,7 +165,7 @@
     if(selected||shovelMode || mouse.y<GRID.y) return;
     const c=colAtX(mouse.x), r=rowAtY(mouse.y);
     if(c<0||r<0) return;
-    const sp=plants.find(p=>p.r===r&&p.c===c&&(p.type==="sunflower"||p.type==="potatoshield"||p.type==="snowpea"||p.type==="threepeater"||p.type==="campfire"));
+    const sp=plants.find(p=>p.r===r&&p.c===c&&(p.type==="sunflower"||p.type==="potatoshield"||p.type==="snowpea"||p.type==="threepeater"||p.type==="campfire"||p.type==="bigcactus"));
     if(!sp) return;
     const cx=cellCenterX(c), cy=cellY(r);
     const minW = upgradeMinWave(sp);
@@ -173,6 +180,7 @@
         else if(sp.type==="snowpea") nxt="Lv"+(sp.up+1)+"(冻"+(1.5+0.2*(sp.up+1)).toFixed(1)+"s)";
         else if(sp.type==="threepeater") nxt="Lv"+(sp.up+1)+"(攻速 x"+(1+0.4*(sp.up+1)).toFixed(1)+")";
         else if(sp.type==="campfire") nxt = (sp.up+1>=5) ? "Lv5(点燃灼伤)" : ("Lv"+(sp.up+1)+"(火伤 x"+(1.3+0.2*(sp.up+1)).toFixed(1)+")");
+        else if(sp.type==="bigcactus") nxt = (sp.up+1>=10) ? "Lv10(地刺·击退2格)" : ("Lv"+(sp.up+1)+"(攻速 x"+(1+0.1*(sp.up+1)).toFixed(1)+")");
         else if(sp.up===0) nxt="选择分支";
         else if(sp.up<5) nxt=(sp.branch==="hp"?"血量":"攻速")+"Lv"+(sp.up+1);
         else if(sp.up===5) nxt="钢化";
@@ -506,6 +514,21 @@
       ctx.beginPath(); ctx.arc(0,0,32+3*pulse,0,Math.PI*2); ctx.stroke();
       ctx.restore();
     }
+    // 狂暴状态: 红橙能量光环 + 跳动火花
+    if(rowBerserk[p.r]>0){
+      const t2=performance.now()/1000, pl=0.5+0.5*Math.sin(t2*14);
+      ctx.save(); ctx.globalCompositeOperation="lighter";
+      const g=ctx.createRadialGradient(0,-4,3,0,-4,30);
+      g.addColorStop(0,"rgba(255,180,70,"+(0.30*pl+0.14).toFixed(3)+")");
+      g.addColorStop(0.6,"rgba(255,95,30,"+(0.18*pl).toFixed(3)+")");
+      g.addColorStop(1,"rgba(255,95,30,0)");
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,-4,30,0,Math.PI*2); ctx.fill();
+      // 环绕能量火花
+      ctx.strokeStyle="rgba(255,210,120,"+(0.5+0.4*pl).toFixed(3)+")"; ctx.lineWidth=2;
+      for(let i=0;i<5;i++){ const a=t2*4 + i*Math.PI*2/5; const r1=20, r2=27+3*Math.sin(t2*9+i);
+        ctx.beginPath(); ctx.moveTo(Math.cos(a)*r1, -4+Math.sin(a)*r1); ctx.lineTo(Math.cos(a)*r2, -4+Math.sin(a)*r2); ctx.stroke(); }
+      ctx.restore();
+    }
     if((p.type==="cherrybomb"||p.type==="jalapeno") && p.fuse<0.5){ const s=1+(0.5-p.fuse)*0.6; ctx.scale(s,s); }
     if(p.type==="potatomine") drawMineArt(0,0,false,p.armed);
     else if(p.type==="sunflower"){
@@ -529,13 +552,13 @@
       ctx.fillStyle = p.type==="threepeater" ? "#caff9a" : "#bfe9fb";
       ctx.fillText(lbl, 0, -39);
     }
-    // 篝火 升级等级角标
-    if(p.up>0 && p.type==="campfire"){
-      const lbl = p.up>=5 ? "🔥Lv5" : ("Lv"+p.up);
+    // 篝火 / 巨仙掌 升级等级角标
+    if(p.up>0 && (p.type==="campfire" || p.type==="bigcactus")){
+      const lbl = p.type==="campfire" ? (p.up>=5?"🔥Lv5":("Lv"+p.up)) : (p.up>=10?"Lv10":("Lv"+p.up));
       ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
       const bw=ctx.measureText(lbl).width+10;
       ctx.fillStyle="rgba(0,0,0,.6)"; roundRect(-bw/2,-46,bw,13,5); ctx.fill();
-      ctx.fillStyle="#ffc78a"; ctx.fillText(lbl, 0, -39);
+      ctx.fillStyle = p.type==="campfire" ? "#ffc78a" : "#bdf0a0"; ctx.fillText(lbl, 0, -39);
     }
     ctx.restore();
     if(p.kind!=="bomb") drawHealthBar(p.x, p.y+40, p.hp/p.maxHp, 40);
@@ -912,13 +935,26 @@
       ctx.restore(); return;
     }
     if(pea.fire){
-      // flame trail
-      const fl = 1+Math.sin(pea.x*0.5)*0.2;
-      ctx.fillStyle="rgba(255,150,40,.5)";
-      ctx.beginPath(); ctx.ellipse(-8,0,8*fl,4,0,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle="#ff5a1e"; ctx.beginPath(); ctx.arc(0,0,9,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle="#ffb14e"; ctx.beginPath(); ctx.arc(0,0,5.5,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle="#fff2c2"; ctx.beginPath(); ctx.arc(-1,-1,2.5,0,Math.PI*2); ctx.fill();
+      const ig = pea.ignite;                 // 点燃弹: 更猛烈
+      const fl = 1+Math.sin(performance.now()/60)*0.25;
+      const dir = (pea.dir||1);
+      // 外焰光晕(发光叠加)
+      ctx.save(); ctx.globalCompositeOperation="lighter";
+      ctx.fillStyle = ig ? "rgba(255,120,30,.55)" : "rgba(255,150,40,.4)";
+      ctx.beginPath(); ctx.arc(0,0,(ig?13:10)*fl,0,Math.PI*2); ctx.fill();
+      // 拖尾火舌
+      ctx.fillStyle = ig ? "rgba(255,90,20,.6)" : "rgba(255,150,40,.45)";
+      ctx.beginPath(); ctx.ellipse(-dir*9,0,(ig?12:8)*fl,(ig?5:4),0,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+      // 核心
+      ctx.fillStyle="#ff5a1e"; ctx.beginPath(); ctx.arc(0,0,ig?10:9,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle="#ffb14e"; ctx.beginPath(); ctx.arc(0,0,ig?6.5:5.5,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle="#fff2c2"; ctx.beginPath(); ctx.arc(-1,-1,ig?3:2.5,0,Math.PI*2); ctx.fill();
+      if(ig){   // 顶部跳动小火苗
+        ctx.fillStyle="rgba(255,220,120,.9)";
+        const h=6+3*Math.sin(performance.now()/50);
+        ctx.beginPath(); ctx.moveTo(-3,-6); ctx.quadraticCurveTo(0,-6-h,3,-6); ctx.closePath(); ctx.fill();
+      }
     } else {
       ctx.fillStyle = pea.freeze?"#5bc0e8":"#3fae3f";
       ctx.beginPath(); ctx.arc(0,0,8,0,Math.PI*2); ctx.fill();
@@ -1206,6 +1242,33 @@
       drawSunIcon(0,0,16); ctx.restore();
     }
   }
+  // 地刺: 从土地钻出一排斜向前的巨型仙人掌(升起→回落)
+  function drawGroundSpikes(){
+    for(const g of gspikes){
+      const cy = cellY(g.r) + GRID.ch;          // 地面线
+      const prog = g.t/g.life;
+      const rise = Math.sin(Math.min(1,prog)*Math.PI); // 0→1→0
+      for(let sx=g.x0; sx<GRID.x+COLS*GRID.cw; sx+=58){
+        const h = (40 + ((sx*7)%26)) * rise;     // 错落高度
+        if(h<2) continue;
+        ctx.save(); ctx.translate(sx, cy); ctx.rotate(-0.32);   // 斜向前
+        // 主刺体
+        const grd=ctx.createLinearGradient(0,0,0,-h);
+        grd.addColorStop(0,"#3f7e33"); grd.addColorStop(1,"#6fc34a");
+        ctx.fillStyle=grd;
+        ctx.beginPath();
+        ctx.moveTo(-7,4); ctx.lineTo(7,4); ctx.lineTo(2.5,-h); ctx.lineTo(-2.5,-h); ctx.closePath(); ctx.fill();
+        // 尖端高光
+        ctx.fillStyle="#bdf0a0"; ctx.beginPath(); ctx.moveTo(-2.5,-h); ctx.lineTo(2.5,-h); ctx.lineTo(0,-h-7); ctx.closePath(); ctx.fill();
+        // 侧刺
+        ctx.strokeStyle="#2e6b22"; ctx.lineWidth=1.4;
+        for(let k=1;k<=3;k++){ const yy=-h*k/4; ctx.beginPath(); ctx.moveTo(-3,yy); ctx.lineTo(-7,yy-4); ctx.moveTo(3,yy); ctx.lineTo(7,yy-4); ctx.stroke(); }
+        ctx.restore();
+      }
+      // 钻出尘土
+      if(prog<0.3 && Math.random()<0.5) spawnParticles(g.x0+Math.random()*200, cy-4, "#b9a06a", 2, 120);
+    }
+  }
   function drawExplosions(){
     for(const e of explosions){
       const a = 1 - e.t/e.life;
@@ -1227,6 +1290,11 @@
         } else {
           ctx.beginPath(); ctx.moveTo(0,-p.size); ctx.lineTo(p.size,p.size*0.6); ctx.lineTo(-p.size*0.8,p.size*0.5); ctx.closePath(); ctx.fill();
         }
+        ctx.restore();
+      } else if(p.rain){
+        // 冰雨: 竖向流光条
+        ctx.save(); ctx.strokeStyle=p.color; ctx.lineWidth=p.size*0.8; ctx.lineCap="round";
+        ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p.x-p.vx*0.02, p.y-Math.min(16,p.vy*0.03)); ctx.stroke();
         ctx.restore();
       } else {
         ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill();

@@ -56,7 +56,7 @@
 
   // ---------- Waves ----------
   // ---------- State ----------
-  let state, plants, zombies, peas, suns, particles, explosions, mowers, debris, mashes, beams, floats;
+  let state, plants, zombies, peas, suns, particles, explosions, mowers, debris, mashes, beams, floats, gspikes;
   let rowShield;   // 每行无敌护盾剩余秒数(终极土豆盾技能)
   let rowBerserk;  // 每行狂暴(攻速+100%)剩余秒数(攻速流终极向日葵技能)
   let autoSkill;   // 土豆盾技能是否自动释放(false=手动点击释放)
@@ -68,6 +68,7 @@
   // endless mode
   let waveNum = 0, nextWaveAt = 10, score = 0, gameSpeed = 1, lastSaved = null;
   let frostCd = 20;   // 终极寒冰 全屏冰霜雪雨 全局冷却(100波后)
+  let frostRainT = 0; // 冰霜雪雨 残留特效计时(秒)
   let runId = 0;   // increments on each reset; stale scheduled spawns from old runs are ignored
   let bestScore = 0;
   let upgradeMenu = null;   // {p} when choosing a branch for a Lv0 sunflower

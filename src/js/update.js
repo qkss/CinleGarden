@@ -29,11 +29,21 @@
     beams = beams.filter(b=>b.t<b.life);
     if(waveNum>=100 && plants.some(p=>p.type==="snowpea" && p.up>=5)){
       frostCd -= dt;
-      if(frostCd<=0){ frostCd = 20;
-        for(const z of zombies){ if(z.hp>0){ z.freezeT=3; z.freezeImmune=0; z.slowT=0; } }   // 全屏冰冻3秒
-        for(let i=0;i<32;i++) spawnParticles(GRID.x+Math.random()*COLS*GRID.cw, GRID.y+Math.random()*(ROWS*GRID.ch), "#bfe9fb", 1, 60);
-        showBanner("❄️ 终极寒冰 · 冰霜雪雨！");
+      if(frostCd<=0){ frostCd = 20; frostRainT = 5;        // 持续5秒
+        for(const z of zombies){ if(z.hp>0){ z.freezeT=5; z.freezeImmune=0; z.slowT=0; } }   // 全屏冰冻5秒
+        SFX.play("freeze");
       }
+    }
+    if(frostRainT>0){
+      frostRainT -= dt;
+      // 大范围冰雨: 持续从顶部落下
+      for(let i=0;i<8;i++){
+        particles.push({ x:GRID.x+Math.random()*COLS*GRID.cw, y:GRID.y-12+Math.random()*40,
+          vx:-18+Math.random()*8, vy:430+Math.random()*240, life:0.45+Math.random()*0.4, t:0,
+          color: Math.random()<0.5?"#cfeefb":"#9fd8f5", size:1.8+Math.random()*2.4, rain:true });
+      }
+      // 期间保持冰冻(新刷出的僵尸也冻住)
+      for(const z of zombies){ if(z.hp>0 && z.freezeT<frostRainT){ z.freezeT=frostRainT; z.slowT=0; } }
     }
 
     // plants
@@ -42,6 +52,13 @@
       if(p.recoil>0) p.recoil -= dt;
       if(p.glowT>0) p.glowT -= dt;
       const def = PLANTS[p.type];
+
+      // 巨仙掌(Lv10): 每20秒发动地刺, 击退本行前方僵尸2格
+      if(p.type==="bigcactus" && (p.up||0)>=10){
+        if(p.spikeCd==null) p.spikeCd=20;
+        p.spikeCd -= dt;
+        if(p.spikeCd<=0){ p.spikeCd=20; fireGroundSpikes(p); }
+      }
 
       // 终极土豆盾(Lv10): 蓄力20秒 -> 技能就绪(身上出现图标)。手动点击释放, 或开启自动释放
       if(p.type==="potatoshield" && (p.up||0)>=10){
@@ -123,7 +140,7 @@
         }
         p.shootCd -= dt;
         if(target && p.shootCd<=0){
-          const ownMult = (p.type==="threepeater") ? threepeaterAtkMult(p) : 1;
+          const ownMult = (p.type==="threepeater") ? threepeaterAtkMult(p) : (p.type==="bigcactus" ? bigcactusAtkMult(p) : 1);
           p.shootCd = def.rate / (rowAttackMult(p.r) * ownMult);   // 攻速光环 + 自身升级
           SFX.play(def.freeze?"shootIce":"shoot", 0.05);
           const shots = def.shots||1;
@@ -180,6 +197,12 @@
         continue;
       }
       pea.x += pea.speed*(pea.dir||1)*dt;
+      // 点燃弹: 拖出燃烧余烬
+      if(pea.ignite && Math.random()<0.7){
+        particles.push({ x:pea.x-(pea.dir||1)*6+(Math.random()*6-3), y:pea.y+(Math.random()*6-3),
+          vx:-(pea.dir||1)*40+(Math.random()*20-10), vy:-20-Math.random()*40, life:0.35+Math.random()*0.3, t:0,
+          color: Math.random()<0.5?"#ff5a1e":"#ffb14e", size:2+Math.random()*2.5 });
+      }
       // pass through a campfire -> become a fire pea: +30% damage, explosive splash
       // 冰冻弹(freeze)不会被附魔, 不叠加火焰
       if(!pea.fire && !pea.freeze){
@@ -448,5 +471,8 @@
     // 漂浮数字(回血等)
     for(const f of floats){ f.t+=dt; f.y+=f.vy*dt; f.vy*=(1-1.2*dt); }
     floats = floats.filter(f=>f.t<f.life);
+    // 地刺动画
+    for(const g of gspikes) g.t+=dt;
+    gspikes = gspikes.filter(g=>g.t<g.life);
     // endless: no win condition — survive as long as possible
   }

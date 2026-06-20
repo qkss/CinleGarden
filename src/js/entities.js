@@ -136,7 +136,25 @@
     if(p.type==="snowpea"){ return p.up<5 ? 250 : null; }          // 每级+0.2s冰冻, 最高Lv5
     if(p.type==="threepeater"){ return p.up<10 ? 300 : null; }     // 每级+0.4x攻速, 最高Lv10 (5x)
     if(p.type==="campfire"){ return p.up<5 ? 250 : null; }          // 每级+火焰伤害, Lv5点燃灼伤(50波后解锁)
+    if(p.type==="bigcactus"){ return p.up<10 ? 250 : null; }         // 每级+攻速, Lv10解锁地刺
     return null;
+  }
+  // 巨仙掌自身攻速倍率: Lv0=1, Lv10=2x
+  function bigcactusAtkMult(p){ return 1 + 0.1 * Math.min(p.up||0, 10); }
+  // 地刺(巨仙掌Lv10): 本行前方斜刺巨型仙人掌, 击退僵尸2格 + 穿刺伤害
+  function fireGroundSpikes(p){
+    gspikes.push({ r:p.r, x0:p.x+24, t:0, life:0.85 });
+    SFX.play("plant");
+    const KB = 2*GRID.cw;   // 击退2格
+    for(const z of zombies){
+      if(z.r===p.r && z.hp>0 && z.x > p.x && !z.fly){
+        if(z.shieldHp>0) z.shieldHp -= 200;   // 地刺=穿刺, 可破盾
+        else z.hp -= 200;
+        z.x = Math.min(W+24, z.x + KB);        // 击退2格
+        z.slowT = Math.max(z.slowT, 0.6);
+        spawnParticles(z.x, z.y, "#9be36b", 9, 220);
+      }
+    }
   }
   // 各类植物可升级的最早波数 (篝火需50波, 其余沿用 UPGRADE_WAVE)
   function upgradeMinWave(p){ return (p && p.type==="campfire") ? 50 : UPGRADE_WAVE; }

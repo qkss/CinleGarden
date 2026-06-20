@@ -1,7 +1,7 @@
 "use strict";
   function reset(startWave){
     state = "playing";
-    plants = []; zombies = []; peas = []; suns = []; particles = []; explosions = []; debris = []; mashes = []; beams = []; floats = [];
+    plants = []; zombies = []; peas = []; suns = []; particles = []; explosions = []; debris = []; mashes = []; beams = []; floats = []; gspikes = [];
     rowShield = [0,0,0,0,0];
     rowBerserk = [0,0,0,0,0];
     autoSkill = false;
@@ -15,7 +15,7 @@
     // 从检查点开始: 给予筹备阳光与更长布防时间
     sun = startWave>0 ? (200 + startWave*40) : 75;
     waveNum = startWave; nextWaveAt = gameTime + (startWave>0 ? 25 : 10);
-    score = 0; gameSpeed = 1; lastSaved = null; frostCd = 20;
+    score = 0; gameSpeed = 1; lastSaved = null; frostCd = 20; frostRainT = 0;
     bannerTimer = 0;
     runId++;   // invalidate any pending spawn timers from a previous game
     bestScore = (loadHighScores()[0]||{}).score || 0;
