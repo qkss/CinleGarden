@@ -11,12 +11,15 @@
     if(type==="potatomine"){ p.arm = 6; p.armed = false; }
     plants.push(p);
   }
+  // 100波后僵尸血量缩放: 每10波 +10% (110波=1.1x, 120波=1.2x ...)
+  function zombieHpScale(){ return waveNum>100 ? 1 + 0.10*Math.floor((waveNum-100)/10) : 1; }
   function addZombie(type, row){
     const d = ZTYPES[type];
-    const hp = d.hp;
+    const mult = zombieHpScale();
+    const hp = Math.round(d.hp * mult);
     zombies.push({
       type, r:row, x:W + 30 + Math.random()*40, y:cellCenterY(row),
-      hp, maxHp:hp, bodyMax:(d.body!=null?d.body:hp), baseSpeed:d.speed + Math.random()*2,
+      hp, maxHp:hp, bodyMax:Math.round((d.body!=null?d.body:d.hp) * mult), baseSpeed:d.speed + Math.random()*2,
       eating:false, t:Math.random()*Math.PI*2, slowT:0, freezeT:0, freezeImmune:0, mireT:0, vaulted:false, vaultAnim:0,
       big:!!d.big, eat:d.eat||35, armorBroken:false,
     });
