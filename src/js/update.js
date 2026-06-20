@@ -27,7 +27,7 @@
     for(let r=0;r<ROWS;r++){ if(rowShield[r]>0) rowShield[r]-=dt; if(rowBerserk[r]>0) rowBerserk[r]-=dt; }
     for(const b of beams) b.t+=dt;
     beams = beams.filter(b=>b.t<b.life);
-    if(waveNum>=100 && plants.some(p=>p.type==="snowpea" && p.up>=5)){
+    if(plants.some(p=>p.type==="snowpea" && p.up>=5)){   // 终极寒冰(Lv5)即可触发, 不再要求100波
       frostCd -= dt;
       if(frostCd<=0){ frostCd = 20; frostRainT = 5;        // 持续5秒
         for(const z of zombies){ if(z.hp>0){ z.freezeT=5; z.freezeImmune=0; z.slowT=0; } }   // 全屏冰冻5秒
