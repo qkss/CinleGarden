@@ -29,7 +29,7 @@
       z.phase = "drop"; z.targetY = cellCenterY(row); z.grabT = 0.6; z.carry = null;
     }
     if(d.door!=null){ z.doorHp = d.door; }                                             // 铁门护盾值
-    if(d.beam){ z.beam = true; z.beamCd = 3.5; }                                       // 鸣人: 能量极光
+    if(d.beam){ z.beam = true; z.beamCd = 3.5; z.invulnT = 10; }                        // 鸣人: 能量极光 + 出场10秒无敌
     if(d.buff){ z.buff = true; z.buffCd = 5; }                                         // 女巫: 群体增益
   }
   function addPea(x,y,r,freeze,air,spike,fdur,dir){

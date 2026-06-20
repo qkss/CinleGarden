@@ -45,7 +45,7 @@
     polevault: { name:"撑杆", hp:160,  body:160,  speed:30,   accessory:"pole" },
     football:  { name:"橄榄球", hp:1100, body:200, speed:23,  accessory:"football" },  // 头盔护甲加厚, 本体也更厚
     gargantuar:{ name:"巨人", hp:3400, body:3400, speed:8,    accessory:"garg", big:true, eat:70 },
-    irongarg:  { name:"钢盔巨人", hp:6800, body:6800, speed:8, accessory:"irongarg", big:true, eat:70 },  // 100波后, 血量翻倍
+    irongarg:  { name:"钢盔巨人", hp:13600, body:13600, speed:8, accessory:"irongarg", big:true, eat:70 },  // 100波后, 血量再翻倍
     spider:    { name:"蜘蛛", hp:150,  body:150,  speed:0,    accessory:"spider", fly:true },   // 空降偷植物 — 判定空中, 仅对空可击
     balloon:   { name:"气球", hp:90,   body:90,   speed:17,   accessory:"balloon", fly:true },     // 飞行,需对空
     screendoor:{ name:"铁门", hp:110,  body:110,  speed:11,   accessory:"screendoor", door:420 },  // 铁门挡豌豆,怕火/爆炸

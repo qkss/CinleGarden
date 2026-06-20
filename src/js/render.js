@@ -1120,6 +1120,20 @@
       ctx.strokeStyle="rgba(199,125,255,"+(0.5+0.3*Math.sin(z.t*8))+")"; ctx.lineWidth=3;
       ctx.beginPath(); ctx.arc(0,-8,22,0,Math.PI*2); ctx.stroke();
     }
+    if(z.invulnT>0){   // 出场无敌: 金色护罩
+      const pulse=0.5+0.5*Math.sin(performance.now()/110);
+      ctx.save();
+      const g=ctx.createRadialGradient(0,-8,8,0,-8,30);
+      g.addColorStop(0,"rgba(255,235,140,0)");
+      g.addColorStop(0.7,"rgba(255,225,110,"+(0.10+0.07*pulse).toFixed(3)+")");
+      g.addColorStop(1,"rgba(255,210,80,"+(0.32+0.14*pulse).toFixed(3)+")");
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,-8,30,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle="rgba(255,240,170,"+(0.6+0.3*pulse).toFixed(3)+")"; ctx.lineWidth=2.5;
+      ctx.beginPath(); ctx.arc(0,-8,29,0,Math.PI*2); ctx.stroke();
+      ctx.fillStyle="rgba(255,245,190,.95)"; ctx.font="bold 11px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
+      ctx.fillText("无敌 "+Math.ceil(z.invulnT)+"s", 0, -44);
+      ctx.restore();
+    }
     // frozen overlay: icy block + frost
     if(z.freezeT>0){
       ctx.fillStyle="rgba(150,220,250,.38)"; roundRect(-20,-44,40,86,8); ctx.fill();
