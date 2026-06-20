@@ -292,7 +292,7 @@
         z.beamCd -= dt;
         if(z.beamCd<=0){ z.beamCd=3.5;
           beams.push({ r:z.r, x:z.x, t:0, life:0.5 });
-          if(rowShield[z.r]<=0){ for(const p of plants){ if(p.r===z.r && p.hp>0){ p.hp-=250; if(p.hp<=0) p.dead=true; } } }
+          if(rowShield[z.r]<=0){ for(const p of plants){ if(p.r===z.r && p.hp>0){ p.hp-=125; if(p.hp<=0) p.dead=true; } } }
         }
       }
 

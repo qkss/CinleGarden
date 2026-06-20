@@ -49,7 +49,12 @@
     const pool = poolForWave(n);
     const stepMs = big ? 480 : 700;
     const rid = runId;   // bind spawns to this game instance
-    const spawn = (type)=>{ if(state==="playing" && runId===rid) addZombie(type, rRow()); };
+    const aliveMing = ()=> zombies.reduce((s,z)=> s+((z.type==="mingzombie"&&z.hp>0)?1:0), 0);
+    const spawn = (type)=>{
+      if(state!=="playing" || runId!==rid) return;
+      if(type==="mingzombie" && aliveMing() >= 1) type = "irongarg";   // 鸣人Boss同时最多1个, 多出的替换为钢盔巨人
+      addZombie(type, rRow());
+    };
     // big wave: a powerful leader (or two) charges in first
     if(big){
       const leader = n>=100 ? (Math.random()<0.5 ? "mingzombie" : "irongarg") : (n>=20 ? "gargantuar" : (n>=10 ? "ironclad" : "bucket"));

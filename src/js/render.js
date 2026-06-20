@@ -52,6 +52,50 @@
     ctx.fillText("点击任意处 或 按 P 继续", W/2, H/2+30);
     ctx.restore();
   }
+  // 矢量闪电图标
+  function drawBoltIcon(cx,cy,s){
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(cx+s*0.4, cy-s);
+    ctx.lineTo(cx-s*0.55, cy+s*0.12);
+    ctx.lineTo(cx-s*0.05, cy+s*0.12);
+    ctx.lineTo(cx-s*0.4, cy+s);
+    ctx.lineTo(cx+s*0.6, cy-s*0.12);
+    ctx.lineTo(cx+s*0.05, cy-s*0.12);
+    ctx.closePath();
+    ctx.fillStyle="#ffe96b"; ctx.fill();
+    ctx.strokeStyle="rgba(150,95,0,.6)"; ctx.lineWidth=1; ctx.stroke();
+    ctx.restore();
+  }
+  // 矢量爱心图标
+  function drawHeartIcon(cx,cy,s){
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(cx, cy+s*0.8);
+    ctx.bezierCurveTo(cx-s*1.25, cy-s*0.25, cx-s*0.5, cy-s*1.1, cx, cy-s*0.35);
+    ctx.bezierCurveTo(cx+s*0.5, cy-s*1.1, cx+s*1.25, cy-s*0.25, cx, cy+s*0.8);
+    ctx.closePath();
+    ctx.fillStyle="#ff6b7a"; ctx.fill();
+    ctx.fillStyle="rgba(255,255,255,.45)"; ctx.beginPath(); ctx.ellipse(cx-s*0.34,cy-s*0.32,s*0.2,s*0.3,-0.5,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+  function branchBtn(b, label, c1, c2, iconFn){
+    ctx.save();
+    const g=ctx.createLinearGradient(b.x,b.y,b.x,b.y+b.h);
+    g.addColorStop(0,c1); g.addColorStop(1,c2);
+    roundRect(b.x,b.y,b.w,b.h,9); ctx.fillStyle=g; ctx.fill();
+    ctx.strokeStyle="rgba(255,255,255,.6)"; ctx.lineWidth=1.5; ctx.stroke();
+    // 顶部高光
+    ctx.fillStyle="rgba(255,255,255,.2)"; roundRect(b.x+2,b.y+2,b.w-4,b.h*0.4,7); ctx.fill();
+    // 图标圆底 + 矢量图标
+    ctx.fillStyle="rgba(0,0,0,.18)"; ctx.beginPath(); ctx.arc(b.x+16, b.y+b.h/2, 10, 0, Math.PI*2); ctx.fill();
+    iconFn(b.x+16, b.y+b.h/2, 8);
+    // 文字
+    ctx.fillStyle="#fff"; ctx.font="bold 13px 'PingFang SC',Arial"; ctx.textAlign="left"; ctx.textBaseline="middle";
+    ctx.shadowColor="rgba(0,0,0,.4)"; ctx.shadowBlur=2;
+    ctx.fillText(label, b.x+30, b.y+b.h/2+0.5);
+    ctx.restore();
+  }
   function drawUpgradeMenu(){
     const r=upgradeMenuRects(); if(!r) return;
     ctx.save();
@@ -61,8 +105,8 @@
     const tw=ctx.measureText(title).width+14;
     ctx.fillStyle="rgba(20,20,30,.92)"; roundRect(r.cx-tw/2, r.ty-9, tw, 18, 5); ctx.fill();
     ctx.fillStyle="#fff"; ctx.fillText(title, r.cx, r.ty);
-    btn(r.atk, "⚡攻速", "#3a7bd5");
-    btn(r.hp, "🛡血量", "#3aa55a");
+    branchBtn(r.atk, "攻速", "#5b9be8", "#2f63b8", drawBoltIcon);
+    branchBtn(r.hp, "血量", "#5fc888", "#2f8a52", drawHeartIcon);
     ctx.restore();
   }
 
@@ -544,11 +588,11 @@
       ctx.strokeStyle=bcol; ctx.lineWidth=2.4; ctx.setLineDash&&ctx.setLineDash([4,3]);
       ctx.beginPath(); ctx.arc(0,-12,21,0,Math.PI*2); ctx.stroke();
       ctx.setLineDash&&ctx.setLineDash([]);
-      // 流派角标(右上): ⚡攻速 / 🛡血量
+      // 流派角标(右上): 矢量闪电(攻速) / 爱心(血量)
       ctx.translate(15,-26);
-      ctx.fillStyle=bcol; ctx.beginPath(); ctx.arc(0,0,7,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle="#10212e"; ctx.font="bold 9px Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
-      ctx.fillText(branch==="atk"?"⚡":"盾", 0, 1);
+      ctx.fillStyle="rgba(10,22,34,.85)"; ctx.beginPath(); ctx.arc(0,0,8,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle=bcol; ctx.lineWidth=2; ctx.stroke();
+      if(branch==="atk") drawBoltIcon(0,0,5); else drawHeartIcon(0,0,4.6);
       ctx.restore();
     }
     // level badge

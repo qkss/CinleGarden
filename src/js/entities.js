@@ -1,9 +1,11 @@
 "use strict";
   // ---------- Entities ----------
+  const PLANT_HP_MULT = 3;   // 所有植物基础血量 ×3
   function addPlant(type, r, c){
     const def = PLANTS[type];
+    const baseHp = def.hp * PLANT_HP_MULT;
     const p = { type, kind:def.kind, r, c, x:cellCenterX(c), y:cellCenterY(r),
-      hp:def.hp, maxHp:def.hp, baseMaxHp:def.hp, selfHpMult:1, t:Math.random()*2, shootCd:0.6, recoil:0, up:0, branch:null };
+      hp:baseHp, maxHp:baseHp, baseMaxHp:baseHp, selfHpMult:1, t:Math.random()*2, shootCd:0.6, recoil:0, up:0, branch:null };
     if(type==="cherrybomb") p.fuse = 1.0;
     if(type==="jalapeno") p.fuse = 1.0;
     if(type==="potatomine"){ p.arm = 6; p.armed = false; }
