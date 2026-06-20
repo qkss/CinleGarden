@@ -133,11 +133,12 @@
       if(p.up===6) return 1500;          // Lv7 终极
       return null;
     }
-    if(p.type==="potatoshield"){ return p.up<10 ? 250 : null; }   // 每级+50%血, 最高Lv10
+    // 其余植物: 升级阳光随等级线性增加 base*(等级+1)
+    if(p.type==="potatoshield"){ return p.up<10 ? 250*(p.up+1) : null; }   // 250,500...2500 最高Lv10
     if(p.type==="snowpea"){ return p.up<5 ? 250 : (p.up<10 ? 500*(p.up-4) : null); }   // Lv1-5:250; Lv6-10阳光大量增加(500/1000/1500/2000/2500); 最高Lv10
-    if(p.type==="threepeater"){ return p.up<10 ? 300 : null; }     // 每级+0.4x攻速, 最高Lv10 (5x)
-    if(p.type==="campfire"){ return p.up<5 ? 250 : null; }          // 每级+火焰伤害, Lv5点燃灼伤(50波后解锁)
-    if(p.type==="bigcactus"){ return p.up<10 ? 250 : null; }         // 每级+攻速, Lv10解锁地刺
+    if(p.type==="threepeater"){ return p.up<10 ? 300*(p.up+1) : null; }     // 300,600...3000 最高Lv10
+    if(p.type==="campfire"){ return p.up<5 ? 250*(p.up+1) : null; }          // 250,500...1250 最高Lv5
+    if(p.type==="bigcactus"){ return p.up<10 ? 250*(p.up+1) : null; }         // 250,500...2500 最高Lv10
     return null;
   }
   // 巨仙掌自身攻速倍率: Lv0=1, Lv10=2x
