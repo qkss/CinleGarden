@@ -48,6 +48,8 @@
     irongarg:  { name:"钢盔巨人", hp:13600, body:13600, speed:8, accessory:"irongarg", big:true, eat:70 },  // 100波后, 血量再翻倍
     shieldgiant:{ name:"盾牌巨人", hp:1500, body:1500, speed:8, accessory:"shieldgiant", big:true, eat:70, shield:600 },  // 盾牌只能被穿刺打破, 免疫豌豆, 破盾后才可击杀
     pangolin:  { name:"盾穿山甲", hp:900, body:360, speed:13, accessory:"pangolin", burrow:true },  // 地底潜行(不可攻击)最多钻到第5格, 厚甲高防御
+    giantrider:{ name:"巨人骑兵", hp:17000, body:17000, speed:11, accessory:"giantrider", big:true, eat:70 },   // 5倍普通巨人血量, 骑乘战马较快
+    armorboss: { name:"装甲车", hp:68000, body:68000, speed:6, accessory:"armorboss", big:true, eat:140 },       // BOSS: 20倍巨人血量, 车顶坐巨人, 同屏最多2个
     spider:    { name:"蜘蛛", hp:150,  body:150,  speed:0,    accessory:"spider", fly:true },   // 空降偷植物 — 判定空中, 仅对空可击
     balloon:   { name:"气球", hp:90,   body:90,   speed:17,   accessory:"balloon", fly:true },     // 飞行,需对空
     screendoor:{ name:"铁门", hp:110,  body:110,  speed:11,   accessory:"screendoor", door:420 },  // 铁门挡豌豆,怕火/爆炸
@@ -81,4 +83,4 @@
   const RESTARTBTN = { x: W-300, y: H-44, w: 84, h: 30 };
   const PAUSEBTN   = { x: W-208, y: H-44, w: 84, h: 30 };
   const SPEEDBTN   = { x: W-116, y: H-44, w: 108, h: 30 };
-  const KILLPTS = { basic:10, cone:25, polevault:30, bucket:60, football:140, ironclad:120, gargantuar:400, irongarg:800, shieldgiant:300, pangolin:90, spider:60, balloon:45, screendoor:70, mingzombie:2000, witch:450 };
+  const KILLPTS = { basic:10, cone:25, polevault:30, bucket:60, football:140, ironclad:120, gargantuar:400, irongarg:800, shieldgiant:300, pangolin:90, giantrider:600, armorboss:3000, spider:60, balloon:45, screendoor:70, mingzombie:2000, witch:450 };

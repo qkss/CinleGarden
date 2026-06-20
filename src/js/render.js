@@ -1052,9 +1052,74 @@
     ctx.restore();
     drawHealthBar(z.x, z.y-30, z.hp/z.maxHp, 38, "#c0392b");
   }
+  function drawGiantRider(z){
+    const slowed = z.slowT>0 || z.freezeT>0;
+    ctx.save(); ctx.translate(z.x, z.y); ctx.scale(2.0,2.0);
+    const walk = z.eating?0:Math.sin(z.t*4);
+    const hide = slowed?"#9fc6cf":"#6b5440";
+    // 战马腿
+    ctx.strokeStyle=slowed?"#8ab2bb":"#4a3a2a"; ctx.lineWidth=4; ctx.lineCap="round";
+    ctx.beginPath(); ctx.moveTo(-14,8); ctx.lineTo(-16+walk*3,26); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-8,8); ctx.lineTo(-6-walk*3,26); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(10,8); ctx.lineTo(12+walk*3,26); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(16,8); ctx.lineTo(18-walk*3,26); ctx.stroke();
+    // 马身
+    ctx.fillStyle=hide; ctx.beginPath(); ctx.ellipse(0,2,20,11,0,0,Math.PI*2); ctx.fill();
+    // 颈+头(朝左)
+    ctx.beginPath(); ctx.moveTo(-16,-2); ctx.lineTo(-26,-14); ctx.lineTo(-20,-16); ctx.lineTo(-12,-4); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(-26,-15,6,4,-0.5,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="#ff5a3a"; ctx.beginPath(); ctx.arc(-27,-16,1.4,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle="#3a2a1a"; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(-18,-10); ctx.lineTo(-10,-2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(20,-2); ctx.lineTo(28,8); ctx.stroke();   // 尾
+    // 骑乘巨人(上半身)
+    ctx.save(); ctx.translate(2,-10);
+    const gskin=slowed?"#9fc6cf":"#62804a", gskin2=slowed?"#8ab2bb":"#4f6a3a", shirt=slowed?"#7e93b2":"#4a3a2a";
+    ctx.fillStyle=shirt; roundRect(-10,-6,20,20,5); ctx.fill();
+    ctx.strokeStyle=gskin; ctx.lineWidth=5; ctx.lineCap="round"; ctx.beginPath(); ctx.moveTo(-6,-2); ctx.lineTo(-16,2); ctx.stroke();
+    ctx.fillStyle=gskin; ctx.beginPath(); ctx.arc(0,-14,9,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=gskin2; ctx.beginPath(); ctx.arc(3,-13,5,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="#2a1a10"; ctx.beginPath(); ctx.arc(-3,-15,1.6,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(3,-15,1.6,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle="#8a6a3a"; ctx.lineWidth=2.5; ctx.beginPath(); ctx.moveTo(-18,4); ctx.lineTo(-34,-12); ctx.stroke();   // 长矛
+    ctx.fillStyle="#c0c6d0"; ctx.beginPath(); ctx.moveTo(-34,-12); ctx.lineTo(-29,-10); ctx.lineTo(-31,-16); ctx.closePath(); ctx.fill();
+    ctx.restore();
+    if(z.freezeT>0){ ctx.fillStyle="rgba(150,220,250,.35)"; roundRect(-32,-30,62,60,8); ctx.fill(); }
+    ctx.restore();
+    drawHealthBar(z.x, z.y-58, z.hp/z.maxHp, 72, "#c0392b");
+  }
+  function drawArmorBoss(z){
+    const slowed = z.slowT>0 || z.freezeT>0;
+    ctx.save(); ctx.translate(z.x, z.y); ctx.scale(2.3,2.3);
+    // 轮
+    ctx.fillStyle="#2a2e33";
+    [-16,0,16].forEach(wx=>{ ctx.beginPath(); ctx.arc(wx,18,8,0,Math.PI*2); ctx.fill(); });
+    ctx.fillStyle="#555"; [-16,0,16].forEach(wx=>{ ctx.beginPath(); ctx.arc(wx,18,3,0,Math.PI*2); ctx.fill(); });
+    // 车体
+    ctx.fillStyle=slowed?"#8ea2b0":"#5c6b78";
+    ctx.beginPath(); ctx.moveTo(-26,16); ctx.lineTo(26,16); ctx.lineTo(22,0); ctx.lineTo(-22,0); ctx.closePath(); ctx.fill();
+    ctx.fillStyle=slowed?"#aebcc8":"#76889a"; ctx.fillRect(-22,2,44,4);
+    ctx.fillStyle="#3a4450"; for(let rx=-18;rx<=18;rx+=9){ ctx.beginPath(); ctx.arc(rx,12,1.4,0,Math.PI*2); ctx.fill(); }
+    // 前斜装甲(左迎敌)
+    ctx.fillStyle=slowed?"#9fb0bc":"#6b7c8a"; ctx.beginPath(); ctx.moveTo(-22,0); ctx.lineTo(-31,14); ctx.lineTo(-26,16); ctx.lineTo(-22,16); ctx.closePath(); ctx.fill();
+    // 车顶巨人
+    ctx.save(); ctx.translate(2,-2);
+    const gskin=slowed?"#9fc6cf":"#62804a", gskin2=slowed?"#8ab2bb":"#4f6a3a", shirt=slowed?"#7e93b2":"#3a2a1a";
+    ctx.fillStyle=shirt; roundRect(-12,-8,24,12,5); ctx.fill();
+    ctx.fillStyle=gskin; ctx.beginPath(); ctx.arc(0,-16,10,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=gskin2; ctx.beginPath(); ctx.arc(4,-15,6,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="#2a1a10"; ctx.beginPath(); ctx.arc(-4,-17,1.8,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(4,-17,1.8,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle="#2a1a10"; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(-8,-20); ctx.lineTo(-2,-18); ctx.moveTo(8,-20); ctx.lineTo(2,-18); ctx.stroke();
+    ctx.strokeStyle=gskin; ctx.lineWidth=5; ctx.lineCap="round"; ctx.beginPath(); ctx.moveTo(-10,-4); ctx.lineTo(-18,2); ctx.stroke();
+    ctx.restore();
+    if(z.freezeT>0){ ctx.fillStyle="rgba(150,220,250,.35)"; roundRect(-36,-30,72,52,8); ctx.fill(); }
+    ctx.restore();
+    drawHealthBar(z.x, z.y-64, z.hp/z.maxHp, 88, "#c0392b");
+  }
   function drawZombie(z){
     if(z.type==="spider"){ drawSpider(z); return; }
     if(z.type==="pangolin"){ drawPangolin(z); return; }
+    if(z.type==="giantrider"){ drawGiantRider(z); return; }
+    if(z.type==="armorboss"){ drawArmorBoss(z); return; }
     ctx.save(); ctx.translate(z.x, z.y);
     if(z.big) ctx.scale(1.95,1.95);               // 巨人放大
     if(z.slowT>0||z.freezeT>0){ ctx.save(); } // marker; tint handled per part via slow flag
