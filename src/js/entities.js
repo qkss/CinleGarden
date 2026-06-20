@@ -144,10 +144,10 @@
   function bigcactusAtkMult(p){ return 1 + 0.1 * Math.min(p.up||0, 10); }
   // 地刺(巨仙掌Lv10): 在攻击目标格钻出一根巨型仙人掌(斜向前), 击退2格 + 穿刺伤害
   function fireGroundSpikes(p){
-    // 找本行前方最近可命中目标
+    // 找本行前方最近可命中目标 (含地底潜行的穿山甲: 地刺能把它撞出来)
     let target=null, best=Infinity;
     for(const z of zombies){
-      if(z.r===p.r && z.hp>0 && z.x>p.x && !z.fly && !z.burrowing){ const d=z.x-p.x; if(d<best){ best=d; target=z; } }
+      if(z.r===p.r && z.hp>0 && z.x>p.x && !z.fly){ const d=z.x-p.x; if(d<best){ best=d; target=z; } }
     }
     if(!target) return false;
     const tx = target.x;
@@ -155,7 +155,11 @@
     SFX.play("plant");
     const KB = 2*GRID.cw;   // 击退2格
     for(const z of zombies){
-      if(z.r===p.r && z.hp>0 && !z.fly && !z.burrowing && Math.abs(z.x - tx) < GRID.cw*0.7){
+      if(z.r===p.r && z.hp>0 && !z.fly && Math.abs(z.x - tx) < GRID.cw*0.7){
+        if(z.burrowing){   // 把地底潜行的穿山甲撞出地面
+          z.burrowing=false; z.phase="surface"; z.surfT=0.5;
+          spawnParticles(z.x, cellCenterY(z.r)+10, "#b9a06a", 18, 260);
+        }
         if(z.shieldHp>0) z.shieldHp -= 250;   // 地刺=穿刺, 可破盾
         else z.hp -= 250;
         z.x = Math.min(W+24, z.x + KB);        // 击退2格
