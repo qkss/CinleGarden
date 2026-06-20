@@ -1,15 +1,19 @@
 "use strict";
-  function reset(){
+  function reset(startWave){
     state = "playing";
     plants = []; zombies = []; peas = []; suns = []; particles = []; explosions = []; debris = []; mashes = []; beams = []; floats = [];
     rowShield = [0,0,0,0,0];
     mowers = [];
     for(let r=0;r<ROWS;r++) mowers.push({ r, x:GRID.x-34, y:cellCenterY(r)+20, active:false, used:false, t:0 });
-    sun = 75; selected = null; shovelMode = false; showInfo = false;
+    startWave = Math.max(0, startWave|0);
+    selected = null; shovelMode = false; showInfo = false;
     lastCardUse = {}; CARD_ORDER.forEach(k=>lastCardUse[k] = -99);
     gameTime = 0;
     nextSkyDrop = 4;
-    waveNum = 0; nextWaveAt = 10; score = 0; gameSpeed = 1; lastSaved = null; frostCd = 20;
+    // 从检查点开始: 给予筹备阳光与更长布防时间
+    sun = startWave>0 ? (200 + startWave*40) : 75;
+    waveNum = startWave; nextWaveAt = gameTime + (startWave>0 ? 25 : 10);
+    score = 0; gameSpeed = 1; lastSaved = null; frostCd = 20;
     bannerTimer = 0;
     runId++;   // invalidate any pending spawn timers from a previous game
     bestScore = (loadHighScores()[0]||{}).score || 0;

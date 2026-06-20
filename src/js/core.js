@@ -19,6 +19,7 @@
       🛒 每行左侧有<b>小推车</b>：僵尸到底线自动冲出清空整行，但<b>每行仅一次</b>！
     </div>
     <p>🔁 <b>无尽模式</b>：波数越高越难，每 5 波是<b>巨潮</b>(强力僵尸带队)。尽量活久、拿高分！<br>
+       📍 <b>关卡选择</b>：每通过 10 波解锁一个检查点(第10/20/30…波)，可从该波直接开局，并获得筹备阳光与更长布防时间。<br>
        右下角：<b>🔊音效/🔇静音</b>(M) / <b>重开</b> / <b>暂停</b>(P) / <b>快进 1x/2x/3x</b>(F)。最高分自动记录到本机排行榜(前 10)。<br>
        🧪 <b>Shift+0</b> 加 10000 阳光；按住 <b>Alt</b> 查看所有植物属性。</p>
     <p style="font-size:14px">🌻 <b>第 5 波后点击向日葵升级</b>，二选一分支(各级 250 阳光，5 级)：⚡攻速(满级本行攻速翻倍) 或 🛡血量(每级 +50% 本行血量)；
@@ -27,15 +28,40 @@
 
   function showMenu(){
     overlay.classList.remove("hidden");
+    const hasCheckpoints = unlockedCheckpoints().length > 0;
     overlay.innerHTML =
       `<h1 class="big">🌻 馨乐花园保卫战 🧟</h1>
        <div class="menuRow">
          <button class="btn" id="startBtn">开始游戏</button>
+         ${hasCheckpoints ? '<button class="btn btn2" id="levelBtn">选择关卡</button>' : ''}
          <button class="btn btn2" id="guideBtn">查看攻略</button>
        </div>
        <div class="author">作者 Niko</div>`;
-    document.getElementById("startBtn").onclick = startGame;
+    document.getElementById("startBtn").onclick = ()=>startGame(0);
     document.getElementById("guideBtn").onclick = showGuide;
+    if(hasCheckpoints) document.getElementById("levelBtn").onclick = showLevelSelect;
+  }
+  function showLevelSelect(){
+    const pts = unlockedCheckpoints();
+    const mx = loadMaxWave();
+    const cells = pts.map(w=>
+      `<button class="btn lvlBtn" data-wave="${w}" style="min-width:96px">第 ${w} 波</button>`
+    ).join("");
+    overlay.classList.remove("hidden");
+    overlay.innerHTML =
+      `<h1>📍 选择关卡</h1>
+       <p>已达到最高 <b>第 ${mx} 波</b>，每 <b>10 波</b>解锁一个检查点。<br>
+          从检查点开始会获得<b>筹备阳光</b>与更长的布防时间。</p>
+       <div class="menuRow" style="flex-wrap:wrap;max-width:560px;justify-content:center;gap:8px">
+         <button class="btn lvlBtn" data-wave="0" style="min-width:120px">🌱 新游戏 (第1波)</button>
+         ${cells}
+       </div>
+       <button class="btn btn2" id="lvlBackBtn" style="margin-top:14px">返回</button>
+       <div class="author">作者 Niko</div>`;
+    overlay.querySelectorAll(".lvlBtn").forEach(b=>{
+      b.onclick = ()=> startGame(parseInt(b.getAttribute("data-wave"),10)||0);
+    });
+    document.getElementById("lvlBackBtn").onclick = showMenu;
   }
   function showGuide(){
     overlay.innerHTML =

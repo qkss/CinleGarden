@@ -13,6 +13,7 @@
     // endless wave scheduler
     if(gameTime >= nextWaveAt){
       waveNum++;
+      saveMaxWave(waveNum);                     // 记录最高波数, 解锁检查点
       const big = (waveNum % 5 === 0);
       spawnWave(waveNum);
       score += 50 + waveNum*15;                 // survival/progress bonus for reaching a wave

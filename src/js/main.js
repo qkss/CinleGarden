@@ -44,10 +44,12 @@
        </div>
        <div class="menuRow">
          <button class="btn" id="againBtn">再玩一次</button>
+         ${unlockedCheckpoints().length ? '<button class="btn btn2" id="levelBtn2">选择关卡</button>' : ''}
          <button class="btn btn2" id="guideBtn2">查看攻略</button>
        </div>
        <div class="author">作者 Niko</div>`;
-    document.getElementById("againBtn").onclick = startGame;
+    document.getElementById("againBtn").onclick = ()=>startGame(0);
+    const lvb = document.getElementById("levelBtn2"); if(lvb) lvb.onclick = showLevelSelect;
     document.getElementById("guideBtn2").onclick = showGuide;
   }
 
@@ -80,12 +82,12 @@
     }catch(e){}
   }
 
-  function startGame(){
+  function startGame(startWave){
     SFX.unlock();   // 在用户点击手势内解锁音频
     if(isMobileDevice() && !(document.fullscreenElement||document.webkitFullscreenElement)) enterFullscreen();  // 手机/平板自动全屏
     overlay.classList.add("hidden");
     const wasRunning = running;
-    reset();
+    reset(typeof startWave==="number" ? startWave : 0);
     running = true;
     if(!wasRunning){ lastTs=performance.now(); requestAnimationFrame(frame); }  // avoid stacking loops on restart
   }
