@@ -1288,31 +1288,35 @@
       drawSunIcon(0,0,16); ctx.restore();
     }
   }
-  // 地刺: 从土地钻出一排斜向前的巨型仙人掌(升起→回落)
+  // 地刺: 在攻击目标格钻出一根巨型仙人掌(斜向前, 升起→回落)
   function drawGroundSpikes(){
     for(const g of gspikes){
       const cy = cellY(g.r) + GRID.ch;          // 地面线
       const prog = g.t/g.life;
       const rise = Math.sin(Math.min(1,prog)*Math.PI); // 0→1→0
-      for(let sx=g.x0; sx<GRID.x+COLS*GRID.cw; sx+=58){
-        const h = (40 + ((sx*7)%26)) * rise;     // 错落高度
-        if(h<2) continue;
-        ctx.save(); ctx.translate(sx, cy); ctx.rotate(-0.32);   // 斜向前
+      const H = 140 * rise;                      // 巨型高度
+      if(H>=2){
+        const WB = 28;                           // 基部宽度
+        ctx.save(); ctx.translate(g.x, cy+6); ctx.rotate(0.34);   // 斜向前(朝僵尸来向)
         // 主刺体
-        const grd=ctx.createLinearGradient(0,0,0,-h);
-        grd.addColorStop(0,"#3f7e33"); grd.addColorStop(1,"#6fc34a");
+        const grd=ctx.createLinearGradient(0,0,0,-H);
+        grd.addColorStop(0,"#2e6b22"); grd.addColorStop(0.5,"#4f9e3a"); grd.addColorStop(1,"#7fce52");
         ctx.fillStyle=grd;
         ctx.beginPath();
-        ctx.moveTo(-7,4); ctx.lineTo(7,4); ctx.lineTo(2.5,-h); ctx.lineTo(-2.5,-h); ctx.closePath(); ctx.fill();
-        // 尖端高光
-        ctx.fillStyle="#bdf0a0"; ctx.beginPath(); ctx.moveTo(-2.5,-h); ctx.lineTo(2.5,-h); ctx.lineTo(0,-h-7); ctx.closePath(); ctx.fill();
-        // 侧刺
-        ctx.strokeStyle="#2e6b22"; ctx.lineWidth=1.4;
-        for(let k=1;k<=3;k++){ const yy=-h*k/4; ctx.beginPath(); ctx.moveTo(-3,yy); ctx.lineTo(-7,yy-4); ctx.moveTo(3,yy); ctx.lineTo(7,yy-4); ctx.stroke(); }
+        ctx.moveTo(-WB*0.5,10); ctx.lineTo(WB*0.5,10); ctx.lineTo(WB*0.16,-H); ctx.lineTo(-WB*0.16,-H); ctx.closePath(); ctx.fill();
+        // 棱线
+        ctx.strokeStyle="rgba(40,90,30,.5)"; ctx.lineWidth=2;
+        ctx.beginPath(); ctx.moveTo(0,8); ctx.lineTo(0,-H); ctx.stroke();
+        // 尖端
+        ctx.fillStyle="#cdf5ac"; ctx.beginPath(); ctx.moveTo(-WB*0.16,-H); ctx.lineTo(WB*0.16,-H); ctx.lineTo(0,-H-18); ctx.closePath(); ctx.fill();
+        // 成对侧刺
+        ctx.strokeStyle="#2e6b22"; ctx.lineWidth=3.4; ctx.lineCap="round";
+        for(let k=1;k<=5;k++){ const yy=-H*k/6, w=WB*0.5*(1-k/7);
+          ctx.beginPath(); ctx.moveTo(-w,yy); ctx.lineTo(-w-14,yy-10); ctx.moveTo(w,yy); ctx.lineTo(w+14,yy-10); ctx.stroke(); }
         ctx.restore();
       }
       // 钻出尘土
-      if(prog<0.3 && Math.random()<0.5) spawnParticles(g.x0+Math.random()*200, cy-4, "#b9a06a", 2, 120);
+      if(prog<0.35 && Math.random()<0.6) spawnParticles(g.x+Math.random()*36-18, cy-2, "#b9a06a", 2, 160);
     }
   }
   function drawExplosions(){

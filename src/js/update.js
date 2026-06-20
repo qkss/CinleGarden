@@ -57,7 +57,7 @@
       if(p.type==="bigcactus" && (p.up||0)>=10){
         if(p.spikeCd==null) p.spikeCd=20;
         p.spikeCd -= dt;
-        if(p.spikeCd<=0){ p.spikeCd=20; fireGroundSpikes(p); }
+        if(p.spikeCd<=0){ p.spikeCd = fireGroundSpikes(p) ? 20 : 2; }   // 无目标则2秒后重试
       }
 
       // 终极土豆盾(Lv10): 蓄力20秒 -> 技能就绪(身上出现图标)。手动点击释放, 或开启自动释放

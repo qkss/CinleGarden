@@ -142,20 +142,28 @@
   }
   // 巨仙掌自身攻速倍率: Lv0=1, Lv10=2x
   function bigcactusAtkMult(p){ return 1 + 0.1 * Math.min(p.up||0, 10); }
-  // 地刺(巨仙掌Lv10): 本行前方斜刺巨型仙人掌, 击退僵尸2格 + 穿刺伤害
+  // 地刺(巨仙掌Lv10): 在攻击目标格钻出一根巨型仙人掌(斜向前), 击退2格 + 穿刺伤害
   function fireGroundSpikes(p){
-    gspikes.push({ r:p.r, x0:p.x+24, t:0, life:0.85 });
+    // 找本行前方最近可命中目标
+    let target=null, best=Infinity;
+    for(const z of zombies){
+      if(z.r===p.r && z.hp>0 && z.x>p.x && !z.fly && !z.burrowing){ const d=z.x-p.x; if(d<best){ best=d; target=z; } }
+    }
+    if(!target) return false;
+    const tx = target.x;
+    gspikes.push({ r:p.r, x:tx, t:0, life:0.9 });    // 单根巨型地刺
     SFX.play("plant");
     const KB = 2*GRID.cw;   // 击退2格
     for(const z of zombies){
-      if(z.r===p.r && z.hp>0 && z.x > p.x && !z.fly && !z.burrowing){
-        if(z.shieldHp>0) z.shieldHp -= 200;   // 地刺=穿刺, 可破盾
-        else z.hp -= 200;
+      if(z.r===p.r && z.hp>0 && !z.fly && !z.burrowing && Math.abs(z.x - tx) < GRID.cw*0.7){
+        if(z.shieldHp>0) z.shieldHp -= 250;   // 地刺=穿刺, 可破盾
+        else z.hp -= 250;
         z.x = Math.min(W+24, z.x + KB);        // 击退2格
         z.slowT = Math.max(z.slowT, 0.6);
-        spawnParticles(z.x, z.y, "#9be36b", 9, 220);
+        spawnParticles(z.x, z.y, "#9be36b", 12, 260);
       }
     }
+    return true;
   }
   // 各类植物可升级的最早波数 (篝火需50波, 其余沿用 UPGRADE_WAVE)
   function upgradeMinWave(p){ return (p && p.type==="campfire") ? 50 : UPGRADE_WAVE; }
