@@ -317,28 +317,82 @@
       ctx.restore();
     }
   }
+  // 矢量盾牌图标(内含闪电), 无 emoji
+  function drawShieldGlyph(cx,cy,s,fill,stroke){
+    ctx.beginPath();
+    ctx.moveTo(cx, cy-s);
+    ctx.lineTo(cx+s*0.85, cy-s*0.55);
+    ctx.lineTo(cx+s*0.85, cy+s*0.22);
+    ctx.quadraticCurveTo(cx+s*0.8, cy+s*0.85, cx, cy+s*1.12);
+    ctx.quadraticCurveTo(cx-s*0.8, cy+s*0.85, cx-s*0.85, cy+s*0.22);
+    ctx.lineTo(cx-s*0.85, cy-s*0.55);
+    ctx.closePath();
+    if(fill){ ctx.fillStyle=fill; ctx.fill(); }
+    if(stroke){ ctx.strokeStyle=stroke; ctx.lineWidth=1.5; ctx.stroke(); }
+    // 内部闪电
+    ctx.beginPath();
+    ctx.moveTo(cx+s*0.12, cy-s*0.5);
+    ctx.lineTo(cx-s*0.26, cy+s*0.08);
+    ctx.lineTo(cx-s*0.02, cy+s*0.08);
+    ctx.lineTo(cx-s*0.14, cy+s*0.62);
+    ctx.lineTo(cx+s*0.30, cy-s*0.04);
+    ctx.lineTo(cx+s*0.04, cy-s*0.04);
+    ctx.closePath();
+    ctx.fillStyle="#ffe96b"; ctx.fill();
+  }
+  // 闪电护盾: 围绕单株植物的电护罩 + 跳动闪电弧
+  function drawLightningShield(x,y,r){
+    const t=performance.now();
+    ctx.save();
+    const pulse=0.5+0.5*Math.sin(t/120);
+    const g=ctx.createRadialGradient(x,y,r*0.35,x,y,r);
+    g.addColorStop(0,"rgba(120,200,255,0)");
+    g.addColorStop(0.72,"rgba(120,200,255,"+(0.08+0.05*pulse).toFixed(3)+")");
+    g.addColorStop(1,"rgba(150,220,255,"+(0.30+0.12*pulse).toFixed(3)+")");
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle="rgba(185,232,255,"+(0.55+0.3*pulse).toFixed(3)+")"; ctx.lineWidth=1.4;
+    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
+    // 闪电弧线
+    ctx.strokeStyle="rgba(210,242,255,.92)"; ctx.lineWidth=1.6;
+    ctx.shadowColor="#9fd8ff"; ctx.shadowBlur=6;
+    const arcs=3;
+    for(let a=0;a<arcs;a++){
+      const base=t/170 + a*Math.PI*2/arcs;
+      ctx.beginPath();
+      const segs=6;
+      for(let i=0;i<=segs;i++){
+        const ang=base + i/segs*1.25;
+        const jag=(i%2? 0.16 : -0.06) + 0.05*Math.sin(t/40 + i + a*2);
+        const rr=r*(0.92 + jag);
+        const px=x+Math.cos(ang)*rr, py=y+Math.sin(ang)*rr;
+        if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+      }
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
   function drawShields(){
     for(let r=0;r<ROWS;r++){
       if(rowShield[r]>0){
         const cy=cellY(r), pulse=0.5+0.5*Math.sin(performance.now()/120);
         ctx.save();
-        ctx.fillStyle="rgba(120,200,255,"+(0.12+0.08*pulse)+")";
+        ctx.fillStyle="rgba(120,200,255,"+(0.06+0.04*pulse).toFixed(3)+")";
         ctx.fillRect(GRID.x, cy, COLS*GRID.cw, GRID.ch);
-        ctx.strokeStyle="rgba(150,220,255,"+(0.5+0.3*pulse)+")"; ctx.lineWidth=3;
-        ctx.strokeRect(GRID.x+1, cy+1, COLS*GRID.cw-2, GRID.ch-2);
-        ctx.fillStyle="rgba(200,235,255,.9)"; ctx.font="bold 14px 'PingFang SC',Arial"; ctx.textAlign="left"; ctx.textBaseline="middle";
-        ctx.fillText("🛡 无敌", GRID.x+6, cy+12);
+        ctx.fillStyle="rgba(200,235,255,.9)"; ctx.font="bold 13px 'PingFang SC',Arial"; ctx.textAlign="left"; ctx.textBaseline="middle";
+        ctx.fillText("无敌护盾", GRID.x+6, cy+12);
         ctx.restore();
+        // 给本行每株植物套上闪电护盾
+        for(const p of plants){ if(p.r===r && p.hp>0) drawLightningShield(p.x, p.y-2, 32); }
       }
       if(rowBerserk[r]>0){
         const cy=cellY(r), pulse=0.5+0.5*Math.sin(performance.now()/90);
         ctx.save();
-        ctx.fillStyle="rgba(255,120,50,"+(0.10+0.08*pulse)+")";
+        ctx.fillStyle="rgba(255,120,50,"+(0.10+0.08*pulse).toFixed(3)+")";
         ctx.fillRect(GRID.x, cy, COLS*GRID.cw, GRID.ch);
-        ctx.strokeStyle="rgba(255,150,70,"+(0.5+0.3*pulse)+")"; ctx.lineWidth=3;
+        ctx.strokeStyle="rgba(255,150,70,"+(0.5+0.3*pulse).toFixed(3)+")"; ctx.lineWidth=3;
         ctx.strokeRect(GRID.x+1, cy+1, COLS*GRID.cw-2, GRID.ch-2);
         ctx.fillStyle="rgba(255,225,190,.95)"; ctx.font="bold 14px 'PingFang SC',Arial"; ctx.textAlign="right"; ctx.textBaseline="middle";
-        ctx.fillText("⚡ 狂暴", GRID.x+COLS*GRID.cw-6, cy+12);
+        ctx.fillText("狂暴", GRID.x+COLS*GRID.cw-6, cy+12);
         ctx.restore();
       }
     }
@@ -1130,7 +1184,7 @@
     roundRect(m.x, m.y, m.w, m.h, 7); ctx.fill();
     ctx.strokeStyle="rgba(255,255,255,.35)"; ctx.lineWidth=1; ctx.stroke();
     ctx.fillStyle="#fff"; ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
-    ctx.fillText(autoSkill?"⚙ 自动":"✋ 手动", m.x+m.w/2, m.y+m.h/2+0.5);
+    ctx.fillText(autoSkill?"自动":"手动", m.x+m.w/2, m.y+m.h/2+0.5);
     ctx.restore();
     // 技能图标 / 蓄力进度
     const ic = rc.icon, cx=ic.x+ic.w/2, cy=ic.y+ic.h/2, r=ic.w/2;
@@ -1142,17 +1196,15 @@
       ctx.restore();
       ctx.fillStyle="rgba(40,90,150,.94)"; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
       ctx.strokeStyle="#bfe0ff"; ctx.lineWidth=2; ctx.stroke();
-      ctx.font="16px Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
-      ctx.fillText("🛡", cx, cy+1);
-      ctx.fillStyle="rgba(190,224,255,.95)"; ctx.font="bold 9px 'PingFang SC',Arial";
+      drawShieldGlyph(cx, cy-1, r*0.6, "#dff0ff", "#7fb8e8");
+      ctx.fillStyle="rgba(190,224,255,.95)"; ctx.font="bold 9px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
       ctx.fillText("点击释放", cx, cy-r-7);
     } else {
       const frac = 1 - Math.max(0, Math.min(1, p.skillCd/20));
       ctx.fillStyle="rgba(20,30,45,.5)"; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
       ctx.strokeStyle="rgba(150,200,255,.3)"; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(cx,cy,r-1,0,Math.PI*2); ctx.stroke();
       ctx.strokeStyle="#7fc0ff"; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(cx,cy,r-1,-Math.PI/2, -Math.PI/2 + frac*Math.PI*2); ctx.stroke();
-      ctx.globalAlpha=0.7; ctx.fillStyle="#cfe3ff"; ctx.font="13px Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
-      ctx.fillText("🛡", cx, cy+1);
+      ctx.globalAlpha=0.6; drawShieldGlyph(cx, cy-1, r*0.52, "#9fc4e8", null);
     }
     ctx.restore();
   }
