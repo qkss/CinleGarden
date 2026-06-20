@@ -367,7 +367,11 @@
             z.x -= z.baseSpeed*1.4*dt;
             if(Math.random()<0.5) spawnParticles(z.x+10, cellCenterY(z.r)+30, "#9c7a4a", 1, 80);  // 土屑
             if(z.x <= z.surfaceX){ z.x = z.surfaceX; z.phase = "surface"; z.surfT = 0.5; z.burrowing = false;
-              spawnParticles(z.x, cellCenterY(z.r)+12, "#b9a06a", 18, 240); SFX.play("chomp", 0.1); }
+              spawnParticles(z.x, cellCenterY(z.r)+12, "#b9a06a", 18, 240); SFX.play("chomp", 0.1);
+              // 出土破坏当前格植物
+              const c = colAtX(z.x), pi = plants.findIndex(pl=>pl.r===z.r && pl.c===c);
+              if(pi>=0){ const pl=plants[pi]; spawnParticles(pl.x, pl.y, PLANTS[pl.type].color, 16, 240); explode(pl.x, pl.y, 6, 0, "#caa"); pl.dead = true; }
+            }
           } else { // surface 出土动画
             z.surfT -= dt; if(z.surfT<=0) z.phase = "walk";
           }
