@@ -24,7 +24,7 @@
     }
 
     // 全局计时: 行无敌护盾倒计时 / 能量极光残留 / 终极寒冰全屏冰霜
-    for(let r=0;r<ROWS;r++) if(rowShield[r]>0) rowShield[r]-=dt;
+    for(let r=0;r<ROWS;r++){ if(rowShield[r]>0) rowShield[r]-=dt; if(rowBerserk[r]>0) rowBerserk[r]-=dt; }
     for(const b of beams) b.t+=dt;
     beams = beams.filter(b=>b.t<b.life);
     if(waveNum>=100 && plants.some(p=>p.type==="snowpea" && p.up>=5)){
@@ -42,6 +42,21 @@
       if(p.recoil>0) p.recoil -= dt;
       if(p.glowT>0) p.glowT -= dt;
       const def = PLANTS[p.type];
+
+      // 终极土豆盾(Lv10): 每20秒给本行 2秒无敌护盾
+      if(p.type==="potatoshield" && (p.up||0)>=10){
+        if(p.skillCd==null) p.skillCd=20;
+        p.skillCd -= dt;
+        if(p.skillCd<=0){ p.skillCd=20; rowShield[p.r]=Math.max(rowShield[p.r],2);
+          const cy = cellCenterY(p.r);
+          for(let gx=GRID.x+20; gx<GRID.x+COLS*GRID.cw; gx+=44){
+            explosions.push({ x:gx, y:cy, r:0, max:30, t:0, life:0.5, color:"#bfe0ff" });
+            spawnParticles(gx, cy, "#9fd8f5", 4, 120);
+          }
+          for(const q of plants){ if(q.r===p.r && q.hp>0) q.glowT = 2; }
+          SFX.play("shield");
+        }
+      }
 
       // 血量光环(血量分支 + 钢化) × 自身升级(土豆盾)：动态调整最大血量
       const targetMax = p.baseMaxHp * (p.selfHpMult||1) * rowHpMult(p.r);
@@ -65,19 +80,19 @@
         }
         // 终极向日葵(Lv7) 技能 — 按流派区分
         if(p.up>=7){
-          if(p.branch==="atk" && waveNum>=100){
-            // 攻速流: 100波后 每20秒给本行 2秒无敌护盾
-            if(p.skillCd==null) p.skillCd=20;
+          if(p.branch==="atk"){
+            // 攻速流: 每10秒触发狂暴, 本行植物攻速+100% 持续4秒
+            if(p.skillCd==null) p.skillCd=10;
             p.skillCd -= dt;
-            if(p.skillCd<=0){ p.skillCd=20; rowShield[p.r]=Math.max(rowShield[p.r],2);
-              // 全行金色护盾扫光特效 + 金光笼罩本行植物
+            if(p.skillCd<=0){ p.skillCd=10; rowBerserk[p.r]=Math.max(rowBerserk[p.r],4);
+              // 全行红橙狂暴扫光特效
               const cy = cellCenterY(p.r);
               for(let gx=GRID.x+20; gx<GRID.x+COLS*GRID.cw; gx+=44){
-                explosions.push({ x:gx, y:cy, r:0, max:30, t:0, life:0.5, color:"#fff0a0" });
-                spawnParticles(gx, cy, "#ffe680", 4, 120);
+                explosions.push({ x:gx, y:cy, r:0, max:28, t:0, life:0.4, color:"#ff7a3c" });
+                spawnParticles(gx, cy, "#ff9a3c", 4, 150);
               }
-              for(const q of plants){ if(q.r===p.r && q.hp>0) q.glowT = 2; }
-              SFX.play("shield");
+              for(const q of plants){ if(q.r===p.r && q.hp>0) q.glowT = 1.6; }
+              SFX.play("ultimate");
             }
           } else if(p.branch==="hp"){
             // 血量流: 每10秒给本行所有植物回血 20% 最大血量

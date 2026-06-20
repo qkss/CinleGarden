@@ -327,6 +327,17 @@
         ctx.fillText("🛡 无敌", GRID.x+6, cy+12);
         ctx.restore();
       }
+      if(rowBerserk[r]>0){
+        const cy=cellY(r), pulse=0.5+0.5*Math.sin(performance.now()/90);
+        ctx.save();
+        ctx.fillStyle="rgba(255,120,50,"+(0.10+0.08*pulse)+")";
+        ctx.fillRect(GRID.x, cy, COLS*GRID.cw, GRID.ch);
+        ctx.strokeStyle="rgba(255,150,70,"+(0.5+0.3*pulse)+")"; ctx.lineWidth=3;
+        ctx.strokeRect(GRID.x+1, cy+1, COLS*GRID.cw-2, GRID.ch-2);
+        ctx.fillStyle="rgba(255,225,190,.95)"; ctx.font="bold 14px 'PingFang SC',Arial"; ctx.textAlign="right"; ctx.textBaseline="middle";
+        ctx.fillText("⚡ 狂暴", GRID.x+COLS*GRID.cw-6, cy+12);
+        ctx.restore();
+      }
     }
   }
   function drawMashes(){

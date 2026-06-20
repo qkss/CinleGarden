@@ -74,7 +74,9 @@
   function rowAttackMult(r){
     let lvl=0;
     for(const p of plants) if(p.type==="sunflower" && p.r===r && p.branch==="atk" && p.up>=1) lvl=Math.max(lvl, Math.min(p.up,5));
-    return 1 + 0.2*lvl;                 // atk-branch Lv5 -> x2 fire rate
+    let m = 1 + 0.2*lvl;                 // atk-branch Lv5 -> x2 fire rate
+    if(rowBerserk && rowBerserk[r]>0) m *= 2;   // 狂暴: 攻速 +100%
+    return m;
   }
   function rowHpMult(r){
     let m=1;
