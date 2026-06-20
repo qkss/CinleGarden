@@ -61,7 +61,7 @@
     // upgrade a sunflower / potato-shield (unlocked after wave UPGRADE_WAVE) — click it to level up
     if(!selected){
       const c=colAtX(mx), r=rowAtY(my);
-      const sp = plants.find(p=>p.r===r&&p.c===c&&(p.type==="sunflower"||p.type==="potatoshield"||p.type==="snowpea"));
+      const sp = plants.find(p=>p.r===r&&p.c===c&&(p.type==="sunflower"||p.type==="potatoshield"||p.type==="snowpea"||p.type==="threepeater"));
       if(sp){
         const cost = nextUpgradeCost(sp);
         if(waveNum>=UPGRADE_WAVE && cost!=null && sun>=cost){
@@ -75,6 +75,9 @@
             } else if(sp.type==="snowpea"){
               spawnParticles(sp.x, sp.y, "#bfe9fb", 16, 200);
               showBanner("❄️ 寒冰 Lv"+sp.up+" (冻结"+(1.5+0.2*sp.up).toFixed(1)+"s)");
+            } else if(sp.type==="threepeater"){
+              spawnParticles(sp.x, sp.y, "#9be36b", 18, 220);
+              showBanner("🌿 三豆 Lv"+sp.up+" (攻速 x"+threepeaterAtkMult(sp).toFixed(1)+")");
             } else {
               spawnParticles(sp.x, sp.y, sp.up>=7?"#ffe680":(sp.up>=6?"#9fd0ff":(sp.branch==="hp"?"#7fd0ff":"#ff9a3c")), 18, 220);
               showBanner("🌻 "+upgradeLabel(sp)+"！");

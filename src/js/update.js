@@ -50,20 +50,39 @@
 
       if(p.kind==="producer"){
         // 每级升级提升阳光产量; 终极(Lv7)产阳光x10
-        if(p.t>=7){ p.t=0; const val=(p.up>=7)?250:Math.round(25*(1+0.4*p.up)); addSun(p.x, p.y-10, false, val); }
+        if(p.t>=7){
+          p.t=0;
+          const val=(p.up>=7)?250:Math.round(25*(1+0.4*p.up));
+          addSun(p.x, p.y-10, false, val);
+          // 产阳光特效: 金色光环 + 花瓣火花
+          const sparkColor = p.up>=7 ? "#fff5a8" : (p.up>=6 ? "#ffe680" : "#ffd23f");
+          explosions.push({ x:p.x, y:p.y-8, r:0, max:p.up>=7?44:28, t:0, life:0.45, color:sparkColor });
+          spawnParticles(p.x, p.y-10, sparkColor, p.up>=7?16:10, 160);
+          spawnShards(p.x, p.y-10, p.up>=7?6:3, ["#ffe680","#ffd23f"], "tri");
+        }
         // 终极向日葵(Lv7) 技能 — 按流派区分
         if(p.up>=7){
           if(p.branch==="atk" && waveNum>=100){
             // 攻速流: 100波后 每20秒给本行 2秒无敌护盾
             if(p.skillCd==null) p.skillCd=20;
             p.skillCd -= dt;
-            if(p.skillCd<=0){ p.skillCd=20; rowShield[p.r]=Math.max(rowShield[p.r],2); showBanner("🌻 终极向日葵(攻速) · 无敌护盾！"); }
+            if(p.skillCd<=0){ p.skillCd=20; rowShield[p.r]=Math.max(rowShield[p.r],2); showBanner("🌻 终极向日葵(攻速) · 无敌护盾！");
+              // 全行金色护盾扫光特效
+              const cy = cellCenterY(p.r);
+              for(let gx=GRID.x+20; gx<GRID.x+COLS*GRID.cw; gx+=44){
+                explosions.push({ x:gx, y:cy, r:0, max:30, t:0, life:0.5, color:"#fff0a0" });
+                spawnParticles(gx, cy, "#ffe680", 4, 120);
+              }
+            }
           } else if(p.branch==="hp"){
             // 血量流: 每10秒给本行所有植物回血 20% 最大血量
             if(p.healCd==null) p.healCd=10;
             p.healCd -= dt;
             if(p.healCd<=0){ p.healCd=10;
-              for(const q of plants){ if(q.r===p.r && q.hp>0 && q.hp<q.maxHp){ q.hp=Math.min(q.maxHp, q.hp + q.maxHp*0.2); spawnParticles(q.x, q.y-10, "#7fd07a", 6, 140); } }
+              for(const q of plants){ if(q.r===p.r && q.hp>0 && q.hp<q.maxHp){ q.hp=Math.min(q.maxHp, q.hp + q.maxHp*0.2); spawnParticles(q.x, q.y-10, "#7fd07a", 10, 180); } }
+              // 中心绿色光环
+              explosions.push({ x:p.x, y:p.y-8, r:0, max:60, t:0, life:0.55, color:"#a7ecb8" });
+              spawnShards(p.x, p.y-10, 8, ["#a7ecb8","#7fd07a"], "tri");
               showBanner("🌻 终极向日葵(血量) · 本行回血 +20%！");
             }
           }
@@ -83,7 +102,8 @@
         }
         p.shootCd -= dt;
         if(target && p.shootCd<=0){
-          p.shootCd = def.rate / rowAttackMult(p.r);   // 攻速光环
+          const ownMult = (p.type==="threepeater") ? threepeaterAtkMult(p) : 1;
+          p.shootCd = def.rate / (rowAttackMult(p.r) * ownMult);   // 攻速光环 + 自身升级
           const shots = def.shots||1;
           const ox = dir>0 ? p.x+24 : p.x-24;
           for(let s=0; s<shots; s++){
@@ -148,18 +168,13 @@
           spawnParticles(pea.x, pea.y, "#ff9a3c", 6, 90);
         }
       }
-      // 尖刺：贯穿整行, 命中每只僵尸一次, 不消失
+      // 尖刺：贯穿整行, 命中每只僵尸一次, 不消失 (无视铁门, 直接打本体)
       if(pea.spike){
         for(const z of zombies){
           if(z.r===pea.r && z.hp>0 && Math.abs(z.x-pea.x)<26 && !pea.hit.has(z) && (pea.air || !z.fly)){
             pea.hit.add(z);
-            if(z.doorHp>0 && !pea.fire){
-              z.doorHp -= pea.dmg; spawnParticles(pea.x, pea.y, "#cfd4da", 4);
-              if(z.doorHp<=0) spawnShards(z.x+16, z.y-4, 11, ["#c2c7cf","#9aa0aa"], "square");
-            } else {
-              z.hp -= pea.dmg;
-              spawnParticles(pea.x, pea.y, pea.fire?"#ff7a1e":"#cfe6a0", 4);
-            }
+            z.hp -= pea.dmg;
+            spawnParticles(pea.x, pea.y, pea.fire?"#ff7a1e":"#cfe6a0", 4);
           }
         }
         if(pea.x>W+20 || pea.x<-20) pea.dead = true;
@@ -167,11 +182,9 @@
       }
       for(const z of zombies){
         if(z.r===pea.r && Math.abs(z.x-pea.x)<26 && z.hp>0 && (pea.air || !z.fly)){
-          // 铁门挡住普通豌豆(伤害打在门上)；火焰豌豆无视铁门直接打本体
+          // 铁门完全免疫普通/冰冻豌豆(火焰豌豆仍可击穿) — 仙人掌穿刺走 spike 分支
           if(z.doorHp>0 && !pea.fire){
-            z.doorHp -= pea.dmg;
-            spawnParticles(pea.x, pea.y, "#cfd4da", 5);
-            if(z.doorHp<=0) spawnShards(z.x+16, z.y-4, 11, ["#c2c7cf","#9aa0aa"], "square");
+            spawnParticles(pea.x, pea.y, "#cfd4da", 4);
             pea.dead = true; break;
           }
           z.hp -= pea.dmg;
@@ -226,14 +239,13 @@
       if(z.buffT>0){ z.buffT-=dt; if(z.buffT<=0 && z.buffActive){ z.buffActive=false; z.maxHp/=6; if(z.hp>z.maxHp) z.hp=z.maxHp; } }
       const frozen = z.freezeT>0;
 
-      // 女巫: 每5秒给周围僵尸 +500% 血量(持续2秒)
+      // 女巫: 每5秒给周围未被增益的僵尸 +500% 血量(持续2秒) - 效果不叠加, 已增益僵尸不刷新
       if(z.buff && !frozen){
         if(z.buffCd==null) z.buffCd=5;
         z.buffCd -= dt;
         if(z.buffCd<=0){ z.buffCd=5;
-          for(const z2 of zombies){ if(z2.hp>0 && Math.hypot(z2.x-z.x, z2.y-z.y) < GRID.cw*1.6){
-            if(!z2.buffActive){ z2.buffActive=true; z2.maxHp*=6; z2.hp*=6; }   // +500% 血
-            z2.buffT = 2;
+          for(const z2 of zombies){ if(z2.hp>0 && !z2.buffActive && Math.hypot(z2.x-z.x, z2.y-z.y) < GRID.cw*1.6){
+            z2.buffActive=true; z2.maxHp*=6; z2.hp*=6; z2.buffT=2;
           }}
           for(let i=0;i<16;i++) spawnParticles(z.x, z.y-10, "#c77dff", 1, 180);
         }
@@ -276,8 +288,8 @@
 
       if(blocker && z.type==="polevault" && !z.vaulted && !frozen){
         z.vaulted = true; z.vaultAnim = 0.5; z.x = blocker.x - 46;
-      } else if(blocker && z.type==="gargantuar"){
-        // 巨人重砸：每下造成固定伤害(肉盾可扛几下)，砸完短暂停顿
+      } else if(blocker && z.big && !z.beam){
+        // 巨人/钢盔巨人 重砸：每下造成固定伤害(肉盾可扛几下)，砸完短暂停顿 (鸣人Boss 用普通啃食)
         z.eating = true;
         if(z.freezeT>0){ /* 冰冻时停手 */ }
         else if(rowShield[blocker.r]>0){ /* 本行无敌护盾, 砸不动 */ }
@@ -337,9 +349,11 @@
       if(z.hp<=0){
         spawnParticles(z.x,z.y,"#7a9e5e",14);
         if(z.freezeT>0) spawnShards(z.x,z.y-18,8,["#dff4fc","#bfe9fb"]);
-        if(z.type==="gargantuar"){   // 巨人死亡爆炸: 波及周围植物
-          explode(z.x, z.y, GRID.cw*1.5, 0, "#ff5a1e"); spawnShards(z.x,z.y-20,16,["#7a9e5e","#5a6b3c"]);
-          for(const p of plants){ if(rowShield[p.r]<=0 && Math.hypot(p.x-z.x, p.y-z.y) < GRID.cw*1.4){ p.hp -= 320; if(p.hp<=0) p.dead=true; } }
+        if(z.type==="gargantuar" || z.type==="irongarg"){   // 巨人/钢盔巨人死亡爆炸: 波及周围植物
+          const dmg = z.type==="irongarg" ? 600 : 320;
+          const rad = z.type==="irongarg" ? GRID.cw*1.7 : GRID.cw*1.5;
+          explode(z.x, z.y, rad, 0, "#ff5a1e"); spawnShards(z.x,z.y-20,16,["#7a9e5e","#5a6b3c"]);
+          for(const p of plants){ if(rowShield[p.r]<=0 && Math.hypot(p.x-z.x, p.y-z.y) < rad*0.93){ p.hp -= dmg; if(p.hp<=0) p.dead=true; } }
         }
         score += (KILLPTS[z.type]||10); return false;
       }

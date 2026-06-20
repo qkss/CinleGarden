@@ -19,13 +19,13 @@
       big:!!d.big, eat:d.eat||35, armorBroken:false,
     });
     const z = zombies[zombies.length-1];
+    if(d.fly){ z.fly = true; z.baseRowY = cellCenterY(row); z.y = z.baseRowY - 32; }   // 气球飞行高度 (蜘蛛也判定为空中, 下方再覆盖坐标)
     if(type==="spider"){
-      // 空降：落在最右侧 4 列范围内的某格
+      // 空降：落在最右侧 4 列范围内的某格 (覆盖 fly 块设置的 y)
       const col = COLS-1 - Math.floor(Math.random()*4);     // 列 5..8
       z.col = col; z.x = cellCenterX(col); z.y = TOPBAR_H-20;
       z.phase = "drop"; z.targetY = cellCenterY(row); z.grabT = 0.6; z.carry = null;
     }
-    if(d.fly){ z.fly = true; z.baseRowY = cellCenterY(row); z.y = z.baseRowY - 32; }   // 气球飞行高度
     if(d.door!=null){ z.doorHp = d.door; }                                             // 铁门护盾值
     if(d.beam){ z.beam = true; z.beamCd = 3.5; }                                       // 鸣人: 能量极光
     if(d.buff){ z.buff = true; z.buffCd = 5; }                                         // 女巫: 群体增益
@@ -96,8 +96,11 @@
     }
     if(p.type==="potatoshield"){ return p.up<10 ? 250 : null; }   // 每级+50%血, 最高Lv10
     if(p.type==="snowpea"){ return p.up<5 ? 250 : null; }          // 每级+0.2s冰冻, 最高Lv5
+    if(p.type==="threepeater"){ return p.up<10 ? 300 : null; }     // 每级+0.4x攻速, 最高Lv10 (5x)
     return null;
   }
+  // 三豆射手自身攻速倍率: Lv0=1, Lv10=5
+  function threepeaterAtkMult(p){ return 1 + 0.4 * Math.min(p.up||0, 10); }
   function upgradeLabel(p){
     const up=p.up, b=p.branch;
     if(up<=0) return "向日葵";

@@ -110,7 +110,7 @@
     if(selected||shovelMode || mouse.y<GRID.y) return;
     const c=colAtX(mouse.x), r=rowAtY(mouse.y);
     if(c<0||r<0) return;
-    const sp=plants.find(p=>p.r===r&&p.c===c&&(p.type==="sunflower"||p.type==="potatoshield"||p.type==="snowpea"));
+    const sp=plants.find(p=>p.r===r&&p.c===c&&(p.type==="sunflower"||p.type==="potatoshield"||p.type==="snowpea"||p.type==="threepeater"));
     if(!sp) return;
     const cx=cellCenterX(c), cy=cellY(r);
     let txt, ok=false;
@@ -122,6 +122,7 @@
         let nxt;
         if(sp.type==="potatoshield") nxt="Lv"+(sp.up+1)+"(+50%血)";
         else if(sp.type==="snowpea") nxt="Lv"+(sp.up+1)+"(冻"+(1.5+0.2*(sp.up+1)).toFixed(1)+"s)";
+        else if(sp.type==="threepeater") nxt="Lv"+(sp.up+1)+"(攻速 x"+(1+0.4*(sp.up+1)).toFixed(1)+")";
         else if(sp.up===0) nxt="选择分支";
         else if(sp.up<5) nxt=(sp.branch==="hp"?"血量":"攻速")+"Lv"+(sp.up+1);
         else if(sp.up===5) nxt="钢化";
@@ -380,6 +381,15 @@
     else if(p.type==="sunflower") drawSunflowerArt(0,0,p.t,p.up,p.branch);
     else if(p.type==="potatoshield") drawPotatoShieldArt(0,0,p.hp/p.maxHp,p.up);
     else drawPlantArt(p.type, 0,0, p.t, p.recoil||0, p.hp/p.maxHp, false);
+    // 三豆射手 / 寒冰 升级等级角标
+    if(p.up>0 && (p.type==="threepeater" || p.type==="snowpea")){
+      const lbl = (p.type==="threepeater" ? "x"+(1+0.4*p.up).toFixed(1) : "Lv"+p.up);
+      ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
+      const bw=ctx.measureText(lbl).width+10;
+      ctx.fillStyle="rgba(0,0,0,.6)"; roundRect(-bw/2,-46,bw,13,5); ctx.fill();
+      ctx.fillStyle = p.type==="threepeater" ? "#caff9a" : "#bfe9fb";
+      ctx.fillText(lbl, 0, -39);
+    }
     ctx.restore();
     if(p.kind!=="bomb") drawHealthBar(p.x, p.y+40, p.hp/p.maxHp, 40);
   }
@@ -815,6 +825,7 @@
     let skin2 = slowed ? "#8ab2bb" : "#7a9e5e";
     let shirt = slowed ? "#7e93b2" : "#6d7a8a";
     if(z.type==="gargantuar" && !slowed){ skin="#62804a"; skin2="#4f6a3a"; shirt="#4a3a2a"; }
+    if(z.type==="irongarg" && !slowed){ skin="#5c7846"; skin2="#48623a"; shirt="#3a3030"; }    // 钢盔巨人: 暗绿肤 + 深灰甲衣
     if(z.type==="football" && !slowed){ shirt="#9a3a3a"; }
     if(z.type==="mingzombie" && !slowed){ skin="#d6a060"; skin2="#b87f44"; shirt="#e08a1e"; }   // 鸣人: 橙黄
     if(z.type==="witch" && !slowed){ skin="#9c7ab0"; skin2="#7e5d92"; shirt="#5a3d72"; }        // 女巫: 紫
@@ -888,23 +899,47 @@
       ctx.beginPath(); ctx.moveTo(-13,-14); ctx.lineTo(13,-14); ctx.stroke();
       ctx.fillStyle="#fff"; ctx.font="bold 9px Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
       ctx.fillText("07", 0, 6);                                   // jersey number
-    } else if(z.type==="gargantuar"){
+    } else if(z.type==="gargantuar" || z.type==="irongarg"){
       // brute club over the shoulder
       ctx.strokeStyle="#6e4a28"; ctx.lineWidth=6; ctx.lineCap="round";
       ctx.beginPath(); ctx.moveTo(10,-4); ctx.lineTo(30,-32); ctx.stroke();
-      ctx.fillStyle="#8a5e30"; roundRect(24,-50,17,24,5); ctx.fill();
-      ctx.fillStyle="#6e4a28"; ctx.beginPath(); ctx.arc(29,-44,2.4,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = z.type==="irongarg" ? "#7c7c84" : "#8a5e30"; roundRect(24,-50,17,24,5); ctx.fill();
+      ctx.fillStyle = z.type==="irongarg" ? "#5c5c66" : "#6e4a28";
+      ctx.beginPath(); ctx.arc(29,-44,2.4,0,Math.PI*2); ctx.fill();
       ctx.beginPath(); ctx.arc(35,-36,2.4,0,Math.PI*2); ctx.fill();
       // angry brow
       ctx.strokeStyle="#2a1a10"; ctx.lineWidth=2.5;
       ctx.beginPath(); ctx.moveTo(-10,-28); ctx.lineTo(-2,-25); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(10,-28); ctx.lineTo(2,-25); ctx.stroke();
+      // 钢盔巨人: 头戴钢盔 + 肩甲 + 红羽
+      if(z.type==="irongarg"){
+        // 肩甲
+        ctx.fillStyle="#8a9099"; ctx.beginPath(); ctx.ellipse(-15,-6,9,8,0,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(15,-6,9,8,0,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle="#aab0b8"; ctx.beginPath(); ctx.ellipse(-15,-9,9,4,0,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(15,-9,9,4,0,0,Math.PI*2); ctx.fill();
+        // 钢盔
+        ctx.fillStyle="#9aa0aa"; ctx.beginPath(); ctx.arc(0,-22,20,Math.PI,0); ctx.fill();
+        ctx.fillStyle="#c2c7cf"; ctx.beginPath(); ctx.arc(0,-22,20,Math.PI,1.25*Math.PI); ctx.fill();
+        ctx.fillStyle="#7e848c"; roundRect(-20,-24,40,17,3); ctx.fill();
+        // 面甲缝
+        ctx.fillStyle="#2a2e33"; roundRect(-14,-19,28,4,2); ctx.fill();
+        ctx.fillStyle="#ff5a3a";
+        ctx.beginPath(); ctx.arc(-6,-17,2.2,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(6,-17,2.2,0,Math.PI*2); ctx.fill();
+        // 铆钉
+        ctx.fillStyle="#6b7079";
+        for(let rx=-14;rx<=14;rx+=8){ ctx.beginPath(); ctx.arc(rx,-9,1.6,0,Math.PI*2); ctx.fill(); }
+        // 红色羽冠
+        ctx.fillStyle="#c0392b"; ctx.beginPath();
+        ctx.moveTo(0,-42); ctx.quadraticCurveTo(12,-56,5,-62); ctx.quadraticCurveTo(2,-50,-2,-44); ctx.closePath(); ctx.fill();
+      }
     } else if(z.type==="screendoor" && z.doorHp>0){
-      // 铁门挡在身前(右侧迎着豌豆)
-      ctx.fillStyle="#aab0b8"; roundRect(14,-30,12,52,3); ctx.fill();
-      ctx.fillStyle="#c2c7cf"; ctx.fillRect(14,-30,4,52);
-      ctx.fillStyle="#7e848c"; ctx.fillRect(14,-6,12,3);
-      ctx.fillStyle="#6b7079"; ctx.beginPath(); ctx.arc(20,-2,2,0,Math.PI*2); ctx.fill();
+      // 铁门挡在身前(僵尸朝左走, 左侧迎着豌豆) — 免疫豌豆射击, 仅穿刺/火焰/爆炸可破
+      ctx.fillStyle="#aab0b8"; roundRect(-26,-30,12,52,3); ctx.fill();
+      ctx.fillStyle="#c2c7cf"; ctx.fillRect(-18,-30,4,52);
+      ctx.fillStyle="#7e848c"; ctx.fillRect(-26,-6,12,3);
+      ctx.fillStyle="#6b7079"; ctx.beginPath(); ctx.arc(-20,-2,2,0,Math.PI*2); ctx.fill();
     } else if(z.type==="balloon"){
       // 头顶气球 + 提线
       ctx.strokeStyle="#7a6a3a"; ctx.lineWidth=1.5;
