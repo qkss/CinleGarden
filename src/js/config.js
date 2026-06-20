@@ -72,6 +72,7 @@
 
   const SPEEDS = [1,2,3];
   let paused = false;
+  const MUTEBTN    = { x: W-392, y: H-44, w: 84, h: 30 };
   const RESTARTBTN = { x: W-300, y: H-44, w: 84, h: 30 };
   const PAUSEBTN   = { x: W-208, y: H-44, w: 84, h: 30 };
   const SPEEDBTN   = { x: W-116, y: H-44, w: 108, h: 30 };

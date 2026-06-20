@@ -14,6 +14,7 @@
 
     // bottom control buttons
     const hit=(b)=>mx>=b.x&&mx<=b.x+b.w&&my>=b.y&&my<=b.y+b.h;
+    if(hit(MUTEBTN)){ SFX.toggle(); return; }
     if(hit(SPEEDBTN)){ cycleSpeed(); return; }
     if(hit(PAUSEBTN)){ paused=!paused; return; }
     if(hit(RESTARTBTN)){ startGame(); return; }
@@ -22,7 +23,7 @@
 
     for(let i=suns.length-1;i>=0;i--){
       const s=suns[i];
-      if(Math.hypot(mx-s.x,my-s.y)<24){ sun+=s.value; suns.splice(i,1); spawnParticles(s.x,s.y,"#ffe680",8); return; }
+      if(Math.hypot(mx-s.x,my-s.y)<24){ sun+=s.value; suns.splice(i,1); spawnParticles(s.x,s.y,"#ffe680",8); SFX.play("sun"); return; }
     }
     if(my<TOPBAR_H){
       // shovel button
@@ -53,6 +54,7 @@
         if(plants.indexOf(sp)>=0 && sun>=250 && sp.up===0){
           sun -= 250; sp.branch = b; sp.up = 1;
           spawnParticles(sp.x, sp.y, b==="hp"?"#7fd0ff":"#ff9a3c", 18, 220);
+          SFX.play("upgrade");
           showBanner("🌻 "+upgradeLabel(sp)+"！");
         }
       }
@@ -68,6 +70,7 @@
           if(sp.type==="sunflower" && sp.up===0){ upgradeMenu = { p:sp }; }   // choose a branch first
           else {
             sun -= cost; sp.up++;
+            SFX.play(sp.up>=7?"ultimate":"upgrade");
             if(sp.type==="potatoshield"){
               sp.selfHpMult = 1 + 0.5*sp.up;             // 每级 +50% 血量
               spawnParticles(sp.x, sp.y, "#9fb6cf", 16, 200);
@@ -93,7 +96,7 @@
         const p=PLANTS[selected];
         if(sun>=p.cost){
           sun-=p.cost; lastCardUse[selected]=gameTime; addPlant(selected,r,c);
-          spawnParticles(cellCenterX(c),cellCenterY(r),"#fff",6); selected=null;
+          spawnParticles(cellCenterX(c),cellCenterY(r),"#fff",6); SFX.play("plant"); selected=null;
         }
       }
     }
@@ -114,7 +117,7 @@
   function collectAllSun(){
     if(!suns.length) return;
     for(const s of suns){ sun += s.value; spawnParticles(s.x, s.y, "#ffe680", 6); }
-    suns = [];
+    suns = []; SFX.play("sun");
   }
 
   function cycleSpeed(){ gameSpeed = SPEEDS[(SPEEDS.indexOf(gameSpeed)+1) % SPEEDS.length]; }
@@ -127,6 +130,7 @@
     if(e.key===" " || e.code==="Space"){ e.preventDefault(); if(state==="playing") collectAllSun(); return; }
     if(e.key==="f" || e.key==="F"){ if(state==="playing") cycleSpeed(); return; }
     if(e.key==="p" || e.key==="P"){ if(state==="playing") paused=!paused; return; }
+    if(e.key==="m" || e.key==="M"){ SFX.toggle(); return; }
     // 测试模式：Shift+0 直接 +10000 阳光
     if(e.shiftKey && (e.code==="Digit0" || e.key===")" || e.key==="0")){ e.preventDefault(); if(state==="playing"){ sun+=10000; showBanner("🧪 测试：+10000 阳光"); } return; }
     // 铲子快捷键 ~

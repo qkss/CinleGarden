@@ -48,6 +48,7 @@
   }
   function iceBurst(px, py, r, dur){
     dur = dur||1.5;
+    SFX.play("freeze", 0.08);
     explosions.push({ x:px, y:py, r:0, max:50, t:0, life:0.4, color:"#9fd8f5" });
     for(const z of zombies){
       // 小范围冻结(只冻命中点附近1格), 不再整片锁场
@@ -149,6 +150,7 @@
       groundY: cellCenterY(z.r)+34, landed:false, life:4.5, t:0 });
   }
   function explode(x,y,radius,dmg,color){
+    if(dmg>0) SFX.play("explode", 0.05);
     explosions.push({ x, y, r:0, max:radius, t:0, life:0.5, color:color||"#ff8a1e" });
     for(const z of zombies){
       if(Math.hypot(z.x-x, z.y-y) < radius){ z.hp -= dmg; }

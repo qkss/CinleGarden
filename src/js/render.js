@@ -35,6 +35,8 @@
     ctx.restore();
   }
   function drawControlButtons(){
+    const on = SFX.isOn();
+    btn(MUTEBTN, on?"🔊 音效":"🔇 静音", on?"rgba(0,0,0,.35)":"#7a3a3a");
     btn(RESTARTBTN, "↻ 重开", "rgba(0,0,0,.35)");
     btn(PAUSEBTN, paused?"▶ 继续":"⏸ 暂停", paused?"#3aa55a":"rgba(0,0,0,.35)");
     const sl = gameSpeed===1?"▶ 1x":(gameSpeed===2?"▶▶ 2x":"▶▶▶ 3x");

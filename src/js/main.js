@@ -19,6 +19,7 @@
   function endGame(){
     if(lastSaved) return;            // avoid double-save
     running=false;
+    SFX.play("gameover");
     const entry = { score: Math.round(score), wave: waveNum, dur: Math.round(gameTime), date: new Date().toLocaleString("zh-CN") };
     lastSaved = entry;
     const hs = saveHighScore(entry);
@@ -80,6 +81,7 @@
   }
 
   function startGame(){
+    SFX.unlock();   // 在用户点击手势内解锁音频
     if(isMobileDevice() && !(document.fullscreenElement||document.webkitFullscreenElement)) enterFullscreen();  // 手机/平板自动全屏
     overlay.classList.add("hidden");
     const wasRunning = running;

@@ -16,6 +16,7 @@
       const big = (waveNum % 5 === 0);
       spawnWave(waveNum);
       score += 50 + waveNum*15;                 // survival/progress bonus for reaching a wave
+      SFX.play(big?"bigwave":"wave");
       showBanner(big ? ("⚠ 第 "+waveNum+" 波 · 巨潮来袭！") : ("第 "+waveNum+" 波"));
       const interval = Math.max(12, 26 - waveNum*0.35);
       nextWaveAt = gameTime + (big ? interval + 8 : interval);
@@ -75,6 +76,7 @@
                 spawnParticles(gx, cy, "#ffe680", 4, 120);
               }
               for(const q of plants){ if(q.r===p.r && q.hp>0) q.glowT = 2; }
+              SFX.play("shield");
             }
           } else if(p.branch==="hp"){
             // 血量流: 每10秒给本行所有植物回血 20% 最大血量
@@ -94,6 +96,7 @@
               // 中心金色光环
               explosions.push({ x:p.x, y:p.y-8, r:0, max:60, t:0, life:0.55, color:"#ffe680" });
               spawnShards(p.x, p.y-10, 8, ["#ffe680","#a7ecb8"], "tri");
+              SFX.play("heal");
               showBanner("🌻 终极向日葵(血量) · 本行回血 +20%！");
             }
           }
@@ -115,6 +118,7 @@
         if(target && p.shootCd<=0){
           const ownMult = (p.type==="threepeater") ? threepeaterAtkMult(p) : 1;
           p.shootCd = def.rate / (rowAttackMult(p.r) * ownMult);   // 攻速光环 + 自身升级
+          SFX.play(def.freeze?"shootIce":"shoot", 0.05);
           const shots = def.shots||1;
           const ox = dir>0 ? p.x+24 : p.x-24;
           for(let s=0; s<shots; s++){
@@ -196,6 +200,7 @@
           // 铁门完全免疫普通/冰冻豌豆(火焰豌豆仍可击穿) — 仙人掌穿刺走 spike 分支
           if(z.doorHp>0 && !pea.fire){
             spawnParticles(pea.x, pea.y, "#cfd4da", 4);
+            SFX.play("hit", 0.12);
             pea.dead = true; break;
           }
           z.hp -= pea.dmg;
@@ -243,7 +248,7 @@
         z.armorBroken = true;
         const a = {cone:{c:["#e08a2e","#b96d1c"],s:"tri"}, bucket:{c:["#c2c7cf","#9aa0aa"],s:"square"},
                    ironclad:{c:["#aab0b8","#7e848c"],s:"square"}, football:{c:["#c64b4b","#7a2b2b"],s:"square"}}[z.type];
-        if(a){ spawnShards(z.x, z.y-34, 13, a.c, a.s); spawnHelmet(z); }
+        if(a){ spawnShards(z.x, z.y-34, 13, a.c, a.s); spawnHelmet(z); SFX.play("break", 0.05); }
       }
       if(z.vaultAnim>0) z.vaultAnim -= dt;
       // 女巫增益到期 -> 还原血量(+500%临时血)
@@ -316,6 +321,7 @@
       } else if(blocker){
         z.eating = true;
         if(!frozen && rowShield[blocker.r]<=0){
+          SFX.play("chomp", 0.35);
           blocker.hp -= z.eat*dt;
           if(blocker.hp<=0){ spawnParticles(blocker.x, blocker.y, PLANTS[blocker.type].color, 12); blocker.dead = true; }
         }
@@ -325,7 +331,7 @@
       }
       if(z.x < GRID.x + 8){
         const m = mowers.find(m=>m.r===z.r && !m.used);
-        if(m){ m.active = true; m.used = true; }          // launch the lawn-mower
+        if(m){ m.active = true; m.used = true; SFX.play("mower"); }          // launch the lawn-mower
         else if(z.x < GRID.x - 28){ state="lost"; endGame(); } // no mower left
       }
     }
@@ -359,6 +365,7 @@
       if(z.gone) return false;   // 蜘蛛带着植物飞走了(不计分)
       if(z.hp<=0){
         spawnParticles(z.x,z.y,"#7a9e5e",14);
+        SFX.play("zombieDie", 0.04);
         if(z.freezeT>0) spawnShards(z.x,z.y-18,8,["#dff4fc","#bfe9fb"]);
         if(z.type==="gargantuar" || z.type==="irongarg"){   // 巨人/钢盔巨人死亡爆炸: 波及周围植物
           const dmg = z.type==="irongarg" ? 600 : 320;
