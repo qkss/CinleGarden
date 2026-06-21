@@ -53,6 +53,8 @@
     spider:    { name:"蜘蛛", hp:150,  body:150,  speed:0,    accessory:"spider", fly:true },   // 空降偷植物 — 判定空中, 仅对空可击
     balloon:   { name:"气球", hp:90,   body:90,   speed:17,   accessory:"balloon", fly:true },     // 飞行,需对空
     griffin:   { name:"狮鹫骑士", hp:3600, body:3600, speed:15, accessory:"griffin", fly:true },   // 骑乘狮鹫的强大空中僵尸, 需对空/爆炸
+    priest:    { name:"骷髅祭祀", hp:900, body:900, speed:11, accessory:"priest", heal:true },     // 130波后: 每5秒治疗周围僵尸
+    nightking: { name:"暗夜王", hp:50000, body:50000, speed:9, accessory:"nightking", big:true, eat:140, noFreeze:true, sword:true },  // 160波后BOSS: 骷髅战马·暗夜王之剑·免疫冰冻·刀光剑影远程
     screendoor:{ name:"铁门", hp:110,  body:110,  speed:11,   accessory:"screendoor", door:420 },  // 铁门挡豌豆,怕火/爆炸
     mingzombie:{ name:"鸣人", hp:32000, body:32000, speed:7,    accessory:"ming", big:true, eat:140, beam:true },  // 120波后Boss: 能量极光穿透整行, 同屏最多2个
     witch:     { name:"女巫", hp:1300, body:1300, speed:11,   accessory:"witch", buff:true },  // 80波后: 每5秒给周围僵尸+500%血2秒
@@ -60,7 +62,7 @@
 
   // ---------- Waves ----------
   // ---------- State ----------
-  let state, plants, zombies, peas, suns, particles, explosions, mowers, debris, mashes, beams, floats, gspikes, footballs, beanbombs;
+  let state, plants, zombies, peas, suns, particles, explosions, mowers, debris, mashes, beams, floats, gspikes, footballs, beanbombs, swordwaves;
   let rowShield;   // 每行无敌护盾剩余秒数(终极土豆盾技能)
   let rowBerserk;  // 每行狂暴(攻速+100%)剩余秒数(攻速流终极向日葵技能)
   let autoSkill;   // 土豆盾技能是否自动释放(false=手动点击释放)
@@ -84,4 +86,4 @@
   const RESTARTBTN = { x: W-300, y: H-44, w: 84, h: 30 };
   const PAUSEBTN   = { x: W-208, y: H-44, w: 84, h: 30 };
   const SPEEDBTN   = { x: W-116, y: H-44, w: 108, h: 30 };
-  const KILLPTS = { basic:10, cone:25, polevault:30, bucket:60, football:140, ironclad:120, gargantuar:400, irongarg:800, shieldgiant:300, pangolin:90, giantrider:600, armorboss:3000, spider:60, balloon:45, griffin:200, screendoor:70, mingzombie:2000, witch:450 };
+  const KILLPTS = { basic:10, cone:25, polevault:30, bucket:60, football:140, ironclad:120, gargantuar:400, irongarg:800, shieldgiant:300, pangolin:90, giantrider:600, armorboss:3000, spider:60, balloon:45, griffin:200, screendoor:70, mingzombie:2000, witch:450, priest:250, nightking:5000 };

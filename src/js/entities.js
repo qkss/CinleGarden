@@ -36,6 +36,9 @@
     if(d.burrow){ z.phase = "dig"; z.burrowing = true; z.surfaceX = cellCenterX(4); }          // 盾穿山甲: 地底潜行至第5格
     if(d.beam){ z.beam = true; z.beamCd = 9; z.invulnT = 8; }                            // 鸣人: 能量极光(每9秒) + 出场8秒无敌(期间免疫冰冻)
     if(d.buff){ z.buff = true; z.buffCd = 5; }                                         // 女巫: 群体增益
+    if(d.heal){ z.heal = true; z.healCd = 5; }                                          // 骷髅祭祀: 群体回血
+    if(d.sword){ z.sword = true; z.swordCd = 4; }                                       // 暗夜王: 刀光剑影
+    if(d.noFreeze){ z.noFreeze = true; }                                                // 免疫冰冻
   }
   function addPea(x,y,r,freeze,air,spike,fdur,dir){
     if(freeze){

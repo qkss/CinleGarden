@@ -18,6 +18,7 @@
     for(const pea of peas) drawPea(pea);
     drawFootballs();
     drawBeanbombs();
+    drawSwordwaves();
     [...zombies].sort((a,b)=>a.y-b.y).forEach(drawZombie);
     drawBeams();
     drawSuns();
@@ -1152,6 +1153,23 @@
       ctx.restore();
     }
   }
+  function drawSwordwaves(){
+    const tt=performance.now();
+    for(const sw of swordwaves){
+      ctx.save(); ctx.translate(sw.x, sw.y);
+      // 蓝白新月刀光(朝左) + 辉光
+      ctx.save(); ctx.globalCompositeOperation="lighter";
+      const a=0.6+0.3*Math.sin(tt/60);
+      ctx.strokeStyle="rgba(150,210,255,"+a.toFixed(2)+")"; ctx.lineWidth=10; ctx.lineCap="round";
+      ctx.beginPath(); ctx.arc(14,0,22,Math.PI*0.62,Math.PI*1.38); ctx.stroke();
+      ctx.restore();
+      ctx.strokeStyle="#dff0ff"; ctx.lineWidth=4; ctx.lineCap="round";
+      ctx.beginPath(); ctx.arc(14,0,22,Math.PI*0.66,Math.PI*1.34); ctx.stroke();
+      ctx.strokeStyle="#7fb8ff"; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.arc(14,0,26,Math.PI*0.7,Math.PI*1.3); ctx.stroke();
+      ctx.restore();
+    }
+  }
   function drawFootballs(){
     for(const fb of footballs){
       ctx.save(); ctx.translate(fb.x, fb.y); ctx.rotate(fb.rot);
@@ -1402,12 +1420,78 @@
     ctx.restore();
     drawHealthBar(z.x, z.y-40, z.hp/z.maxHp, 56, "#c0392b");
   }
+  function drawPriest(z){
+    const slowed = z.slowT>0 || z.freezeT>0;
+    ctx.save(); ctx.translate(z.x, z.y);
+    const walk = z.eating?0:Math.sin(z.t*6)*0.04; ctx.rotate(walk);
+    const robe = slowed?"#5a6b8a":"#3a2d5a", robe2=slowed?"#46557a":"#2a1f44";
+    // 长袍
+    ctx.fillStyle=robe; ctx.beginPath(); ctx.moveTo(-13,40); ctx.lineTo(-10,-14); ctx.quadraticCurveTo(0,-22,10,-14); ctx.lineTo(13,40); ctx.closePath(); ctx.fill();
+    ctx.fillStyle=robe2; ctx.fillRect(-13,30,26,10);
+    // 兜帽
+    ctx.fillStyle=robe2; ctx.beginPath(); ctx.arc(0,-18,12,Math.PI*0.9,Math.PI*2.1); ctx.fill();
+    ctx.fillStyle=robe; ctx.beginPath(); ctx.moveTo(-11,-16); ctx.quadraticCurveTo(0,-34,11,-16); ctx.lineTo(8,-10); ctx.quadraticCurveTo(0,-22,-8,-10); ctx.closePath(); ctx.fill();
+    // 骷髅脸
+    ctx.fillStyle=slowed?"#cfe0e8":"#e8e2d0"; ctx.beginPath(); ctx.arc(0,-15,7,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="#1f9e6a"; ctx.beginPath(); ctx.arc(-2.6,-15,1.8,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(2.6,-15,1.8,0,Math.PI*2); ctx.fill();
+    // 法杖 + 绿色法球
+    ctx.strokeStyle="#7a5530"; ctx.lineWidth=3; ctx.lineCap="round";
+    ctx.beginPath(); ctx.moveTo(-14,4); ctx.lineTo(-18,-26); ctx.stroke();
+    const gl=0.5+0.5*Math.sin(z.t*4);
+    ctx.fillStyle="rgba(120,230,120,"+(0.4+0.3*gl).toFixed(2)+")"; ctx.beginPath(); ctx.arc(-18,-28,7+gl*1.5,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="#9be36b"; ctx.beginPath(); ctx.arc(-18,-28,4,0,Math.PI*2); ctx.fill();
+    if(z.freezeT>0){ ctx.fillStyle="rgba(150,220,250,.38)"; roundRect(-16,-36,32,80,8); ctx.fill(); }
+    ctx.restore();
+    drawHealthBar(z.x, z.y-40, z.hp/z.maxHp, 36, "#c0392b");
+  }
+  function drawNightking(z){
+    const slowed = z.slowT>0;   // 免疫冰冻, 不显示冰
+    ctx.save(); ctx.translate(z.x, z.y); ctx.scale(2.05,2.05);
+    const walk = z.eating?0:Math.sin(z.t*4);
+    const bone = slowed?"#aeb6c2":"#dfe4ea", bone2=slowed?"#8d96a4":"#b8bfc9";
+    // 骷髅战马腿
+    ctx.strokeStyle=bone2; ctx.lineWidth=3.5; ctx.lineCap="round";
+    ctx.beginPath(); ctx.moveTo(-14,8); ctx.lineTo(-16+walk*3,26); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-8,8); ctx.lineTo(-6-walk*3,26); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(10,8); ctx.lineTo(12+walk*3,26); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(16,8); ctx.lineTo(18-walk*3,26); ctx.stroke();
+    // 马身(骨架)
+    ctx.fillStyle=bone; ctx.beginPath(); ctx.ellipse(0,2,20,10,0,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle=bone2; ctx.lineWidth=1.5; for(let i=-3;i<=3;i++){ ctx.beginPath(); ctx.moveTo(i*5,-6); ctx.lineTo(i*5,10); ctx.stroke(); }   // 肋骨
+    // 马头(朝左)
+    ctx.fillStyle=bone; ctx.beginPath(); ctx.moveTo(-16,-2); ctx.lineTo(-30,-12); ctx.lineTo(-22,-2); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(-28,-13,6,4,-0.4,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="#5ac8ff"; ctx.beginPath(); ctx.arc(-29,-14,1.6,0,Math.PI*2); ctx.fill();   // 蓝眼
+    ctx.beginPath(); ctx.moveTo(20,-2); ctx.lineTo(28,6); ctx.stroke();   // 尾骨
+    // 暗夜王(上半身)
+    ctx.save(); ctx.translate(2,-12);
+    const armor=slowed?"#3a4658":"#27303f", skin="#bcd4e0";
+    ctx.fillStyle=armor; roundRect(-9,-6,18,20,5); ctx.fill();
+    ctx.fillStyle="#1a2230"; ctx.fillRect(-9,2,18,4);
+    ctx.fillStyle=skin; ctx.beginPath(); ctx.arc(0,-13,8,0,Math.PI*2); ctx.fill();   // 头
+    ctx.fillStyle="#5ac8ff"; ctx.beginPath(); ctx.arc(-3,-14,1.7,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(3,-14,1.7,0,Math.PI*2); ctx.fill();
+    // 冰冠
+    ctx.fillStyle="#7fb8ff"; ctx.beginPath();
+    ctx.moveTo(-8,-18); ctx.lineTo(-8,-24); ctx.lineTo(-4,-20); ctx.lineTo(0,-28); ctx.lineTo(4,-20); ctx.lineTo(8,-24); ctx.lineTo(8,-18); ctx.closePath(); ctx.fill();
+    // 暗夜王之剑(挥舞)
+    const sw = z.swingT>0 ? Math.sin((1-z.swingT/0.4)*Math.PI) : 0;
+    ctx.save(); ctx.translate(-8,0); ctx.rotate(-0.5 - sw*1.6);
+    ctx.strokeStyle="#3a4658"; ctx.lineWidth=2.5; ctx.beginPath(); ctx.moveTo(0,4); ctx.lineTo(0,-2); ctx.stroke();   // 柄
+    const sg=ctx.createLinearGradient(0,-2,0,-34); sg.addColorStop(0,"#bcd4e0"); sg.addColorStop(1,"#7fd0ff");
+    ctx.strokeStyle=sg; ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(0,-2); ctx.lineTo(0,-34); ctx.stroke();
+    ctx.restore();
+    ctx.restore();
+    ctx.restore();
+    drawHealthBar(z.x, z.y-62, z.hp/z.maxHp, 84, "#5ac8ff");
+  }
   function drawZombie(z){
     if(z.type==="spider"){ drawSpider(z); return; }
     if(z.type==="pangolin"){ drawPangolin(z); return; }
     if(z.type==="giantrider"){ drawGiantRider(z); return; }
     if(z.type==="armorboss"){ drawArmorBoss(z); return; }
     if(z.type==="griffin"){ drawGriffin(z); return; }
+    if(z.type==="priest"){ drawPriest(z); return; }
+    if(z.type==="nightking"){ drawNightking(z); return; }
     ctx.save(); ctx.translate(z.x, z.y);
     if(z.big) ctx.scale(1.95,1.95);               // 巨人放大
     if(z.slowT>0||z.freezeT>0){ ctx.save(); } // marker; tint handled per part via slow flag

@@ -362,6 +362,7 @@
       z.t += dt;
       // 出场无敌(鸣人Boss): 期间任何伤害都被抵消(每帧回满)
       if(z.invulnT>0){ z.invulnT -= dt; z.hp = z.maxHp; z.burnT = 0; z.freezeT = 0; z.slowT = 0; }   // 无敌期间免疫一切伤害与冰冻/减速
+      if(z.noFreeze){ z.freezeT = 0; z.freezeImmune = 0; }   // 免疫冰冻(暗夜王)
       if(z.slowT>0) z.slowT -= dt;
       if(z.mireT>0) z.mireT -= dt;
       const wasFrozen = z.freezeT>0;
@@ -413,6 +414,28 @@
           if(rowShield[z.r]<=0 && !titanium){ for(const p of plants){ if(p.r===z.r && p.hp>0){ p.hp-=125; if(p.hp<=0) p.dead=true; } } }
         }
       }
+
+      // 骷髅祭祀: 每5秒治疗周围僵尸(回复12%最大血量)
+      if(z.heal && !frozen){
+        if(z.healCd==null) z.healCd=5;
+        z.healCd -= dt;
+        if(z.healCd<=0){ z.healCd=5;
+          explosions.push({ x:z.x, y:z.y-8, r:0, max:GRID.cw*2, t:0, life:0.5, color:"#9be36b" });
+          for(const z2 of zombies){ if(z2.hp>0 && Math.hypot(z2.x-z.x, z2.y-z.y) < GRID.cw*2 && z2.hp<z2.maxHp){
+            z2.hp = Math.min(z2.maxHp, z2.hp + z2.maxHp*0.12); spawnParticles(z2.x, z2.y-10, "#9be36b", 6, 150);
+          }}
+        }
+      }
+      // 暗夜王: 挥舞暗夜王之剑, 发射刀光剑影(远程穿行伤害)
+      if(z.sword && !frozen){
+        if(z.swordCd==null) z.swordCd=4;
+        z.swordCd -= dt;
+        if(z.swordCd<=0){ z.swordCd=4; z.swingT=0.4;
+          swordwaves.push({ x:z.x-34, y:z.y-14, r:z.r, vx:-380, dmg:240, hit:new Set(), t:0, life:3.5 });
+          SFX.play("hit", 0.05);
+        }
+      }
+      if(z.swingT>0) z.swingT -= dt;
 
       // 空降蜘蛛：下降 → 抓取 → 升空带走
       if(z.type==="spider"){
@@ -615,5 +638,16 @@
       }
     }
     beanbombs = beanbombs.filter(b=>!b.dead);
+    // 暗夜王刀光剑影: 向左穿行, 伤害本行植物(无敌护盾可挡)
+    for(const sw of swordwaves){
+      sw.x += sw.vx*dt; sw.t += dt;
+      if(rowShield[sw.r]<=0){
+        for(const p of plants){ if(p.r===sw.r && p.hp>0 && Math.abs(p.x-sw.x)<30 && !sw.hit.has(p)){
+          sw.hit.add(p); p.hp -= sw.dmg; spawnParticles(p.x, p.y, PLANTS[p.type].color, 8, 200); if(p.hp<=0) p.dead=true;
+        }}
+      }
+      if(sw.x < GRID.x-40 || sw.t > sw.life) sw.dead = true;
+    }
+    swordwaves = swordwaves.filter(s=>!s.dead);
     // endless: no win condition — survive as long as possible
   }

@@ -1,7 +1,7 @@
 "use strict";
   function reset(startWave){
     state = "playing";
-    plants = []; zombies = []; peas = []; suns = []; particles = []; explosions = []; debris = []; mashes = []; beams = []; floats = []; gspikes = []; footballs = []; beanbombs = [];
+    plants = []; zombies = []; peas = []; suns = []; particles = []; explosions = []; debris = []; mashes = []; beams = []; floats = []; gspikes = []; footballs = []; beanbombs = []; swordwaves = [];
     rowShield = [0,0,0,0,0];
     rowBerserk = [0,0,0,0,0];
     autoSkill = false;
@@ -24,7 +24,7 @@
   }
 
   // 僵尸出场最早波数 (气球10波后、巨人20波后、女巫80波后、鸣人Boss 100波后、钢盔巨人100波后)
-  const ZMINWAVE = { balloon:11, gargantuar:20, pangolin:16, shieldgiant:30, giantrider:90, griffin:50, witch:81, mingzombie:120, irongarg:101, armorboss:150 };
+  const ZMINWAVE = { balloon:11, gargantuar:20, pangolin:16, shieldgiant:30, giantrider:90, griffin:50, witch:81, mingzombie:120, irongarg:101, armorboss:150, priest:130, nightking:160 };
   // pool of zombie types by wave (difficulty ramps; heavies unlock progressively, no cap)
   function poolForWave(n){
     let pool;
@@ -36,7 +36,7 @@
     else if(n<=18) pool=["bucket","polevault","ironclad","football","ironclad","pangolin","spider","balloon","screendoor"];
     else if(n<=26) pool=["bucket","ironclad","football","ironclad","gargantuar","pangolin","polevault","spider","balloon","screendoor"];
     else if(n<=99) pool=["ironclad","football","gargantuar","ironclad","football","bucket","gargantuar","shieldgiant","pangolin","giantrider","griffin","polevault","spider","balloon","screendoor","witch"];
-    else           pool=["ironclad","football","gargantuar","irongarg","gargantuar","irongarg","football","bucket","shieldgiant","pangolin","giantrider","griffin","armorboss","polevault","spider","balloon","screendoor","mingzombie","witch"];
+    else           pool=["ironclad","football","gargantuar","irongarg","gargantuar","irongarg","football","bucket","shieldgiant","pangolin","giantrider","griffin","armorboss","polevault","spider","balloon","screendoor","mingzombie","witch","priest","nightking"];
     pool = pool.filter(tt => n >= (ZMINWAVE[tt]||0));   // 未到出场波数则剔除
     return pool.length ? pool : ["basic"];
   }
@@ -55,6 +55,7 @@
       if(state!=="playing" || runId!==rid) return;
       if(type==="mingzombie" && aliveCount("mingzombie") >= 2) type = "irongarg";   // 鸣人Boss同屏最多2个
       if(type==="armorboss" && aliveCount("armorboss") >= 2) type = "giantrider";   // 装甲车BOSS同屏最多2个
+      if(type==="nightking" && aliveCount("nightking") >= 1) type = "irongarg";      // 暗夜王BOSS同屏最多1个
       addZombie(type, rRow());
     };
     // big wave: a powerful leader (or two) charges in first
