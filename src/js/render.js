@@ -1080,36 +1080,31 @@
   }
 
   function drawFuseHalo(level){
-    const L = Math.min(Math.max(level||1,1), 6), col = FUSE_HALO[L-1];
+    const L = Math.min(Math.max(level||1,1), 6);
     const t = performance.now()/1000, pulse=0.5+0.5*Math.sin(t*3);
-    const cy = 42;
+    const cy = 42, topCol = FUSE_HALO[L-1];
+    const rwOf = i => 15 + (i-1)*6 + pulse*1.2;   // 内圈(Lv1白圈)较小, 每层向外+6
     ctx.save();
-    // 柔光底盘
-    ctx.globalAlpha = 0.30+0.16*pulse;
-    ctx.fillStyle = col; ctx.beginPath(); ctx.ellipse(0, cy, 32, 12, 0, 0, Math.PI*2); ctx.fill();
-    // 向上的光柱(淡)
-    ctx.globalAlpha = 0.12+0.06*pulse;
-    ctx.fillStyle = col; ctx.beginPath();
-    ctx.moveTo(-22,cy); ctx.lineTo(-12,cy-46); ctx.lineTo(12,cy-46); ctx.lineTo(22,cy); ctx.closePath(); ctx.fill();
-    // 主光环(粗·浓色)
-    ctx.globalAlpha = 0.9;
-    ctx.strokeStyle = col; ctx.lineWidth = 4.5;
-    ctx.beginPath(); ctx.ellipse(0, cy, 28+3*pulse, 10+pulse, 0, 0, Math.PI*2); ctx.stroke();
-    // 上弧白色高光(让黑/暗红等深色也清晰可见)
-    ctx.globalAlpha = 0.55+0.35*pulse;
-    ctx.strokeStyle = "rgba(255,255,255,0.95)"; ctx.lineWidth = 1.8;
-    ctx.beginPath(); ctx.ellipse(0, cy, 28+3*pulse, 10+pulse, 0, Math.PI*1.02, Math.PI*1.98); ctx.stroke();
-    // 扩散脉冲圈
-    const ep = (t*0.7)%1;
-    ctx.globalAlpha = (1-ep)*0.55;
-    ctx.strokeStyle = col; ctx.lineWidth = 2.5;
-    ctx.beginPath(); ctx.ellipse(0, cy, 28+ep*22, 10+ep*8, 0, 0, Math.PI*2); ctx.stroke();
-    // 升腾螺旋光点(带白芯)
+    // 柔光底盘(随最外圈大小)
+    ctx.globalAlpha = 0.22+0.12*pulse;
+    ctx.fillStyle = topCol; const orw=rwOf(L); ctx.beginPath(); ctx.ellipse(0, cy, orw+4, (orw+4)*0.38, 0, 0, Math.PI*2); ctx.fill();
+    // 一圈圈叠加: Lv1(白,最内最小) -> LvL(最外), 每层一个本级颜色的圈
+    for(let i=1;i<=L;i++){
+      const col=FUSE_HALO[i-1], rw=rwOf(i), rh=rw*0.38;
+      ctx.globalAlpha = 0.9;
+      ctx.strokeStyle = col; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.ellipse(0, cy, rw, rh, 0, 0, Math.PI*2); ctx.stroke();
+      // 上弧白色高光(深色圈也清晰)
+      ctx.globalAlpha = 0.4;
+      ctx.strokeStyle = "rgba(255,255,255,0.9)"; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.ellipse(0, cy, rw, rh, 0, Math.PI*1.05, Math.PI*1.95); ctx.stroke();
+    }
+    // 升腾螺旋光点(带白芯, 用最高级颜色)
     for(let i=0;i<6;i++){
-      const ph=(t*0.7+i/6)%1, ang=t*2.2+i*1.05, rad=24*(1-ph*0.55), sz=2.6*(1-ph*0.5);
-      const px=Math.cos(ang)*rad, py=cy - ph*50;
+      const ph=(t*0.7+i/6)%1, ang=t*2.2+i*1.05, rad=(orw-4)*(1-ph*0.5), sz=2.4*(1-ph*0.5);
+      const px=Math.cos(ang)*rad, py=cy - ph*48;
       ctx.globalAlpha = (1-ph)*0.95;
-      ctx.fillStyle = col; ctx.beginPath(); ctx.arc(px,py, sz, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = topCol; ctx.beginPath(); ctx.arc(px,py, sz, 0, Math.PI*2); ctx.fill();
       ctx.fillStyle = "rgba(255,255,255,0.85)"; ctx.beginPath(); ctx.arc(px,py, sz*0.45, 0, Math.PI*2); ctx.fill();
     }
     ctx.restore();
