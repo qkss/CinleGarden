@@ -241,6 +241,13 @@
               if(z.shieldHp<=0){ spawnShards(z.x-22, z.y-8, 13, ["#c2c7cf","#9aa0aa"], "square"); SFX.play("break", 0.05); }
               blocked=true; break;
             }
+            if(z.type==="armorboss"){
+              // 装甲车BOSS: 厚重装甲格挡穿甲子弹, 仍受伤但子弹无法继续穿透
+              pea.hit.add(z);
+              z.hp -= pea.dmg;
+              spawnParticles(pea.x, pea.y, "#cdd3da", 5); SFX.play("hit", 0.1);
+              blocked=true; break;
+            }
             pea.hit.add(z);
             z.hp -= pea.dmg;
             spawnParticles(pea.x, pea.y, pea.fire?"#ff7a1e":"#cfe6a0", 4);
