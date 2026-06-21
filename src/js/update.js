@@ -337,7 +337,7 @@
     for(const z of zombies){
       z.t += dt;
       // 出场无敌(鸣人Boss): 期间任何伤害都被抵消(每帧回满)
-      if(z.invulnT>0){ z.invulnT -= dt; z.hp = z.maxHp; z.burnT = 0; }
+      if(z.invulnT>0){ z.invulnT -= dt; z.hp = z.maxHp; z.burnT = 0; z.freezeT = 0; z.slowT = 0; }   // 无敌期间免疫一切伤害与冰冻/减速
       if(z.slowT>0) z.slowT -= dt;
       if(z.mireT>0) z.mireT -= dt;
       const wasFrozen = z.freezeT>0;

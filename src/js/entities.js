@@ -34,7 +34,7 @@
     if(d.door!=null){ z.doorHp = d.door; }                                             // 铁门护盾值
     if(d.shield!=null){ z.shieldHp = Math.round(d.shield*mult); z.shieldMax = z.shieldHp; }   // 盾牌巨人: 只能被穿刺打破
     if(d.burrow){ z.phase = "dig"; z.burrowing = true; z.surfaceX = cellCenterX(4); }          // 盾穿山甲: 地底潜行至第5格
-    if(d.beam){ z.beam = true; z.beamCd = 3.5; z.invulnT = 10; }                        // 鸣人: 能量极光 + 出场10秒无敌
+    if(d.beam){ z.beam = true; z.beamCd = 3.5; z.invulnT = 8; }                          // 鸣人: 能量极光 + 出场8秒无敌(期间免疫冰冻)
     if(d.buff){ z.buff = true; z.buffCd = 5; }                                         // 女巫: 群体增益
   }
   function addPea(x,y,r,freeze,air,spike,fdur,dir){
