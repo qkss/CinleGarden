@@ -75,6 +75,15 @@
     };
   }
 
+  // 融化反应: 正在灼伤的僵尸被冰霜冻结 -> 剩余灼伤伤害 x3 立即爆发 + 蒸汽
+  function meltBurn(z){
+    if(!z || z.hp<=0 || !(z.burnT>0)) return;
+    const dmg = z.burnDps * z.burnT * 3;   // 剩余灼伤 +200%
+    z.hp -= dmg; z.burnT = 0;
+    explosions.push({ x:z.x, y:z.y-8, r:0, max:54, t:0, life:0.38, color:"#ffd9a0" });
+    spawnParticles(z.x, z.y-10, "#eaf6fb", 14, 220); spawnParticles(z.x, z.y-10, "#ffb14e", 8, 200);
+    floats.push({ x:z.x, y:z.y-26, vy:-34, t:0, life:1.0, text:"融化!", color:"#ffd9a0" });
+  }
   // 点燃僵尸: 持续5秒灼伤 (冰冻会熄火)
   function ignite(z){
     if(!z || z.hp<=0 || z.freezeT>0) return;

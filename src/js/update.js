@@ -30,7 +30,7 @@
     if(plants.some(p=>p.type==="snowpea" && p.up>=5)){   // 终极寒冰(Lv5)即可触发, 不再要求100波
       frostCd -= dt;
       if(frostCd<=0){ frostCd = 20; frostRainT = 5;        // 持续5秒
-        for(const z of zombies){ if(z.hp>0){ z.freezeT=5; z.freezeImmune=0; z.slowT=0; } }   // 全屏冰冻5秒
+        for(const z of zombies){ if(z.hp>0){ if(z.burnT>0) meltBurn(z); z.freezeT=5; z.freezeImmune=0; z.slowT=0; } }   // 全屏冰冻5秒(灼伤者触发融化)
         SFX.play("freeze");
       }
     }
@@ -43,7 +43,7 @@
           color: Math.random()<0.5?"#cfeefb":"#9fd8f5", size:1.8+Math.random()*2.4, rain:true });
       }
       // 期间保持冰冻(新刷出的僵尸也冻住)
-      for(const z of zombies){ if(z.hp>0 && z.freezeT<frostRainT){ z.freezeT=frostRainT; z.slowT=0; } }
+      for(const z of zombies){ if(z.hp>0 && z.freezeT<frostRainT){ if(z.burnT>0) meltBurn(z); z.freezeT=frostRainT; z.slowT=0; } }
     }
 
     // plants
