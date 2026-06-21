@@ -396,6 +396,21 @@
         continue;   // 钻地/出土期间不做常规移动
       }
 
+      // 橄榄球僵尸: 边走边向前方植物投掷橄榄球(远程伤害)
+      if(z.type==="football" && !frozen){
+        if(z.throwCd==null) z.throwCd = 2 + Math.random()*1.5;
+        z.throwCd -= dt;
+        if(z.throwCd<=0){
+          let tgt=null, best=Infinity;
+          for(const p of plants){ if(p.r===z.r && p.hp>0 && p.x < z.x-20){ const d=z.x-p.x; if(d<best && d<5*GRID.cw){ best=d; tgt=p; } } }
+          if(tgt){
+            z.throwCd = 2.6 + Math.random()*1.2;
+            const D=Math.max(80, z.x-tgt.x), apex=70, vx=300, T=D/vx, g=8*apex/(T*T), vy0=-g*T/2;
+            footballs.push({ x:z.x-18, y:z.y-24, r:z.r, vx:-vx, vy:vy0, g, baseY:cellCenterY(z.r)+18, dmg:80, rot:0, vrot:-16 });
+          } else { z.throwCd = 0.6; }   // 无目标稍后再探测
+        }
+      }
+
       const speed = frozen ? 0 : z.baseSpeed * (z.slowT>0 ? 0.45 : 1) * (z.mireT>0 ? 0.22 : 1);
 
       // 飞行单位(气球)无视植物, 直接飘过
@@ -512,5 +527,22 @@
     // 地刺动画
     for(const g of gspikes) g.t+=dt;
     gspikes = gspikes.filter(g=>g.t<g.life);
+    // 橄榄球投射物: 抛物线飞向植物, 命中造成伤害
+    for(const fb of footballs){
+      fb.x += fb.vx*dt; fb.vy += fb.g*dt; fb.y += fb.vy*dt; fb.rot += fb.vrot*dt;
+      if(Math.random()<0.4) particles.push({ x:fb.x, y:fb.y, vx:0, vy:10, life:0.3, t:0, color:"#7a4a28", size:2 });
+      let hit=null;
+      for(const p of plants){ if(p.r===fb.r && p.hp>0 && Math.abs(p.x-fb.x)<26 && Math.abs(p.y-fb.y)<32){ hit=p; break; } }
+      if(!hit && fb.vy>0 && fb.y>=fb.baseY){            // 落地: 砸到该格植物
+        hit = plants.find(p=>p.r===fb.r && p.hp>0 && Math.abs(p.x-fb.x)<GRID.cw*0.5) || true;
+        fb.y = fb.baseY;
+      }
+      if(hit){
+        if(hit!==true){ hit.hp -= fb.dmg; spawnParticles(hit.x, hit.y, PLANTS[hit.type].color, 8, 180); if(hit.hp<=0) hit.dead=true; }
+        spawnParticles(fb.x, fb.y, "#8a5a30", 6, 160);
+        fb.dead = true;
+      } else if(fb.x < -20){ fb.dead = true; }
+    }
+    footballs = footballs.filter(f=>!f.dead);
     // endless: no win condition — survive as long as possible
   }

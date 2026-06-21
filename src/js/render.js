@@ -16,6 +16,7 @@
     for(const p of plants) drawPlant(p);
     drawGroundSpikes();
     for(const pea of peas) drawPea(pea);
+    drawFootballs();
     [...zombies].sort((a,b)=>a.y-b.y).forEach(drawZombie);
     drawBeams();
     drawSuns();
@@ -1010,6 +1011,18 @@
     ctx.restore();
   }
 
+  function drawFootballs(){
+    for(const fb of footballs){
+      ctx.save(); ctx.translate(fb.x, fb.y); ctx.rotate(fb.rot);
+      // 橄榄球: 棕色椭球 + 白色缝线
+      ctx.fillStyle="#7a3a22"; ctx.beginPath(); ctx.ellipse(0,0,11,7,0,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle="#9a4a2a"; ctx.beginPath(); ctx.ellipse(-2,-2,5,3.4,0,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle="#f0e8d8"; ctx.lineWidth=1.4; ctx.lineCap="round";
+      ctx.beginPath(); ctx.moveTo(-6,0); ctx.lineTo(6,0); ctx.stroke();
+      for(let i=-1;i<=1;i++){ ctx.beginPath(); ctx.moveTo(i*3,-2.5); ctx.lineTo(i*3,2.5); ctx.stroke(); }
+      ctx.restore();
+    }
+  }
   function drawPea(pea){
     ctx.save(); ctx.translate(pea.x,pea.y);
     if(pea.spike){
