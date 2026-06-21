@@ -481,7 +481,7 @@
   function drawPlantArt(type, x, y, t, recoil, hpFrac, iconMode){
     if(type==="sunflower") drawSunflowerArt(x,y,t);
     else if(type==="peashooter") drawPeashooterArt(x,y,t,recoil,"#6cc24a");
-    else if(type==="snowpea") drawPeashooterArt(x,y,t,recoil,"#7fcfee");
+    else if(type==="snowpea") drawSnowpeaArt(x,y,t,recoil,0);
     else if(type==="repeater") drawRepeaterArt(x,y,t,recoil);
     else if(type==="threepeater") drawThreepeaterArt(x,y,t,recoil);
     else if(type==="cactus") drawCactusArt(x,y,t,recoil,false);
@@ -542,6 +542,7 @@
       drawSunflowerBadge(p, topY);
     }
     else if(p.type==="potatoshield") drawPotatoShieldArt(0,0,p.hp/p.maxHp,p.up);
+    else if(p.type==="snowpea") drawSnowpeaArt(0,0,p.t,p.recoil||0,p.up);
     else drawPlantArt(p.type, 0,0, p.t, p.recoil||0, p.hp/p.maxHp, false);
     // 三豆射手 / 寒冰 升级等级角标
     if(p.up>0 && (p.type==="threepeater" || p.type==="snowpea")){
@@ -654,6 +655,56 @@
     ctx.fillStyle="#3f8e2a"; ctx.beginPath(); ctx.ellipse(20,-2,9,8,0,0,Math.PI*2); ctx.fill();
     ctx.fillStyle="#2e6b1c"; ctx.beginPath(); ctx.arc(26,-2,5,0,Math.PI*2); ctx.fill();
     ctx.fillStyle="#1f3a14"; ctx.beginPath(); ctx.arc(-2,-4,3,0,Math.PI*2); ctx.fill();
+  }
+  function drawSnowpeaArt(x,y,t,recoil,up){
+    up = up||0;
+    ctx.save(); ctx.translate(x,y);
+    // 茎叶
+    ctx.strokeStyle="#3f8e2a"; ctx.lineWidth=8; ctx.lineCap="round";
+    ctx.beginPath(); ctx.moveTo(0,36); ctx.lineTo(0,2); ctx.stroke();
+    ctx.fillStyle="#4a9e2f"; ctx.beginPath(); ctx.ellipse(-13,26,11,5,-0.6,0,Math.PI*2); ctx.fill();
+    // 等级越高头部越深越亮
+    const headCol = up>=10 ? "#5aa6e6" : up>=5 ? "#6cc4ee" : "#7fcfee";
+    ctx.save(); ctx.translate(recoil>0?-6:0,-8);
+    peaHead(headCol);
+    // 雪花火花(随等级增多并旋转)
+    ctx.strokeStyle="#fff"; ctx.lineWidth=1.6;
+    const sparks = 3 + Math.min(up,6);
+    for(let i=0;i<sparks;i++){ ctx.save(); ctx.translate(-4,-3); ctx.rotate(i*Math.PI*2/sparks + t*0.6);
+      ctx.beginPath(); ctx.moveTo(-5,0); ctx.lineTo(5,0); ctx.stroke(); ctx.restore(); }
+    // Lv5-9: 冰晶冠
+    if(up>=5 && up<10){
+      ctx.fillStyle="#e6f6fc"; ctx.strokeStyle="#afe0f2"; ctx.lineWidth=1;
+      for(let i=-1;i<=1;i++){ const cx=i*9; ctx.beginPath(); ctx.moveTo(cx-3.5,-15); ctx.lineTo(cx,-26-(i===0?4:0)); ctx.lineTo(cx+3.5,-15); ctx.closePath(); ctx.fill(); ctx.stroke(); }
+    }
+    // Lv10(满级): 头戴魔法帽
+    if(up>=10){
+      const sway = Math.sin(t*1.5)*0.12;
+      ctx.save(); ctx.translate(0,-17); ctx.rotate(sway);
+      // 帽檐
+      ctx.fillStyle="#3a2d6e"; ctx.beginPath(); ctx.ellipse(0,0,17,5.5,0,0,Math.PI*2); ctx.fill();
+      // 帽锥(弯尖)
+      const g=ctx.createLinearGradient(0,-46,0,0); g.addColorStop(0,"#6a52c8"); g.addColorStop(1,"#3f307e");
+      ctx.fillStyle=g; ctx.beginPath();
+      ctx.moveTo(-12,-1); ctx.quadraticCurveTo(-6,-30,10,-48); ctx.quadraticCurveTo(4,-26,12,-1); ctx.closePath(); ctx.fill();
+      // 帽带
+      ctx.fillStyle="#2a2050"; ctx.beginPath(); ctx.moveTo(-12,-4); ctx.quadraticCurveTo(0,0,12,-4); ctx.lineTo(11,-9); ctx.quadraticCurveTo(0,-5,-11,-9); ctx.closePath(); ctx.fill();
+      // 星星点缀
+      ctx.fillStyle="#cfe0ff"; star(-2,-20,2.4); star(4,-32,1.8);
+      // 帽尖星
+      ctx.fillStyle="#ffd23f"; star(10,-48,3.2);
+      ctx.restore();
+      // 魔法光环
+      ctx.strokeStyle="rgba(150,200,255,"+(0.35+0.25*Math.sin(t*5)).toFixed(3)+")"; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.arc(0,0,24,0,Math.PI*2); ctx.stroke();
+    }
+    ctx.restore(); ctx.restore();
+  }
+  // 小四角星
+  function star(cx,cy,r){
+    ctx.beginPath();
+    for(let i=0;i<8;i++){ const a=i/8*Math.PI*2; const rr=i%2?r*0.42:r; ctx.lineTo(cx+Math.cos(a)*rr, cy+Math.sin(a)*rr); }
+    ctx.closePath(); ctx.fill();
   }
   function drawPeashooterArt(x,y,t,recoil,headColor){
     ctx.save(); ctx.translate(x,y);
