@@ -1081,18 +1081,37 @@
 
   function drawFuseHalo(level){
     const L = Math.min(Math.max(level||1,1), 6), col = FUSE_HALO[L-1];
-    const t = performance.now()/1000, pulse=0.5+0.5*Math.sin(t*4);
+    const t = performance.now()/1000, pulse=0.5+0.5*Math.sin(t*3);
+    const cy = 42;
     ctx.save();
-    // 地面椭圆光环(颜色随融合等级)
-    ctx.globalAlpha = 0.5+0.3*pulse;
-    ctx.strokeStyle = col; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.ellipse(0, 40, 26+2*pulse, 9+pulse, 0, 0, Math.PI*2); ctx.stroke();
-    ctx.globalAlpha = 0.18+0.1*pulse;
-    ctx.fillStyle = col; ctx.beginPath(); ctx.ellipse(0, 40, 24, 8, 0, 0, Math.PI*2); ctx.fill();
-    // 升腾光点
-    ctx.globalAlpha = 0.7;
-    for(let i=0;i<3;i++){ const a=t*1.5+i*2.1, ph=(t*0.6+i/3)%1;
-      ctx.beginPath(); ctx.arc(Math.cos(a)*20, 40-ph*30, 1.6, 0, Math.PI*2); ctx.fill(); }
+    // 柔光底盘
+    ctx.globalAlpha = 0.30+0.16*pulse;
+    ctx.fillStyle = col; ctx.beginPath(); ctx.ellipse(0, cy, 32, 12, 0, 0, Math.PI*2); ctx.fill();
+    // 向上的光柱(淡)
+    ctx.globalAlpha = 0.12+0.06*pulse;
+    ctx.fillStyle = col; ctx.beginPath();
+    ctx.moveTo(-22,cy); ctx.lineTo(-12,cy-46); ctx.lineTo(12,cy-46); ctx.lineTo(22,cy); ctx.closePath(); ctx.fill();
+    // 主光环(粗·浓色)
+    ctx.globalAlpha = 0.9;
+    ctx.strokeStyle = col; ctx.lineWidth = 4.5;
+    ctx.beginPath(); ctx.ellipse(0, cy, 28+3*pulse, 10+pulse, 0, 0, Math.PI*2); ctx.stroke();
+    // 上弧白色高光(让黑/暗红等深色也清晰可见)
+    ctx.globalAlpha = 0.55+0.35*pulse;
+    ctx.strokeStyle = "rgba(255,255,255,0.95)"; ctx.lineWidth = 1.8;
+    ctx.beginPath(); ctx.ellipse(0, cy, 28+3*pulse, 10+pulse, 0, Math.PI*1.02, Math.PI*1.98); ctx.stroke();
+    // 扩散脉冲圈
+    const ep = (t*0.7)%1;
+    ctx.globalAlpha = (1-ep)*0.55;
+    ctx.strokeStyle = col; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.ellipse(0, cy, 28+ep*22, 10+ep*8, 0, 0, Math.PI*2); ctx.stroke();
+    // 升腾螺旋光点(带白芯)
+    for(let i=0;i<6;i++){
+      const ph=(t*0.7+i/6)%1, ang=t*2.2+i*1.05, rad=24*(1-ph*0.55), sz=2.6*(1-ph*0.5);
+      const px=Math.cos(ang)*rad, py=cy - ph*50;
+      ctx.globalAlpha = (1-ph)*0.95;
+      ctx.fillStyle = col; ctx.beginPath(); ctx.arc(px,py, sz, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = "rgba(255,255,255,0.85)"; ctx.beginPath(); ctx.arc(px,py, sz*0.45, 0, Math.PI*2); ctx.fill();
+    }
     ctx.restore();
   }
   function drawCrown(x,y){
