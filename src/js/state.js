@@ -44,8 +44,9 @@
 
   function spawnWave(n){
     const big = (n % 5 === 0);
-    let count = Math.min(28, 2 + Math.floor(n*0.55));
-    if(big) count = Math.round(count*1.5);
+    // 普通波控制密度(上限16, 出怪时长<波间隔避免堆叠); 每5波巨潮才是大波
+    let count = Math.min(16, 2 + Math.floor(n*0.4));
+    if(big) count = Math.round(count*1.7);
     const pool = poolForWave(n);
     const stepMs = big ? 480 : 700;
     const rid = runId;   // bind spawns to this game instance

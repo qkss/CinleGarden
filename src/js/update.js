@@ -19,7 +19,7 @@
       score += 50 + waveNum*15;                 // survival/progress bonus for reaching a wave
       SFX.play(big?"bigwave":"wave");
       showBanner(big ? ("⚠ 第 "+waveNum+" 波 · 巨潮来袭！") : ("第 "+waveNum+" 波"));
-      const interval = Math.max(12, 26 - waveNum*0.35);
+      const interval = Math.max(15, 28 - waveNum*0.3);   // 拉长波间隔下限, 避免后期成片堆叠
       nextWaveAt = gameTime + (big ? interval + 8 : interval);
     }
 
