@@ -26,7 +26,7 @@
     threepeater:{name:"三豆",  cost:325, cooldown:12, hp:60,  kind:"shooter",  color:"#3f9e3f", dmg:25, rate:1.6, shots:3, unlock:50 },
     cactus:    { name:"仙人掌", cost:125, cooldown:6,  hp:60, kind:"shooter", color:"#5aa84a", dmg:20, rate:1.4, shots:1, spike:true, back:true },  // 穿透尖刺(仅地面)·可向后射击
     bigcactus: { name:"巨仙掌", cost:225, cooldown:10, hp:80, kind:"shooter", color:"#3f7e33", dmg:25, rate:1.4, shots:1, spike:true, air:true, unlock:10 },  // 穿透尖刺·可打空中(10波解锁)
-    jalapeno:  { name:"辣椒",  cost:150, cooldown:25, hp:60,  kind:"rowbomb",   color:"#d23f3f", unlock:20 },
+    jalapeno:  { name:"辣椒",  cost:500, cooldown:25, hp:60,  kind:"rowbomb",   color:"#d23f3f", unlock:20 },
     campfire:  { name:"篝火",  cost:175, cooldown:15, hp:200, kind:"torch",    color:"#ff7a1e", unlock:10 },
     wallnut:   { name:"坚果",  cost:50,  cooldown:15, hp:320, kind:"defense",  color:"#c99761" },
     potatoshield:{ name:"土豆盾", cost:75, cooldown:20, hp:520, kind:"defense", color:"#9c6b3a" },
