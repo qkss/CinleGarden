@@ -6,9 +6,8 @@
 
 ```
 src/                      游戏程序
-├── index.html            入口(模块化版本，按 styles.css + js/* 加载)
+├── index.html            入口(按 styles.css + js/* 加载)
 ├── styles.css            样式
-├── plants-vs-zombies.html  单文件版(双击即玩，便于分发)
 └── js/                   按工程分类的源码模块
     ├── core.js           画布引用 + 开始菜单/攻略界面
     ├── config.js         布局常量、植物/僵尸定义、卡片、快捷键、按钮区域
@@ -28,8 +27,6 @@ tests/                    测试脚本(无头 Node 验证逻辑)
 
 ## 运行
 
-- 直接玩：双击 `src/plants-vs-zombies.html`（单文件，无依赖）。
-- 模块化版：在 `src/` 下用浏览器打开 `index.html`（需保留 `js/` 与 `styles.css` 同级）。
+- 在 `src/` 下用浏览器打开 `index.html`（需保留 `js/` 与 `styles.css` 同级）。
 
-> 模块化版采用经典 `<script>` 顺序加载、共享全局作用域；两个版本逻辑完全一致，
-> `plants-vs-zombies.html` 是由 `js/` 各模块合并而成的构建产物。
+> 采用经典 `<script>` 顺序加载、共享全局作用域。
