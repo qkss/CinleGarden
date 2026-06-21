@@ -44,9 +44,10 @@
       }
       // 期间保持冰冻(新刷出的僵尸也冻住)
       for(const z of zombies){ if(z.hp>0 && z.freezeT<frostRainT){ if(z.burnT>0) meltBurn(z); z.freezeT=frostRainT; z.slowT=0; } }
-      // 王冠寒冰: 冰霜雪雨持续按最大血量造成百分比伤害(5秒共10% -> 2%/秒)
-      if(plants.some(p=>p.type==="snowpea" && p.fused)){
-        for(const z of zombies){ if(z.hp>0 && !z.burrowing){ z.hp -= z.maxHp * 0.02 * dt; if(Math.random()<0.05) spawnParticles(z.x, z.y-8, "#bfe9fb", 1, 60); } }
+      // 融合寒冰: 冰霜雪雨持续按最大血量造成百分比伤害(5秒共10%×融合等级 -> 2%×等级/秒)
+      const snowFL = maxFuseLevel("snowpea");
+      if(snowFL>0){
+        for(const z of zombies){ if(z.hp>0 && !z.burrowing){ z.hp -= z.maxHp * 0.02 * snowFL * dt; if(Math.random()<0.05) spawnParticles(z.x, z.y-8, "#bfe9fb", 1, 60); } }
       }
     }
 
@@ -62,9 +63,10 @@
         if(p.beanCd==null) p.beanCd=10;
         p.beanCd -= dt;
         if(p.beanCd<=0){ p.beanCd=10;
-          const targets = zombies.filter(z=>z.hp>0 && !z.burrowing).sort((a,b)=>b.hp-a.hp).slice(0,5);
+          const fl = p.fuseLevel||1;
+          const targets = zombies.filter(z=>z.hp>0 && !z.burrowing).sort((a,b)=>b.hp-a.hp).slice(0, 5+(fl-1));   // 融合等级越高弹数越多
           for(const z of targets){
-            beanbombs.push({ x:z.x, y:TOPBAR_H-20, targetY:cellCenterY(z.r), r:z.r, vy:140+Math.random()*70, g:780, rot:0, vrot:(Math.random()-.5)*10, dmg:600 });
+            beanbombs.push({ x:z.x, y:TOPBAR_H-20, targetY:cellCenterY(z.r), r:z.r, vy:140+Math.random()*70, g:780, rot:0, vrot:(Math.random()-.5)*10, dmg:600*fl });
           }
           if(targets.length){ showBanner("🌿 撒豆成兵！"); SFX.play("ultimate"); }
         }
@@ -102,7 +104,7 @@
         // 每级升级提升阳光产量; 终极(Lv7)产阳光x10
         if(p.t>=7){
           p.t=0;
-          const val= p.fused ? 2500 : ((p.up>=7)?250:Math.round(25*(1+0.4*p.up)));   // 融合: 10倍产量
+          const val= p.fused ? 2500*(p.fuseLevel||1) : ((p.up>=7)?250:Math.round(25*(1+0.4*p.up)));   // 融合: 产量随融合等级
           addSun(p.x, p.y-10, false, val);
           // 产阳光特效: 金色光环 + 花瓣火花
           const sparkColor = p.up>=7 ? "#fff5a8" : (p.up>=6 ? "#ffe680" : "#ffd23f");

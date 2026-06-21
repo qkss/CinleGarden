@@ -499,6 +499,7 @@
   function drawPlant(p){
     ctx.save();
     ctx.translate(p.x, p.y);
+    if(p.fused) drawFuseHalo(p.fuseLevel);   // 融合: 脚下椭圆光环(颜色随融合等级)
     const bob = Math.sin(p.t*2 + p.c)*2;
     ctx.translate(0, bob);
     // 终极向日葵: 金光笼罩
@@ -543,11 +544,11 @@
       // 等级标签紧贴花头顶部(花头最高花瓣约在 local -47, 随生长缩放)
       const topY = (1-gs)*22 + (-47)*gs;
       drawSunflowerBadge(p, topY);
-      // 可融合提示(未融合·同流派5棵满级)
-      if(!p.fused && fusionEligible(p)){
+      // 可融合 / 可二合一 提示
+      if(fusionEligible(p) || refusionEligible(p)){
         const pl=0.5+0.5*Math.sin(p.t*6);
         ctx.save(); ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
-        const txt="👑 可融合"; const bw=ctx.measureText(txt).width+10;
+        const txt = p.fused ? "✨ 可二合一" : "✨ 可融合"; const bw=ctx.measureText(txt).width+10;
         ctx.fillStyle="rgba(120,60,0,"+(0.7+0.3*pl).toFixed(2)+")"; roundRect(-bw/2,topY-30,bw,14,6); ctx.fill();
         ctx.fillStyle="#ffe680"; ctx.fillText(txt,0,topY-23);
         ctx.restore();
@@ -566,11 +567,14 @@
     // 三豆射手 / 寒冰 升级等级角标 / 融合王冠 / 可融合提示
     if(p.up>0 && (p.type==="threepeater" || p.type==="snowpea")){
       if(p.fused){
-        const gp=0.5+0.5*Math.sin(p.t*5);
-        ctx.save(); ctx.globalCompositeOperation="lighter";
-        ctx.fillStyle="rgba(255,215,80,"+(0.16+0.1*gp).toFixed(3)+")"; ctx.beginPath(); ctx.arc(0,-12,30,0,Math.PI*2); ctx.fill();
-        ctx.restore();
-        drawCrown(0,-48);
+        // 不再戴王冠(底部椭圆光环表示融合等级); 可二次融合时给提示
+        if(refusionEligible(p)){
+          const pl=0.5+0.5*Math.sin(p.t*6);
+          ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
+          const txt="✨ 可二合一", bw2=ctx.measureText(txt).width+10;
+          ctx.fillStyle="rgba(120,60,0,"+(0.7+0.3*pl).toFixed(2)+")"; roundRect(-bw2/2,-50,bw2,14,6); ctx.fill();
+          ctx.fillStyle="#ffe680"; ctx.fillText(txt,0,-43);
+        }
       } else {
         const lbl = nextUpgradeCost(p)===null ? "Lv MAX" : (p.type==="threepeater" ? "x"+(1+0.4*p.up).toFixed(1) : "Lv"+p.up);
         ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
@@ -580,7 +584,7 @@
         ctx.fillText(lbl, 0, -39);
         if(fusionEligible(p)){
           const pl=0.5+0.5*Math.sin(p.t*6);
-          ctx.font="bold 10px 'PingFang SC',Arial"; const txt="👑 可融合", bw2=ctx.measureText(txt).width+10;
+          ctx.font="bold 10px 'PingFang SC',Arial"; const txt="✨ 可融合", bw2=ctx.measureText(txt).width+10;
           ctx.fillStyle="rgba(120,60,0,"+(0.7+0.3*pl).toFixed(2)+")"; roundRect(-bw2/2,-64,bw2,14,6); ctx.fill();
           ctx.fillStyle="#ffe680"; ctx.fillText(txt,0,-57);
         }
@@ -612,10 +616,17 @@
         ctx.fillStyle="rgba(200,220,255,"+(0.16+0.1*gp).toFixed(3)+")"; ctx.beginPath(); ctx.arc(0,4,30,0,Math.PI*2); ctx.fill();
         ctx.restore();
         drawCrown(0,-24);
+        if(refusionEligible(p)){
+          const pl=0.5+0.5*Math.sin(p.t*6);
+          ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
+          const txt="✨ 可二合一", bw2=ctx.measureText(txt).width+10;
+          ctx.fillStyle="rgba(120,60,0,"+(0.7+0.3*pl).toFixed(2)+")"; roundRect(-bw2/2,-44,bw2,14,6); ctx.fill();
+          ctx.fillStyle="#ffe680"; ctx.fillText(txt,0,-37);
+        }
       } else if(fusionEligible(p)){
         const pl=0.5+0.5*Math.sin(p.t*6);
         ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
-        const txt="👑 可融合", bw2=ctx.measureText(txt).width+10;
+        const txt="✨ 可融合", bw2=ctx.measureText(txt).width+10;
         ctx.fillStyle="rgba(120,60,0,"+(0.7+0.3*pl).toFixed(2)+")"; roundRect(-bw2/2,-30,bw2,14,6); ctx.fill();
         ctx.fillStyle="#ffe680"; ctx.fillText(txt,0,-23);
       }
@@ -1068,6 +1079,22 @@
     ctx.restore();
   }
 
+  function drawFuseHalo(level){
+    const L = Math.min(Math.max(level||1,1), 6), col = FUSE_HALO[L-1];
+    const t = performance.now()/1000, pulse=0.5+0.5*Math.sin(t*4);
+    ctx.save();
+    // 地面椭圆光环(颜色随融合等级)
+    ctx.globalAlpha = 0.5+0.3*pulse;
+    ctx.strokeStyle = col; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.ellipse(0, 40, 26+2*pulse, 9+pulse, 0, 0, Math.PI*2); ctx.stroke();
+    ctx.globalAlpha = 0.18+0.1*pulse;
+    ctx.fillStyle = col; ctx.beginPath(); ctx.ellipse(0, 40, 24, 8, 0, 0, Math.PI*2); ctx.fill();
+    // 升腾光点
+    ctx.globalAlpha = 0.7;
+    for(let i=0;i<3;i++){ const a=t*1.5+i*2.1, ph=(t*0.6+i/3)%1;
+      ctx.beginPath(); ctx.arc(Math.cos(a)*20, 40-ph*30, 1.6, 0, Math.PI*2); ctx.fill(); }
+    ctx.restore();
+  }
   function drawCrown(x,y){
     ctx.save(); ctx.translate(x,y);
     ctx.fillStyle="#ffd23f"; ctx.strokeStyle="#c8901a"; ctx.lineWidth=1.2;

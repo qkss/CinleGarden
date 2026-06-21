@@ -155,6 +155,25 @@
     if(q.type==="sunflower") return q.up>=7;
     return nextUpgradeCost(q)===null;
   }
+  // 融合等级光环颜色: 1白 2绿 3蓝 4金 5黑 6暗红
+  const FUSE_HALO = ["#ffffff","#7fe88a","#7fb8ff","#ffd23f","#3a3a3a","#9a2b2b"];
+  const FUSE_MAXLV = 6;
+  // 二次融合(二合一): 已融合植物 + 同类(同流派)另一融合体, 升一级
+  function refusionEligible(p){
+    if(!p || !p.fused || (p.fuseLevel||1) >= FUSE_MAXLV) return false;
+    for(const q of plants){ if(q!==p && q.fused && q.type===p.type && (p.type!=="sunflower" || q.branch===p.branch) && (q.fuseLevel||1)===(p.fuseLevel||1)) return true; }
+    return false;
+  }
+  // 应用融合等级数值: 血量随等级提升
+  function applyFuseStats(p){
+    const L = Math.min(p.fuseLevel||1, FUSE_MAXLV);
+    p.selfHpMult = (p.type==="potatoshield" ? 20 : 10) * L;
+  }
+  // 同类融合体中的最高融合等级(全局技能用)
+  function maxFuseLevel(type){
+    let L=0; for(const q of plants){ if(q.type===type && q.fused) L=Math.max(L, q.fuseLevel||1); }
+    return L;
+  }
   function nextUpgradeCost(p){
     if(!p) return null;
     if(p.type==="sunflower"){
