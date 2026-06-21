@@ -143,7 +143,7 @@
       let n=0; for(const q of plants){ if(q.type==="sunflower" && q.up>=7 && q.branch===p.branch && !q.fused) n++; }
       return n>=5;
     }
-    if(p.type==="snowpea" || p.type==="threepeater" || p.type==="potatoshield"){
+    if(p.type==="snowpea" || p.type==="threepeater" || p.type==="potatoshield" || p.type==="bigcactus"){
       if(nextUpgradeCost(p)!==null) return false;   // 必须满级(Lv10)
       let n=0; for(const q of plants){ if(q.type===p.type && nextUpgradeCost(q)===null && !q.fused) n++; }
       return n>=5;

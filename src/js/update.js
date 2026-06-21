@@ -79,6 +79,26 @@
         // 冷却完毕进入"就绪": 仅在本行有目标时才发动, 否则保持就绪不触发
         if(p.spikeCd<=0 && fireGroundSpikes(p)) p.spikeCd = 20;
       }
+      // 融合巨仙掌: 暴雨梨花 — 每15秒, 5秒内向前发射最多50发高轨穿刺(密集弹幕)
+      if(p.type==="bigcactus" && p.fused){
+        if(p.barrageCd==null) p.barrageCd=15;
+        if(p.barrageT>0){
+          p.barrageT -= dt; p.barrageFireCd -= dt;
+          if(p.barrageFireCd<=0 && p.barrageShots>0){
+            p.barrageFireCd = 0.1; p.barrageShots--;   // 50发 / 5秒 = 10发/秒
+            peas.push({ x:p.x+24, y:p.y-22, r:p.r, speed:460, dmg:25*(p.fuseLevel||1), freeze:false, air:true, spike:true, dir:1, hit:new Set(), barrage:true });
+            p.recoil = 0.08;
+          }
+          if(p.barrageT<=0 || p.barrageShots<=0){ p.barrageT=0; p.barrageCd=15; }
+        } else {
+          p.barrageCd -= dt;
+          if(p.barrageCd<=0){
+            if(zombies.some(z=>z.r===p.r && z.hp>0 && z.x>p.x && !z.burrowing)){
+              p.barrageT=5; p.barrageShots=50; p.barrageFireCd=0; showBanner("🌵 暴雨梨花！"); SFX.play("ultimate");
+            } else p.barrageCd=1;   // 无目标稍后再探
+          }
+        }
+      }
 
       // 终极土豆盾(Lv10): 蓄力20秒 -> 技能就绪(身上出现图标)。手动点击释放, 或开启自动释放
       if(p.type==="potatoshield" && (p.up||0)>=10){

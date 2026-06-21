@@ -87,6 +87,7 @@
             const fname = sp.type==="sunflower" ? ("融合向日葵·"+(sp.branch==="atk"?"狂暴(全屏)":"回血(全屏)"))
                         : sp.type==="snowpea" ? "融合寒冰·冰霜雪雨灼烧"
                         : sp.type==="potatoshield" ? "钛金属土豆盾·免疫偷取·常驻挡鸣人"
+                        : sp.type==="bigcactus" ? "融合巨仙掌·暴雨梨花"
                         : "融合三豆·撒豆成兵";
             showBanner("✨ "+fname+"！");
           }

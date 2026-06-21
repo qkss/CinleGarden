@@ -600,13 +600,21 @@
       for(let i=-1;i<=1;i++){ ctx.beginPath(); ctx.moveTo(i*9-2,40); ctx.lineTo(i*9,40-5-3*pl); ctx.lineTo(i*9+2,40); ctx.closePath(); ctx.fill(); }
       ctx.restore();
     }
-    // 篝火 / 巨仙掌 升级等级角标
-    if(p.up>0 && (p.type==="campfire" || p.type==="bigcactus")){
+    // 篝火 / 巨仙掌 升级等级角标 (巨仙掌融合后不显示等级, 由光环表示)
+    if(p.up>0 && (p.type==="campfire" || p.type==="bigcactus") && !p.fused){
       const lbl = nextUpgradeCost(p)===null ? "Lv MAX" : ("Lv"+p.up);
       ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
       const bw=ctx.measureText(lbl).width+10;
       ctx.fillStyle="rgba(0,0,0,.6)"; roundRect(-bw/2,-46,bw,13,5); ctx.fill();
       ctx.fillStyle = p.type==="campfire" ? "#ffc78a" : "#bdf0a0"; ctx.fillText(lbl, 0, -39);
+    }
+    // 巨仙掌 可融合 / 可二合一 提示
+    if(p.type==="bigcactus" && (fusionEligible(p) || refusionEligible(p))){
+      const pl=0.5+0.5*Math.sin(p.t*6);
+      ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
+      const txt = p.fused ? "✨ 可二合一" : "✨ 可融合", bw2=ctx.measureText(txt).width+10;
+      ctx.fillStyle="rgba(120,60,0,"+(0.7+0.3*pl).toFixed(2)+")"; roundRect(-bw2/2,-50,bw2,14,6); ctx.fill();
+      ctx.fillStyle="#ffe680"; ctx.fillText(txt,0,-43);
     }
     // 钛金属土豆盾(融合) 王冠 / 可融合提示
     if(p.type==="potatoshield"){
@@ -1150,6 +1158,13 @@
     ctx.save(); ctx.translate(pea.x,pea.y);
     if(pea.spike){
       if((pea.dir||1)<0) ctx.scale(-1,1);   // 向后发射的尖刺翻转朝向
+      if(pea.barrage){
+        // 暴雨梨花: 粉白花瓣穿刺 + 白色拖光(高轨·辨识度)
+        ctx.fillStyle="rgba(255,210,230,.55)"; ctx.beginPath(); ctx.ellipse(-11,0,11,3.2,0,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle="#ffd8e8"; ctx.beginPath(); ctx.moveTo(13,0); ctx.lineTo(-9,-4.5); ctx.lineTo(-9,4.5); ctx.closePath(); ctx.fill();
+        ctx.fillStyle="#fff"; ctx.beginPath(); ctx.moveTo(13,0); ctx.lineTo(1,-2.2); ctx.lineTo(1,2.2); ctx.closePath(); ctx.fill();
+        ctx.restore(); return;
+      }
       // 尖刺：细长锥形, 火焰尖刺为橙色
       const body = pea.fire?"#ff7a1e":"#caa15a", tip = pea.fire?"#ffd27a":"#e6d2a0";
       if(pea.fire){ ctx.fillStyle="rgba(255,150,40,.5)"; ctx.beginPath(); ctx.ellipse(-10,0,9,3,0,0,Math.PI*2); ctx.fill(); }
