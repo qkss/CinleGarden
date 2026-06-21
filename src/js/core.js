@@ -4,7 +4,7 @@
   const overlay = document.getElementById("overlay");
 
   // 开始界面攻略内容(点"查看攻略"展开)
-  const GUIDE_HTML = `
+  const GUIDE_HTML = L(`
     <p>顶部点击卡片选植物（或按快捷键 <b>1-9 0 - + =</b> 依次对应各卡），再点击草坪格子种下。点击阳光收集，或按 <b>空格</b>一键拾取全部阳光 ☀️。<b>~</b> 键或右上角 <b>🛠️铲子</b>（或右键）铲除植物以便更换。</p>
     <div class="legend">
       🌻 <b>向日葵</b> 产阳光 · 🟢 <b>豌豆射手</b> 基础输出 · ❄️ <b>寒冰射手</b> 投掷冰冻·可升级延长冻结(40波解锁) ·
@@ -30,19 +30,46 @@
        ❄️ <b>融合寒冰</b>：冰霜雪雨期间<b>持续按最大血量造成伤害</b>(每级10%)，可触发融化。<br>
        🌿 <b>融合三豆</b>：技能<b>撒豆成兵</b>——每10秒从天降<b>巨型点燃豌豆火球</b>，造成大量伤害(数量/威力随等级)。<br>
        🥔 <b>钛金属土豆盾</b>：超高血量、太重不会被蜘蛛偷走，<b>不开技能也常驻挡住本行鸣人激光</b>。<br>
-       🌵 <b>融合巨仙掌</b>：技能<b>暴雨梨花</b>——每15秒持续5秒向前倾泻最多<b>50发高轨穿刺</b>(粉白花瓣·轨道偏高)。</p>`;
+       🌵 <b>融合巨仙掌</b>：技能<b>暴雨梨花</b>——每15秒持续5秒向前倾泻最多<b>50发高轨穿刺</b>(粉白花瓣·轨道偏高)。</p>`,
+  `
+    <p>Click a card up top to pick a plant (or hotkeys <b>1-9 0 - + =</b> in order), then click a lawn cell to plant it. Click suns to collect, or press <b>Space</b> to grab all suns ☀️. Press <b>~</b> or the <b>🛠️ shovel</b> (top-right) / right-click to dig up a plant.</p>
+    <div class="legend">
+      🌻 <b>Sunflower</b> makes sun · 🟢 <b>Peashooter</b> basic damage · ❄️ <b>Snow Pea</b> lobs freeze, upgradeable freeze (unlock W40) ·
+      🔁 <b>Repeater</b> double fire (unlock W10) · 🌿 <b>Threepeater</b> 3 lanes (unlock W50) · 🌵 <b>Cactus</b> piercing spike (whole row · fires backward if a zombie is behind) · 🌵 <b>Big Cactus</b> piercing · hits air · counters balloons (unlock W10 · up to Lv10 · +fire rate per level · Lv10 ground-spike every 20s erupts at the target cell, knockback 2 · surfaces burrowing pangolins) · 🔥 <b>Torch</b> enchants peas to fire · burns through screen doors (unlock W10 · upgradeable after W50 · +fire dmg/level · Lv5 ignites zombies for 5s · ignited shots on a frozen zombie trigger Melt, +200% dmg) ·
+      🟤 <b>Wall-nut</b> tank · 🥔 <b>Potato Shield</b> super tank · upgradeable · explodes when destroyed (Lv5 leaves a slowing mash · Lv10 gives the row a 2s invincible shield every 20s) ·
+      🌶️ <b>Jalapeno</b> burns a whole lane (unlock W20) · 🍒 <b>Cherry Bomb</b> area instakill · 💣 <b>Potato Mine</b> buries a one-shot bomb<br>
+      Enemies (armor is stripped first, then they become normal): Basic / 🚧 Conehead / 🪣 Buckethead / 🛡️ Knight /
+      🦘 Pole Vault (fast · vaults the first plant) / 🏈 Football (fast · after W10 throws footballs at range · block with wall-nut/potato) / 🦣 Gargantuar (one-punch crush · death blast) / 🐴 Giant Rider (5× HP · faster) / 🚙 Armor Tank BOSS (20× HP · giant on top · max 2 on screen) /
+      🕷️ Spider (drops in · steals plants · only lands in the right 4 columns) / 🎈 Balloon (flying · needs cactus/bombs) / 🦅 Griffin Rider (strong flier · high HP · anti-air/explosives) / 🚪 Screen Door (blocks peas · break with fire/explosion) / 🛡️ Shield Giant (immune to peas · shield only broken by cactus spikes · but fears jalapeno/bombs) / 🦔 Pangolin (burrows underground untargetable · randomly locks a plant in its row · surfaces by the 5th cell to destroy it · a Lv5 potato shield can't be broken)<br>
+      <b>Bosses</b>: 🌀 Beam Boss (after W120 · energy beam pierces the whole row · lasts 5s · high HP/dmg · 8s spawn invincibility + freeze-immune) / 🚙 Armor Tank (after W150 · huge HP · armor blocks piercing shots) / 🧙 Witch (after W80 · every 5s gives nearby zombies +500% HP for 2s) / 💀 Skeleton Priest (after W130 · heals nearby zombies every 5s) / ❄️ Night King (after W160 · skeletal horse + Night King's sword · freeze-immune · ranged sword slashes · max 1 on screen)<br>
+      <b>Ultimate skills</b>: 🌻 Ultimate Sunflower (atk) every 10s triggers ⚡ Berserk · row +100% fire rate for 4s / 🌻 Ultimate Sunflower (hp) heals the row 20% every 10s · 🥔 Ultimate Potato (Lv10) shows a shield icon when charged · click to cloak the row in a 5s invincible lightning shield (toggle manual/auto · auto smartly blocks the Beam Boss) · ❄️ Ultimate Snow Pea (Lv5) every 20s a frost storm freezes the whole field for 5s<br>
+      🛒 Each lane has a <b>lawn-mower</b> on the left: it auto-clears the lane when a zombie reaches the house, but <b>only once per lane</b>!
+    </div>
+    <p>🔁 <b>Endless mode</b>: harder every wave; every 5th wave is a <b>Huge Wave</b> (led by elites). Survive long, score high!<br>
+       📍 <b>Level select</b>: every 10 waves cleared unlocks a checkpoint (W10/20/30…); start from there with bonus prep-sun and longer setup time.<br>
+       Bottom-right: <b>🔊 Sound/🔇 Mute</b> (M) / <b>Restart</b> / <b>Pause</b> (P) / <b>Fast-forward 1x/2x/3x</b> (F). Top scores save to a local leaderboard (top 10).<br>
+       Hold <b>Alt</b> to view all plant stats.</p>
+    <p style="font-size:14px">🌻 <b>After W5, click a sunflower to upgrade</b> — pick a branch (cost ramps 250/500/750/1000/1250): ⚡ Attack (max = double row fire rate) or 🛡 Health (+50% row HP per level);
+       after Lv5 they merge → Lv6 Steeled (2500, +100% row HP) → Lv7 Ultimate (5000, all cooldowns −50% · sun ×10).
+       🥔 Potato Shield / ❄️ Snow Pea can also be clicked to upgrade.<br>
+       ✨ <b>Plant Fusion</b>: with <b>5 max-level</b> of the same plant (sunflower needs same branch) a "Fuse" prompt appears; click one and spend <b>10000 sun</b> to fuse. The fused plant gets a <b>ground halo</b> (color = fusion level). <b>Two same-level fused plants can fuse again</b> (2-in-1) for higher stats. Halo colors: white→green→blue→gold→black→dark red (Lv1~6).<br>
+       🌻 <b>Fused Sunflower</b>: 10× HP and sun output; Berserk/Heal skill becomes <b>full-screen</b>.<br>
+       ❄️ <b>Fused Snow Pea</b>: during the frost storm, <b>deals % max-HP damage</b> over time (10% per level), can trigger Melt.<br>
+       🌿 <b>Fused Threepeater</b>: skill <b>Bean Barrage</b> — every 10s drops <b>giant ignited pea-fireballs</b> for big damage (count/power scale with level).<br>
+       🥔 <b>Titanium Potato Shield</b>: huge HP, too heavy to be stolen by spiders, and <b>blocks the Beam Boss in its row even without activating its skill</b>.<br>
+       🌵 <b>Fused Big Cactus</b>: skill <b>Pear-Blossom Storm</b> — every 15s pours up to <b>50 high-track piercing spikes</b> forward for 5s (pink-white petals · higher trajectory).</p>`);
 
   function showMenu(){
     overlay.classList.remove("hidden");
     const hasCheckpoints = unlockedCheckpoints().length > 0;
     overlay.innerHTML =
-      `<h1 class="big">🌻 馨乐花园保卫战 🧟</h1>
+      `<h1 class="big">🌻 ${L("馨乐花园保卫战","Cinle Garden Defense")} 🧟</h1>
        <div class="menuRow">
-         <button class="btn" id="startBtn">开始游戏</button>
-         ${hasCheckpoints ? '<button class="btn btn2" id="levelBtn">选择关卡</button>' : ''}
-         <button class="btn btn2" id="guideBtn">查看攻略</button>
+         <button class="btn" id="startBtn">${L("开始游戏","Start")}</button>
+         ${hasCheckpoints ? '<button class="btn btn2" id="levelBtn">'+L("选择关卡","Levels")+'</button>' : ''}
+         <button class="btn btn2" id="guideBtn">${L("查看攻略","How to play")}</button>
        </div>
-       <div class="author">作者 Niko</div>`;
+       <div class="author">${L("作者 Niko","by Niko")}</div>`;
     document.getElementById("startBtn").onclick = ()=>startGame(0);
     document.getElementById("guideBtn").onclick = showGuide;
     if(hasCheckpoints) document.getElementById("levelBtn").onclick = showLevelSelect;
@@ -51,19 +78,19 @@
     const pts = unlockedCheckpoints();
     const mx = loadMaxWave();
     const cells = pts.map(w=>
-      `<button class="btn lvlBtn" data-wave="${w}" style="min-width:96px">第 ${w} 波</button>`
+      `<button class="btn lvlBtn" data-wave="${w}" style="min-width:96px">${L("第 "+w+" 波","Wave "+w)}</button>`
     ).join("");
     overlay.classList.remove("hidden");
     overlay.innerHTML =
-      `<h1>📍 选择关卡</h1>
-       <p>已达到最高 <b>第 ${mx} 波</b>，每 <b>10 波</b>解锁一个检查点。<br>
-          从检查点开始会获得<b>筹备阳光</b>与更长的布防时间。</p>
+      `<h1>📍 ${L("选择关卡","Level Select")}</h1>
+       <p>${L("已达到最高 <b>第 "+mx+" 波</b>，每 <b>10 波</b>解锁一个检查点。","Best reached: <b>Wave "+mx+"</b>. Every <b>10 waves</b> unlocks a checkpoint.")}<br>
+          ${L("从检查点开始会获得<b>筹备阳光</b>与更长的布防时间。","Starting from a checkpoint grants <b>bonus prep-sun</b> and longer setup time.")}</p>
        <div class="menuRow" style="flex-wrap:wrap;max-width:560px;justify-content:center;gap:8px">
-         <button class="btn lvlBtn" data-wave="0" style="min-width:120px">🌱 新游戏 (第1波)</button>
+         <button class="btn lvlBtn" data-wave="0" style="min-width:120px">${L("🌱 新游戏 (第1波)","🌱 New Game (W1)")}</button>
          ${cells}
        </div>
-       <button class="btn btn2" id="lvlBackBtn" style="margin-top:14px">返回</button>
-       <div class="author">作者 Niko</div>`;
+       <button class="btn btn2" id="lvlBackBtn" style="margin-top:14px">${L("返回","Back")}</button>
+       <div class="author">${L("作者 Niko","by Niko")}</div>`;
     overlay.querySelectorAll(".lvlBtn").forEach(b=>{
       b.onclick = ()=> startGame(parseInt(b.getAttribute("data-wave"),10)||0);
     });
@@ -71,8 +98,8 @@
   }
   function showGuide(){
     overlay.innerHTML =
-      `<h1>📖 游戏攻略</h1>${GUIDE_HTML}
-       <button class="btn" id="guideBackBtn">返回</button>
-       <div class="author">作者 Niko</div>`;
+      `<h1>📖 ${L("游戏攻略","How to Play")}</h1>${GUIDE_HTML}
+       <button class="btn" id="guideBackBtn">${L("返回","Back")}</button>
+       <div class="author">${L("作者 Niko","by Niko")}</div>`;
     document.getElementById("guideBackBtn").onclick = showMenu;
   }

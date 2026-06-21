@@ -47,9 +47,9 @@
   }
   function drawControlButtons(){
     const on = SFX.isOn();
-    btn(MUTEBTN, on?"🔊 音效":"🔇 静音", on?"rgba(0,0,0,.35)":"#7a3a3a");
-    btn(RESTARTBTN, "↻ 重开", "rgba(0,0,0,.35)");
-    btn(PAUSEBTN, paused?"▶ 继续":"⏸ 暂停", paused?"#3aa55a":"rgba(0,0,0,.35)");
+    btn(MUTEBTN, on?L("🔊 音效","🔊 Sound"):L("🔇 静音","🔇 Mute"), on?"rgba(0,0,0,.35)":"#7a3a3a");
+    btn(RESTARTBTN, L("↻ 重开","↻ Restart"), "rgba(0,0,0,.35)");
+    btn(PAUSEBTN, paused?L("▶ 继续","▶ Resume"):L("⏸ 暂停","⏸ Pause"), paused?"#3aa55a":"rgba(0,0,0,.35)");
     const sl = gameSpeed===1?"▶ 1x":(gameSpeed===2?"▶▶ 2x":"▶▶▶ 3x");
     btn(SPEEDBTN, sl, gameSpeed>1?"#ff9d2e":"rgba(0,0,0,.35)");
   }
@@ -57,9 +57,9 @@
     ctx.save();
     ctx.fillStyle="rgba(15,10,25,.55)"; ctx.fillRect(0,TOPBAR_H,W,H-TOPBAR_H);
     ctx.fillStyle="#fff"; ctx.font="bold 40px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
-    ctx.fillText("⏸ 已暂停", W/2, H/2-10);
+    ctx.fillText(L("⏸ 已暂停","⏸ Paused"), W/2, H/2-10);
     ctx.font="16px 'PingFang SC',Arial"; ctx.fillStyle="#cfe7f5";
-    ctx.fillText("点击任意处 或 按 P 继续", W/2, H/2+30);
+    ctx.fillText(L("点击任意处 或 按 P 继续","Click anywhere or press P to resume"), W/2, H/2+30);
     ctx.restore();
   }
   // 矢量闪电图标
@@ -111,12 +111,12 @@
     ctx.save();
     // title
     ctx.font="bold 12px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
-    const title="选择升级方向 (各250阳光)";
+    const title=L("选择升级方向 (各250阳光)","Choose a branch (250 sun)");
     const tw=ctx.measureText(title).width+14;
     ctx.fillStyle="rgba(20,20,30,.92)"; roundRect(r.cx-tw/2, r.ty-9, tw, 18, 5); ctx.fill();
     ctx.fillStyle="#fff"; ctx.fillText(title, r.cx, r.ty);
-    branchBtn(r.atk, "攻速", "#5b9be8", "#2f63b8", drawBoltIcon);
-    branchBtn(r.hp, "血量", "#5fc888", "#2f8a52", drawHeartIcon);
+    branchBtn(r.atk, L("攻速","Atk"), "#5b9be8", "#2f63b8", drawBoltIcon);
+    branchBtn(r.hp, L("血量","HP"), "#5fc888", "#2f8a52", drawHeartIcon);
     ctx.restore();
   }
 
@@ -163,7 +163,7 @@
     }
     // hint
     ctx.fillStyle="rgba(255,255,255,.8)"; ctx.font="bold 12px 'PingFang SC',Arial"; ctx.textAlign="left";
-    ctx.fillText("属性总览 (松开 Alt 关闭)", GRID.x, TOPBAR_H+6);
+    ctx.fillText(L("属性总览 (松开 Alt 关闭)","Plant stats (release Alt to close)"), GRID.x, TOPBAR_H+6);
     ctx.restore();
   }
 
@@ -176,22 +176,22 @@
     const cx=cellCenterX(c), cy=cellY(r);
     const minW = upgradeMinWave(sp);
     let txt, ok=false;
-    if(waveNum<minW){ txt="第"+minW+"波后可升级"; }
+    if(waveNum<minW){ txt=L("第"+minW+"波后可升级","Upgradable after W"+minW); }
     else { const cost=nextUpgradeCost(sp);
-      if(cost==null) txt="已满级 MAX";
+      if(cost==null) txt=L("已满级 MAX","MAX");
       else {
         ok = sun>=cost;
         let nxt;
-        if(sp.type==="potatoshield") nxt="Lv"+(sp.up+1)+"(+50%血)";
-        else if(sp.type==="snowpea") nxt="Lv"+(sp.up+1)+"(冻"+(1.5+0.2*(sp.up+1)).toFixed(1)+"s)";
-        else if(sp.type==="threepeater") nxt="Lv"+(sp.up+1)+"(攻速 x"+(1+0.4*(sp.up+1)).toFixed(1)+")";
-        else if(sp.type==="campfire") nxt = (sp.up+1>=5) ? "Lv5(点燃灼伤)" : ("Lv"+(sp.up+1)+"(火伤 x"+(1.3+0.2*(sp.up+1)).toFixed(1)+")");
-        else if(sp.type==="bigcactus") nxt = (sp.up+1>=10) ? "Lv10(地刺·击退2格)" : ("Lv"+(sp.up+1)+"(攻速 x"+(1+0.1*(sp.up+1)).toFixed(1)+")");
-        else if(sp.up===0) nxt="选择分支";
-        else if(sp.up<5) nxt=(sp.branch==="hp"?"血量":"攻速")+"Lv"+(sp.up+1);
-        else if(sp.up===5) nxt="钢化";
-        else nxt="终极";
-        txt="点击升级→"+nxt+" "+cost+"阳光";
+        if(sp.type==="potatoshield") nxt="Lv"+(sp.up+1)+L("(+50%血)"," (+50% HP)");
+        else if(sp.type==="snowpea") nxt="Lv"+(sp.up+1)+L("(冻"," (freeze ")+(1.5+0.2*(sp.up+1)).toFixed(1)+"s)";
+        else if(sp.type==="threepeater") nxt="Lv"+(sp.up+1)+L("(攻速 x"," (SP x")+(1+0.4*(sp.up+1)).toFixed(1)+")";
+        else if(sp.type==="campfire") nxt = (sp.up+1>=5) ? L("Lv5(点燃灼伤)","Lv5 (ignite)") : ("Lv"+(sp.up+1)+L("(火伤 x"," (fire x")+(1.3+0.2*(sp.up+1)).toFixed(1)+")");
+        else if(sp.type==="bigcactus") nxt = (sp.up+1>=10) ? L("Lv10(地刺·击退2格)","Lv10 (ground-spike)") : ("Lv"+(sp.up+1)+L("(攻速 x"," (SP x")+(1+0.1*(sp.up+1)).toFixed(1)+")");
+        else if(sp.up===0) nxt=L("选择分支","choose branch");
+        else if(sp.up<5) nxt=(sp.branch==="hp"?L("血量","HP"):L("攻速","Atk"))+"Lv"+(sp.up+1);
+        else if(sp.up===5) nxt=L("钢化","Steeled");
+        else nxt=L("终极","Ultimate");
+        txt=L("点击升级→","Upgrade → ")+nxt+" "+cost+L("阳光"," sun");
       }
     }
     ctx.save();
@@ -215,7 +215,7 @@
     ctx.fillText(fmtNum(sun), 86, 50);
     if(autoCollectSun){   // 自动收取标识
       ctx.fillStyle="#3aa55a"; roundRect(78,68,38,13,4); ctx.fill();
-      ctx.fillStyle="#fff"; ctx.font="bold 9px 'PingFang SC',Arial"; ctx.fillText("自动", 97, 75);
+      ctx.fillStyle="#fff"; ctx.font="bold 9px 'PingFang SC',Arial"; ctx.fillText(L("自动","AUTO"), 97, 75);
     }
     ctx.restore();
 
@@ -241,7 +241,7 @@
     ctx.restore();
     ctx.fillStyle = shovelMode?"#b5621c":"#6b5026"; ctx.font="bold 11px 'PingFang SC',Arial";
     ctx.textAlign="center"; ctx.textBaseline="bottom";
-    ctx.fillText("铲子", s.x+s.w/2, s.y+s.h-4);
+    ctx.fillText(L("铲子","Shovel"), s.x+s.w/2, s.y+s.h-4);
     // hotkey ~
     ctx.fillStyle="#9a7c45"; ctx.font="bold 10px Arial"; ctx.textAlign="left"; ctx.textBaseline="top";
     ctx.fillText("~", s.x+5, s.y+4);
@@ -257,10 +257,12 @@
     ctx.fillStyle = selected===key ? "#fff7d6" : "#e8d9a8"; ctx.fill();
     ctx.lineWidth=3; ctx.strokeStyle = selected===key ? "#ff9d2e" : "#9a7c45"; ctx.stroke();
 
-    // name
+    // name (英文名较长, 字号缩小并按宽度自适应)
     ctx.fillStyle="#4a3a1c"; ctx.textAlign="center"; ctx.textBaseline="top";
-    ctx.font="bold 13px 'PingFang SC',Arial";
-    ctx.fillText(p.name, x+w/2, y+6);
+    const pname = L(p.name, p.en||p.name);
+    ctx.font = lang==="zh" ? "bold 13px 'PingFang SC',Arial" : "bold 9px Arial";
+    if(lang!=="zh"){ let fs=9; while(fs>6 && ctx.measureText(pname).width>w-4){ fs--; ctx.font="bold "+fs+"px Arial"; } }
+    ctx.fillText(pname, x+w/2, y+ (lang==="zh"?6:8));
 
     // icon
     ctx.save();
@@ -283,7 +285,7 @@
       ctx.fillStyle="#ffd23f"; ctx.font="bold 14px Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
       ctx.fillText("🔒", x+w/2, y+h/2-6);
       ctx.fillStyle="#fff"; ctx.font="bold 11px 'PingFang SC',Arial";
-      ctx.fillText(p.unlock+"波解锁", x+w/2, y+h/2+12);
+      ctx.fillText(L(p.unlock+"波解锁","W"+p.unlock), x+w/2, y+h/2+12);
     } else if(cdLeft>0){
       const frac = cdLeft/p.cooldown;
       ctx.fillStyle="rgba(20,20,30,.55)"; roundRect(x,y,w,h*frac,10); ctx.fill();
@@ -441,7 +443,7 @@
         ctx.fillStyle="rgba(120,200,255,"+(0.06+0.04*pulse).toFixed(3)+")";
         ctx.fillRect(GRID.x, cy, COLS*GRID.cw, GRID.ch);
         ctx.fillStyle="rgba(200,235,255,.9)"; ctx.font="bold 13px 'PingFang SC',Arial"; ctx.textAlign="left"; ctx.textBaseline="middle";
-        ctx.fillText("无敌护盾", GRID.x+6, cy+12);
+        ctx.fillText(L("无敌护盾","SHIELD"), GRID.x+6, cy+12);
         ctx.restore();
         // 给本行每株植物套上闪电护盾
         for(const p of plants){ if(p.r===r && p.hp>0) drawLightningShield(p.x, p.y-2, 32); }
@@ -454,7 +456,7 @@
         ctx.strokeStyle="rgba(255,150,70,"+(0.5+0.3*pulse).toFixed(3)+")"; ctx.lineWidth=3;
         ctx.strokeRect(GRID.x+1, cy+1, COLS*GRID.cw-2, GRID.ch-2);
         ctx.fillStyle="rgba(255,225,190,.95)"; ctx.font="bold 14px 'PingFang SC',Arial"; ctx.textAlign="right"; ctx.textBaseline="middle";
-        ctx.fillText("狂暴", GRID.x+COLS*GRID.cw-6, cy+12);
+        ctx.fillText(L("狂暴","BERSERK"), GRID.x+COLS*GRID.cw-6, cy+12);
         ctx.restore();
       }
     }
@@ -556,7 +558,7 @@
       if(fusionEligible(p) || refusionEligible(p)){
         const pl=0.5+0.5*Math.sin(p.t*6);
         ctx.save(); ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
-        const txt = p.fused ? "✨ 可二合一" : "✨ 可融合"; const bw=ctx.measureText(txt).width+10;
+        const txt = p.fused ? L("✨ 可二合一","✨ Fuse+") : L("✨ 可融合","✨ Fuse"); const bw=ctx.measureText(txt).width+10;
         ctx.fillStyle="rgba(120,60,0,"+(0.7+0.3*pl).toFixed(2)+")"; roundRect(-bw/2,topY-30,bw,14,6); ctx.fill();
         ctx.fillStyle="#ffe680"; ctx.fillText(txt,0,topY-23);
         ctx.restore();
@@ -579,7 +581,7 @@
         if(refusionEligible(p)){
           const pl=0.5+0.5*Math.sin(p.t*6);
           ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
-          const txt="✨ 可二合一", bw2=ctx.measureText(txt).width+10;
+          const txt=L("✨ 可二合一","✨ Fuse+"), bw2=ctx.measureText(txt).width+10;
           ctx.fillStyle="rgba(120,60,0,"+(0.7+0.3*pl).toFixed(2)+")"; roundRect(-bw2/2,-50,bw2,14,6); ctx.fill();
           ctx.fillStyle="#ffe680"; ctx.fillText(txt,0,-43);
         }
@@ -592,7 +594,7 @@
         ctx.fillText(lbl, 0, -39);
         if(fusionEligible(p)){
           const pl=0.5+0.5*Math.sin(p.t*6);
-          ctx.font="bold 10px 'PingFang SC',Arial"; const txt="✨ 可融合", bw2=ctx.measureText(txt).width+10;
+          ctx.font="bold 10px 'PingFang SC',Arial"; const txt=L("✨ 可融合","✨ Fuse"), bw2=ctx.measureText(txt).width+10;
           ctx.fillStyle="rgba(120,60,0,"+(0.7+0.3*pl).toFixed(2)+")"; roundRect(-bw2/2,-64,bw2,14,6); ctx.fill();
           ctx.fillStyle="#ffe680"; ctx.fillText(txt,0,-57);
         }
@@ -620,7 +622,7 @@
     if(p.type==="bigcactus" && (fusionEligible(p) || refusionEligible(p))){
       const pl=0.5+0.5*Math.sin(p.t*6);
       ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
-      const txt = p.fused ? "✨ 可二合一" : "✨ 可融合", bw2=ctx.measureText(txt).width+10;
+      const txt = p.fused ? L("✨ 可二合一","✨ Fuse+") : L("✨ 可融合","✨ Fuse"), bw2=ctx.measureText(txt).width+10;
       ctx.fillStyle="rgba(120,60,0,"+(0.7+0.3*pl).toFixed(2)+")"; roundRect(-bw2/2,-50,bw2,14,6); ctx.fill();
       ctx.fillStyle="#ffe680"; ctx.fillText(txt,0,-43);
     }
@@ -635,14 +637,14 @@
         if(refusionEligible(p)){
           const pl=0.5+0.5*Math.sin(p.t*6);
           ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
-          const txt="✨ 可二合一", bw2=ctx.measureText(txt).width+10;
+          const txt=L("✨ 可二合一","✨ Fuse+"), bw2=ctx.measureText(txt).width+10;
           ctx.fillStyle="rgba(120,60,0,"+(0.7+0.3*pl).toFixed(2)+")"; roundRect(-bw2/2,-44,bw2,14,6); ctx.fill();
           ctx.fillStyle="#ffe680"; ctx.fillText(txt,0,-37);
         }
       } else if(fusionEligible(p)){
         const pl=0.5+0.5*Math.sin(p.t*6);
         ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
-        const txt="✨ 可融合", bw2=ctx.measureText(txt).width+10;
+        const txt=L("✨ 可融合","✨ Fuse"), bw2=ctx.measureText(txt).width+10;
         ctx.fillStyle="rgba(120,60,0,"+(0.7+0.3*pl).toFixed(2)+")"; roundRect(-bw2/2,-30,bw2,14,6); ctx.fill();
         ctx.fillStyle="#ffe680"; ctx.fillText(txt,0,-23);
       }
@@ -730,8 +732,8 @@
   function drawSunflowerBadge(p, topY){
     if(!(p.up>0)) return;
     const up=p.up, branch=p.branch;
-    const suffix = (up>=6 && branch) ? (branch==="atk"?"·攻速":"·血量") : "";
-    const lbl = p.fused ? ("王冠"+(branch==="atk"?"·狂暴":"·回血")) : (up>=7?("终极"+suffix):(up>=6?("钢化"+suffix):((branch==="hp"?"血":"攻")+"Lv"+up)));
+    const suffix = (up>=6 && branch) ? (branch==="atk"?L("·攻速","·Atk"):L("·血量","·HP")) : "";
+    const lbl = p.fused ? (L("王冠","Crown")+(branch==="atk"?L("·狂暴","·Bsk"):L("·回血","·Heal"))) : (up>=7?(L("终极","Ult")+suffix):(up>=6?(L("钢化","Steel")+suffix):((branch==="hp"?L("血","HP"):L("攻","Atk"))+"Lv"+up)));
     ctx.save();
     ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
     const bw=ctx.measureText(lbl).width+10;
@@ -1693,7 +1695,7 @@
       ctx.strokeStyle="rgba(255,240,170,"+(0.6+0.3*pulse).toFixed(3)+")"; ctx.lineWidth=2.5;
       ctx.beginPath(); ctx.arc(0,-8,29,0,Math.PI*2); ctx.stroke();
       ctx.fillStyle="rgba(255,245,190,.95)"; ctx.font="bold 11px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
-      ctx.fillText("无敌 "+Math.ceil(z.invulnT)+"s", 0, -44);
+      ctx.fillText(L("无敌 ","INVUL ")+Math.ceil(z.invulnT)+"s", 0, -44);
       ctx.restore();
     }
     // frozen overlay: icy block + frost
@@ -1848,7 +1850,7 @@
     roundRect(m.x, m.y, m.w, m.h, 7); ctx.fill();
     ctx.strokeStyle="rgba(255,255,255,.35)"; ctx.lineWidth=1; ctx.stroke();
     ctx.fillStyle="#fff"; ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
-    ctx.fillText(autoSkill?"自动":"手动", m.x+m.w/2, m.y+m.h/2+0.5);
+    ctx.fillText(autoSkill?L("自动","Auto"):L("手动","Manual"), m.x+m.w/2, m.y+m.h/2+0.5);
     ctx.restore();
     // 技能图标 / 蓄力进度
     const ic = rc.icon, cx=ic.x+ic.w/2, cy=ic.y+ic.h/2, r=ic.w/2;
@@ -1862,7 +1864,7 @@
       ctx.strokeStyle="#bfe0ff"; ctx.lineWidth=2; ctx.stroke();
       drawShieldGlyph(cx, cy-1, r*0.6, "#dff0ff", "#7fb8e8");
       ctx.fillStyle="rgba(190,224,255,.95)"; ctx.font="bold 9px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
-      ctx.fillText("点击释放", cx, cy-r-7);
+      ctx.fillText(L("点击释放","Tap to cast"), cx, cy-r-7);
     } else {
       const frac = 1 - Math.max(0, Math.min(1, p.skillCd/20));
       ctx.fillStyle="rgba(20,30,45,.5)"; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
@@ -1879,13 +1881,13 @@
     // wave pill
     ctx.fillStyle="rgba(0,0,0,.32)"; roundRect(GRID.x, H-40, 150, 26, 8); ctx.fill();
     ctx.fillStyle="#ffd23f"; ctx.font="bold 16px 'PingFang SC',Arial"; ctx.textAlign="left";
-    ctx.fillText("🌊 第 "+waveNum+" 波", GRID.x+12, H-27);
+    ctx.fillText(L("🌊 第 "+waveNum+" 波","🌊 Wave "+waveNum), GRID.x+12, H-27);
     // score
     ctx.fillStyle="rgba(0,0,0,.32)"; roundRect(GRID.x+162, H-40, 200, 26, 8); ctx.fill();
-    ctx.fillStyle="#fff"; ctx.fillText("得分 "+fmtNum(score), GRID.x+174, H-27);
+    ctx.fillStyle="#fff"; ctx.fillText(L("得分 ","Score ")+fmtNum(score), GRID.x+174, H-27);
     // best
     ctx.fillStyle="rgba(0,0,0,.32)"; roundRect(GRID.x+374, H-40, 190, 26, 8); ctx.fill();
-    ctx.fillStyle="#9be36b"; ctx.fillText("最高 "+fmtNum(best), GRID.x+386, H-27);
+    ctx.fillStyle="#9be36b"; ctx.fillText(L("最高 ","Best ")+fmtNum(best), GRID.x+386, H-27);
     // clock
     ctx.fillStyle="#cfe7f5"; ctx.font="13px 'PingFang SC',Arial";
     ctx.fillText("⏱ "+fmtClock(gameTime), GRID.x+572, H-27);
@@ -1899,7 +1901,7 @@
     ctx.fillStyle = gameSpeed>1 ? "#ff9d2e" : "rgba(0,0,0,.35)"; ctx.fill();
     ctx.lineWidth=2; ctx.strokeStyle="#fff6"; ctx.stroke();
     ctx.fillStyle="#fff"; ctx.font="bold 14px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
-    const label = gameSpeed===1?"▶ 1x 正常":(gameSpeed===2?"▶▶ 2x 快进":"▶▶▶ 3x 快进");
+    const label = gameSpeed===1?L("▶ 1x 正常","▶ 1x"):(gameSpeed===2?L("▶▶ 2x 快进","▶▶ 2x"):L("▶▶▶ 3x 快进","▶▶▶ 3x"));
     ctx.fillText(label, s.x+s.w/2, s.y+s.h/2);
     ctx.restore();
   }

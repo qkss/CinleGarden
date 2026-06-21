@@ -18,7 +18,7 @@
       spawnWave(waveNum);
       score += 50 + waveNum*15;                 // survival/progress bonus for reaching a wave
       SFX.play(big?"bigwave":"wave");
-      showBanner(big ? ("⚠ 第 "+waveNum+" 波 · 巨潮来袭！") : ("第 "+waveNum+" 波"));
+      showBanner(big ? L("⚠ 第 "+waveNum+" 波 · 巨潮来袭！","⚠ Wave "+waveNum+" · Huge Wave!") : L("第 "+waveNum+" 波","Wave "+waveNum));
       const interval = Math.max(15, 28 - waveNum*0.3);   // 拉长波间隔下限, 避免后期成片堆叠
       nextWaveAt = gameTime + (big ? interval + 8 : interval);
     }
@@ -70,7 +70,7 @@
             // 斜向下坠落: 从目标左后上方抛出, 带水平速度
             beanbombs.push({ x:z.x-80, y:TOPBAR_H-20, targetY:cellCenterY(z.r), r:z.r, vx:160, vy:120+Math.random()*40, g:760, rot:0, vrot:(Math.random()-.5)*8, dmg:600*fl });
           }
-          if(targets.length){ showBanner("🌿 撒豆成兵！"); SFX.play("ultimate"); }
+          if(targets.length){ showBanner(L("🌿 撒豆成兵！","🌿 Bean Barrage!")); SFX.play("ultimate"); }
         }
       }
 
@@ -96,7 +96,7 @@
           p.barrageCd -= dt;
           if(p.barrageCd<=0){
             if(zombies.some(z=>z.r===p.r && z.hp>0 && z.x>p.x && !z.burrowing)){
-              p.barrageT=5; p.barrageShots=50; p.barrageFireCd=0; showBanner("🌵 暴雨梨花！"); SFX.play("ultimate");
+              p.barrageT=5; p.barrageShots=50; p.barrageFireCd=0; showBanner(L("🌵 暴雨梨花！","🌵 Pear-Blossom Storm!")); SFX.play("ultimate");
             } else p.barrageCd=1;   // 无目标稍后再探
           }
         }

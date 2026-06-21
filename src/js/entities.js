@@ -91,7 +91,7 @@
     z.hp -= dmg; z.burnT = 0;
     explosions.push({ x:z.x, y:z.y-8, r:0, max:54, t:0, life:0.38, color:"#ffd9a0" });
     spawnParticles(z.x, z.y-10, "#eaf6fb", 14, 220); spawnParticles(z.x, z.y-10, "#ffb14e", 8, 200);
-    floats.push({ x:z.x, y:z.y-26, vy:-34, t:0, life:1.0, text:"融化!", color:"#ffd9a0" });
+    floats.push({ x:z.x, y:z.y-26, vy:-34, t:0, life:1.0, text:L("融化!","MELT!"), color:"#ffd9a0" });
   }
   // 点燃僵尸: 持续5秒灼伤 (冰冻会熄火)
   function ignite(z){
@@ -237,9 +237,9 @@
   function threepeaterAtkMult(p){ return 1 + 0.4 * Math.min(p.up||0, 10); }
   function upgradeLabel(p){
     const up=p.up, b=p.branch;
-    if(up<=0) return "向日葵";
-    if(up<=5) return (b==="hp"?"血量向日葵 Lv":"攻速向日葵 Lv")+up;
-    return up===6 ? "钢化向日葵" : "终极向日葵";
+    if(up<=0) return L("向日葵","Sunflower");
+    if(up<=5) return (b==="hp"?L("血量向日葵 Lv","HP Sunflower Lv"):L("攻速向日葵 Lv","Atk Sunflower Lv"))+up;
+    return up===6 ? L("钢化向日葵","Steeled Sunflower") : L("终极向日葵","Ultimate Sunflower");
   }
   function effCooldown(key){ return PLANTS[key].cooldown * (ultimateActive()?0.5:1); }
   function cardLocked(key){ return (PLANTS[key].unlock||0) > waveNum; }   // 未到解锁波数

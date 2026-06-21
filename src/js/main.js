@@ -29,25 +29,26 @@
       const mine = (h===entry) ? ' style="color:#ffd23f;font-weight:bold"' : '';
       return `<tr${mine}><td style="padding:2px 10px">${i+1}</td><td style="padding:2px 10px;text-align:right">${fmtNum(h.score)}</td><td style="padding:2px 10px;text-align:center">${h.wave}</td><td style="padding:2px 10px;font-size:12px;opacity:.85">${h.date}</td></tr>`;
     }).join("");
-    const newRecord = rank===1 ? `<p style="color:#ffd23f">🏆 新纪录！</p>` : (rank>0&&rank<=10 ? `<p>进入排行榜第 ${rank} 名！</p>` : "");
+    const newRecord = rank===1 ? `<p style="color:#ffd23f">${L("🏆 新纪录！","🏆 New record!")}</p>` : (rank>0&&rank<=10 ? `<p>${L("进入排行榜第 "+rank+" 名！","Leaderboard #"+rank+"!")}</p>` : "");
     overlay.classList.remove("hidden");
     overlay.innerHTML =
-      `<h1>💀 游戏结束</h1>
-       <p>你坚持到了 <b>第 ${waveNum} 波</b>，存活 <b>${fmtClock(gameTime)}</b>，得分 <b>${fmtNum(score)}</b>。</p>
+      `<h1>💀 ${L("游戏结束","Game Over")}</h1>
+       <p>${L("你坚持到了 <b>第 "+waveNum+" 波</b>，存活 <b>"+fmtClock(gameTime)+"</b>，得分 <b>"+fmtNum(score)+"</b>。",
+              "You reached <b>Wave "+waveNum+"</b>, survived <b>"+fmtClock(gameTime)+"</b>, scored <b>"+fmtNum(score)+"</b>.")}</p>
        ${newRecord}
        <div style="background:rgba(0,0,0,.3);border-radius:12px;padding:10px 14px;max-width:520px">
-         <div style="font-weight:bold;margin-bottom:4px">🏅 排行榜 (前 10)</div>
+         <div style="font-weight:bold;margin-bottom:4px">${L("🏅 排行榜 (前 10)","🏅 Leaderboard (Top 10)")}</div>
          <table style="border-collapse:collapse;margin:0 auto;font-size:14px">
-           <tr style="opacity:.7"><td style="padding:2px 10px">#</td><td style="padding:2px 10px;text-align:right">分数</td><td style="padding:2px 10px">波数</td><td style="padding:2px 10px">时间</td></tr>
+           <tr style="opacity:.7"><td style="padding:2px 10px">#</td><td style="padding:2px 10px;text-align:right">${L("分数","Score")}</td><td style="padding:2px 10px">${L("波数","Wave")}</td><td style="padding:2px 10px">${L("时间","Time")}</td></tr>
            ${rows}
          </table>
        </div>
        <div class="menuRow">
-         <button class="btn" id="againBtn">再玩一次</button>
-         ${unlockedCheckpoints().length ? '<button class="btn btn2" id="levelBtn2">选择关卡</button>' : ''}
-         <button class="btn btn2" id="guideBtn2">查看攻略</button>
+         <button class="btn" id="againBtn">${L("再玩一次","Play Again")}</button>
+         ${unlockedCheckpoints().length ? '<button class="btn btn2" id="levelBtn2">'+L("选择关卡","Levels")+'</button>' : ''}
+         <button class="btn btn2" id="guideBtn2">${L("查看攻略","How to play")}</button>
        </div>
-       <div class="author">作者 Niko</div>`;
+       <div class="author">${L("作者 Niko","by Niko")}</div>`;
     document.getElementById("againBtn").onclick = ()=>startGame(0);
     const lvb = document.getElementById("levelBtn2"); if(lvb) lvb.onclick = showLevelSelect;
     document.getElementById("guideBtn2").onclick = showGuide;
@@ -92,4 +93,5 @@
     if(!wasRunning){ lastTs=performance.now(); requestAnimationFrame(frame); }  // avoid stacking loops on restart
   }
 
+  try{ document.title = L("馨乐花园保卫战","Cinle Garden Defense"); }catch(e){}
   reset(); state="idle"; showMenu(); draw();
