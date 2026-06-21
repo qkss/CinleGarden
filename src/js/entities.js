@@ -125,6 +125,13 @@
     return m;
   }
   function ultimateActive(){ return plants.some(p=>p.type==="sunflower" && p.up>=7); }
+  const FUSE_COST = 10000;
+  // 同流派满级(终极)向日葵达5棵 -> 可融合
+  function fusionEligible(p){
+    if(!(p && p.type==="sunflower" && p.up>=7 && p.branch && !p.fused)) return false;
+    let n=0; for(const q of plants){ if(q.type==="sunflower" && q.up>=7 && q.branch===p.branch && !q.fused) n++; }
+    return n>=5;
+  }
   function nextUpgradeCost(p){
     if(!p) return null;
     if(p.type==="sunflower"){

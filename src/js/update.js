@@ -85,7 +85,7 @@
         // 每级升级提升阳光产量; 终极(Lv7)产阳光x10
         if(p.t>=7){
           p.t=0;
-          const val=(p.up>=7)?250:Math.round(25*(1+0.4*p.up));
+          const val= p.fused ? 2500 : ((p.up>=7)?250:Math.round(25*(1+0.4*p.up)));   // 融合: 10倍产量
           addSun(p.x, p.y-10, false, val);
           // 产阳光特效: 金色光环 + 花瓣火花
           const sparkColor = p.up>=7 ? "#fff5a8" : (p.up>=6 ? "#ffe680" : "#ffd23f");
@@ -99,14 +99,17 @@
             // 攻速流: 每10秒触发狂暴, 本行植物攻速+100% 持续4秒
             if(p.skillCd==null) p.skillCd=10;
             p.skillCd -= dt;
-            if(p.skillCd<=0){ p.skillCd=10; rowBerserk[p.r]=Math.max(rowBerserk[p.r],4);
-              // 全行红橙狂暴扫光特效
-              const cy = cellCenterY(p.r);
-              for(let gx=GRID.x+20; gx<GRID.x+COLS*GRID.cw; gx+=44){
-                explosions.push({ x:gx, y:cy, r:0, max:28, t:0, life:0.4, color:"#ff7a3c" });
-                spawnParticles(gx, cy, "#ff9a3c", 4, 150);
+            if(p.skillCd<=0){ p.skillCd=10;
+              const rows = p.fused ? [0,1,2,3,4] : [p.r];   // 融合: 全屏狂暴
+              for(const rr of rows){
+                rowBerserk[rr]=Math.max(rowBerserk[rr],4);
+                const cy = cellCenterY(rr);
+                for(let gx=GRID.x+20; gx<GRID.x+COLS*GRID.cw; gx+=44){
+                  explosions.push({ x:gx, y:cy, r:0, max:28, t:0, life:0.4, color:"#ff7a3c" });
+                  spawnParticles(gx, cy, "#ff9a3c", 4, 150);
+                }
               }
-              for(const q of plants){ if(q.r===p.r && q.hp>0) q.glowT = 1.6; }
+              for(const q of plants){ if((p.fused||q.r===p.r) && q.hp>0) q.glowT = 1.6; }
               SFX.play("ultimate");
             }
           } else if(p.branch==="hp"){
@@ -114,7 +117,7 @@
             if(p.healCd==null) p.healCd=10;
             p.healCd -= dt;
             if(p.healCd<=0){ p.healCd=10;
-              for(const q of plants){ if(q.r===p.r && q.hp>0){
+              for(const q of plants){ if((p.fused||q.r===p.r) && q.hp>0){   // 融合: 全屏回血
                 q.glowT = 1.4;                                       // 金光笼罩本行植物
                 const heal = q.maxHp*0.2;
                 if(q.hp<q.maxHp){

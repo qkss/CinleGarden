@@ -533,14 +533,24 @@
     if((p.type==="cherrybomb"||p.type==="jalapeno") && p.fuse<0.5){ const s=1+(0.5-p.fuse)*0.6; ctx.scale(s,s); }
     if(p.type==="potatomine") drawMineArt(0,0,false,p.armed);
     else if(p.type==="sunflower"){
-      // 初始幼苗较小, 随升级逐步长大到满级最大形态
-      const gs = 0.62 + 0.38*Math.min(p.up||0,7)/7;
+      // 初始幼苗较小, 随升级逐步长大; 融合后更大
+      let gs = 0.62 + 0.38*Math.min(p.up||0,7)/7;
+      if(p.fused) gs *= 1.18;
       ctx.save(); ctx.translate(0,(1-gs)*22); ctx.scale(gs,gs);   // 以根部为锚, 向上长高
-      drawSunflowerArt(0,0,p.t,p.up,p.branch);
+      drawSunflowerArt(0,0,p.t,p.up,p.branch,p.fused);
       ctx.restore();
       // 等级标签紧贴花头顶部(花头最高花瓣约在 local -47, 随生长缩放)
       const topY = (1-gs)*22 + (-47)*gs;
       drawSunflowerBadge(p, topY);
+      // 可融合提示(未融合·同流派5棵满级)
+      if(!p.fused && fusionEligible(p)){
+        const pl=0.5+0.5*Math.sin(p.t*6);
+        ctx.save(); ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
+        const txt="👑 可融合"; const bw=ctx.measureText(txt).width+10;
+        ctx.fillStyle="rgba(120,60,0,"+(0.7+0.3*pl).toFixed(2)+")"; roundRect(-bw/2,topY-30,bw,14,6); ctx.fill();
+        ctx.fillStyle="#ffe680"; ctx.fillText(txt,0,topY-23);
+        ctx.restore();
+      }
     }
     else if(p.type==="potatoshield") drawPotatoShieldArt(0,0,p.hp/p.maxHp,p.up);
     else if(p.type==="snowpea") drawSnowpeaArt(0,0,p.t,p.recoil||0,p.up);
@@ -595,7 +605,7 @@
 
   const SF_ATK = ["#ffd23f","#ffc02e","#ffa61e","#ff8a1e","#ff6a1e","#ff4a2a"];   // 攻速分支 橙红
   const SF_HP  = ["#ffd23f","#bcd2e8","#9fc0e0","#82add6","#6f9fd0","#5b90c8"];   // 血量分支 蓝
-  function drawSunflowerArt(x,y,t,up,branch){
+  function drawSunflowerArt(x,y,t,up,branch,fused){
     up = up||0;
     ctx.save(); ctx.translate(x,y);
     const pulse = 0.5+0.5*Math.sin(t*5);
@@ -640,6 +650,22 @@
       if(branch==="atk") drawBoltIcon(0,0,5); else drawHeartIcon(0,0,4.6);
       ctx.restore();
     }
+    // 融合: 头戴王冠 + 光环
+    if(fused){
+      const pulse=0.5+0.5*Math.sin(t*5);
+      ctx.save(); ctx.globalCompositeOperation="lighter";
+      ctx.fillStyle="rgba(255,215,80,"+(0.18+0.12*pulse).toFixed(3)+")"; ctx.beginPath(); ctx.arc(0,-12,34+3*pulse,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+      // 王冠(花头顶部)
+      ctx.save(); ctx.translate(0,-34);
+      ctx.fillStyle="#ffd23f"; ctx.strokeStyle="#c8901a"; ctx.lineWidth=1.2;
+      ctx.beginPath();
+      ctx.moveTo(-13,4); ctx.lineTo(-13,-6); ctx.lineTo(-6,1); ctx.lineTo(0,-9); ctx.lineTo(6,1); ctx.lineTo(13,-6); ctx.lineTo(13,4); ctx.closePath();
+      ctx.fill(); ctx.stroke();
+      ctx.fillStyle="#ff6b7a"; ctx.beginPath(); ctx.arc(0,-1,1.8,0,Math.PI*2); ctx.fill();   // 宝石
+      ctx.fillStyle="#7fd0ff"; ctx.beginPath(); ctx.arc(-13,-6,1.6,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(13,-6,1.6,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
     ctx.restore();
   }
   // 向日葵等级标签(在生长缩放之外绘制, 紧贴花头顶部)
@@ -647,7 +673,7 @@
     if(!(p.up>0)) return;
     const up=p.up, branch=p.branch;
     const suffix = (up>=6 && branch) ? (branch==="atk"?"·攻速":"·血量") : "";
-    const lbl = up>=7?("终极"+suffix):(up>=6?("钢化"+suffix):((branch==="hp"?"血":"攻")+"Lv"+up));
+    const lbl = p.fused ? ("王冠"+(branch==="atk"?"·狂暴":"·回血")) : (up>=7?("终极"+suffix):(up>=6?("钢化"+suffix):((branch==="hp"?"血":"攻")+"Lv"+up)));
     ctx.save();
     ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
     const bw=ctx.measureText(lbl).width+10;
