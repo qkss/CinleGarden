@@ -24,14 +24,14 @@
   }
 
   // 僵尸出场最早波数 (气球10波后、巨人20波后、女巫80波后、鸣人Boss 100波后、钢盔巨人100波后)
-  const ZMINWAVE = { balloon:11, football:15, gargantuar:20, pangolin:16, shieldgiant:30, giantrider:90, griffin:50, witch:81, mingzombie:120, irongarg:101, armorboss:150, priest:130, nightking:160 };
+  const ZMINWAVE = { balloon:11, football:8, gargantuar:20, pangolin:16, shieldgiant:30, giantrider:90, griffin:50, witch:81, mingzombie:120, irongarg:101, armorboss:150, priest:130, nightking:160 };
   // pool of zombie types by wave (difficulty ramps; heavies unlock progressively, no cap)
   function poolForWave(n){
     let pool;
     if(n<=2)       pool=["basic","basic","cone"];
     else if(n<=4)  pool=["basic","cone","cone","polevault"];
     else if(n<=6)  pool=["basic","cone","bucket","polevault"];
-    else if(n<=9)  pool=["cone","bucket","polevault","ironclad","spider","balloon","screendoor"];
+    else if(n<=9)  pool=["cone","bucket","polevault","ironclad","football","spider","balloon","screendoor"];
     else if(n<=13) pool=["cone","bucket","polevault","ironclad","football","spider","balloon","screendoor"];
     else if(n<=18) pool=["bucket","polevault","ironclad","football","ironclad","pangolin","spider","balloon","screendoor"];
     else if(n<=26) pool=["bucket","ironclad","football","ironclad","gargantuar","pangolin","polevault","spider","balloon","screendoor"];
