@@ -24,7 +24,7 @@
   }
 
   // 僵尸出场最早波数 (气球10波后、巨人20波后、女巫80波后、鸣人Boss 100波后、钢盔巨人100波后)
-  const ZMINWAVE = { balloon:11, gargantuar:20, pangolin:16, shieldgiant:30, giantrider:90, griffin:50, witch:81, mingzombie:120, irongarg:101, armorboss:150, priest:130, nightking:160 };
+  const ZMINWAVE = { balloon:11, football:15, gargantuar:20, pangolin:16, shieldgiant:30, giantrider:90, griffin:50, witch:81, mingzombie:120, irongarg:101, armorboss:150, priest:130, nightking:160 };
   // pool of zombie types by wave (difficulty ramps; heavies unlock progressively, no cap)
   function poolForWave(n){
     let pool;
