@@ -51,11 +51,12 @@
     const stepMs = big ? 480 : 700;
     const rid = runId;   // bind spawns to this game instance
     const aliveCount = (t)=> zombies.reduce((s,z)=> s+((z.type===t&&z.hp>0)?1:0), 0);
+    const bossBonus = n>=120 ? Math.floor((n-120)/10)+1 : 0;   // 120波后每10波BOSS同屏数+1
     const spawn = (type)=>{
       if(state!=="playing" || runId!==rid) return;
-      if(type==="mingzombie" && aliveCount("mingzombie") >= 2) type = "irongarg";   // 鸣人Boss同屏最多2个
-      if(type==="armorboss" && aliveCount("armorboss") >= 2) type = "giantrider";   // 装甲车BOSS同屏最多2个
-      if(type==="nightking" && aliveCount("nightking") >= 1) type = "irongarg";      // 暗夜王BOSS同屏最多1个
+      if(type==="mingzombie" && aliveCount("mingzombie") >= 2+bossBonus) type = "irongarg";   // 鸣人Boss同屏上限
+      if(type==="armorboss" && aliveCount("armorboss") >= 2+bossBonus) type = "giantrider";   // 装甲车BOSS同屏上限
+      if(type==="nightking" && aliveCount("nightking") >= 1+bossBonus) type = "irongarg";      // 暗夜王BOSS同屏上限
       addZombie(type, rRow());
     };
     // big wave: a powerful leader (or two) charges in first

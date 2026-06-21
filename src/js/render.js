@@ -356,7 +356,7 @@
 
   function drawBeams(){
     for(const b of beams){
-      const a = 1 - b.t/b.life;
+      const a = Math.min(1, (b.life-b.t)/0.6);   // 持续保持明亮, 最后0.6秒淡出
       const cy = cellCenterY(b.r);
       ctx.save();
       ctx.globalAlpha = a;

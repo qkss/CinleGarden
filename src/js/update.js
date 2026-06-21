@@ -25,7 +25,7 @@
 
     // 全局计时: 行无敌护盾倒计时 / 能量极光残留 / 终极寒冰全屏冰霜
     for(let r=0;r<ROWS;r++){ if(rowShield[r]>0) rowShield[r]-=dt; if(rowBerserk[r]>0) rowBerserk[r]-=dt; }
-    for(const b of beams) b.t+=dt;
+    for(const b of beams){ b.t+=dt; if(b.src && b.src.hp>0) b.x = b.src.x; }
     beams = beams.filter(b=>b.t<b.life);
     if(plants.some(p=>p.type==="snowpea" && p.up>=5)){   // 终极寒冰(Lv5)即可触发, 不再要求100波
       frostCd -= dt;
@@ -407,11 +407,21 @@
       if(z.beam && !frozen){
         if(z.beamCd==null) z.beamCd=9;
         z.beamCd -= dt;
-        if(z.beamCd<=0){ z.beamCd=9;
-          beams.push({ r:z.r, x:z.x, t:0, life:0.5 });
-          // 钛金属土豆盾常驻挡鸣人(无需开无敌); 或本行无敌护盾激活时也挡
+        if(z.beamCd<=0){ z.beamCd=9; z.beamActiveT=5; beams.push({ r:z.r, x:z.x, src:z, t:0, life:5 }); }   // 持续5秒激光
+        if(z.beamActiveT>0){
+          z.beamActiveT -= dt;
+          // 钛金属土豆盾常驻挡鸣人; 或本行无敌护盾激活时也挡
           const titanium = plants.some(p=>p.type==="potatoshield" && p.fused && p.r===z.r && p.hp>0);
-          if(rowShield[z.r]<=0 && !titanium){ for(const p of plants){ if(p.r===z.r && p.hp>0){ p.hp-=125; if(p.hp<=0) p.dead=true; } } }
+          if(rowShield[z.r]>0 || titanium){
+            // 被护盾挡住: 盾牌前沿迸发火花
+            if(Math.random()<0.6){
+              const fp = plants.filter(p=>p.r===z.r && p.hp>0).sort((a,b)=>a.x-b.x)[0];
+              const fx = fp ? fp.x+18 : GRID.x+20;
+              spawnParticles(fx, cellCenterY(z.r)-2, Math.random()<0.5?"#c77dff":"#ffffff", 3, 240);
+            }
+          } else {
+            for(const p of plants){ if(p.r===z.r && p.hp>0){ p.hp -= 25*dt; if(p.hp<=0) p.dead=true; } }   // 总125伤 / 5秒 = 25/秒
+          }
         }
       }
 
