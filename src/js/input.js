@@ -81,11 +81,12 @@
             sun -= FUSE_COST;
             let removed=0;
             for(const q of plants){ if(q!==sp && q.type===sp.type && !q.fused && removed<4 && (sp.type!=="sunflower" || q.branch===sp.branch) && fusionMember(q)){ q.dead=true; spawnParticles(q.x,q.y-8,"#ffd700",14,220); removed++; } }
-            sp.fused = true; sp.selfHpMult = 10;   // 10倍生命值
+            sp.fused = true; sp.selfHpMult = (sp.type==="potatoshield") ? 20 : 10;   // 土豆盾血量更高
             spawnParticles(sp.x, sp.y-10, "#ffd700", 36, 300); spawnShards(sp.x, sp.y-10, 12, ["#ffe680","#ffd23f"], "tri");
             SFX.play("ultimate");
             const fname = sp.type==="sunflower" ? ("王冠向日葵·"+(sp.branch==="atk"?"狂暴(全屏)":"回血(全屏)"))
                         : sp.type==="snowpea" ? "王冠寒冰·冰霜雪雨灼烧"
+                        : sp.type==="potatoshield" ? "钛金属土豆盾·免疫偷取·常驻挡鸣人"
                         : "王冠三豆·撒豆成兵";
             showBanner("👑 "+fname+"！");
           }

@@ -34,7 +34,7 @@
     if(d.door!=null){ z.doorHp = d.door; }                                             // 铁门护盾值
     if(d.shield!=null){ z.shieldHp = Math.round(d.shield*mult); z.shieldMax = z.shieldHp; }   // 盾牌巨人: 只能被穿刺打破
     if(d.burrow){ z.phase = "dig"; z.burrowing = true; z.surfaceX = cellCenterX(4); }          // 盾穿山甲: 地底潜行至第5格
-    if(d.beam){ z.beam = true; z.beamCd = 3.5; z.invulnT = 8; }                          // 鸣人: 能量极光 + 出场8秒无敌(期间免疫冰冻)
+    if(d.beam){ z.beam = true; z.beamCd = 9; z.invulnT = 8; }                            // 鸣人: 能量极光(每9秒) + 出场8秒无敌(期间免疫冰冻)
     if(d.buff){ z.buff = true; z.buffCd = 5; }                                         // 女巫: 群体增益
   }
   function addPea(x,y,r,freeze,air,spike,fdur,dir){
@@ -56,7 +56,7 @@
   // 终极土豆盾技能: 释放本行 2 秒无敌护盾
   function firePotatoSkill(p){
     if(!p || p.dead) return;
-    rowShield[p.r] = Math.max(rowShield[p.r], 2);
+    rowShield[p.r] = Math.max(rowShield[p.r], 5);
     const cy = cellCenterY(p.r);
     for(let gx=GRID.x+20; gx<GRID.x+COLS*GRID.cw; gx+=44){
       explosions.push({ x:gx, y:cy, r:0, max:30, t:0, life:0.5, color:"#bfe0ff" });
@@ -143,7 +143,7 @@
       let n=0; for(const q of plants){ if(q.type==="sunflower" && q.up>=7 && q.branch===p.branch && !q.fused) n++; }
       return n>=5;
     }
-    if(p.type==="snowpea" || p.type==="threepeater"){
+    if(p.type==="snowpea" || p.type==="threepeater" || p.type==="potatoshield"){
       if(nextUpgradeCost(p)!==null) return false;   // 必须满级(Lv10)
       let n=0; for(const q of plants){ if(q.type===p.type && nextUpgradeCost(q)===null && !q.fused) n++; }
       return n>=5;

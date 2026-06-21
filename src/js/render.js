@@ -604,6 +604,22 @@
       ctx.fillStyle="rgba(0,0,0,.6)"; roundRect(-bw/2,-46,bw,13,5); ctx.fill();
       ctx.fillStyle = p.type==="campfire" ? "#ffc78a" : "#bdf0a0"; ctx.fillText(lbl, 0, -39);
     }
+    // 钛金属土豆盾(融合) 王冠 / 可融合提示
+    if(p.type==="potatoshield"){
+      if(p.fused){
+        const gp=0.5+0.5*Math.sin(p.t*5);
+        ctx.save(); ctx.globalCompositeOperation="lighter";
+        ctx.fillStyle="rgba(200,220,255,"+(0.16+0.1*gp).toFixed(3)+")"; ctx.beginPath(); ctx.arc(0,4,30,0,Math.PI*2); ctx.fill();
+        ctx.restore();
+        drawCrown(0,-24);
+      } else if(fusionEligible(p)){
+        const pl=0.5+0.5*Math.sin(p.t*6);
+        ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
+        const txt="👑 可融合", bw2=ctx.measureText(txt).width+10;
+        ctx.fillStyle="rgba(120,60,0,"+(0.7+0.3*pl).toFixed(2)+")"; roundRect(-bw2/2,-30,bw2,14,6); ctx.fill();
+        ctx.fillStyle="#ffe680"; ctx.fillText(txt,0,-23);
+      }
+    }
     ctx.restore();
     if(p.kind!=="bomb") drawHealthBar(p.x, p.y+40, p.hp/p.maxHp, 40);
   }

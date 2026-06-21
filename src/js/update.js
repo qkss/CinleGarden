@@ -380,11 +380,13 @@
       }
       // 鸣人Boss: 能量极光 — 穿透整行, 高伤
       if(z.beam && !frozen){
-        if(z.beamCd==null) z.beamCd=3.5;
+        if(z.beamCd==null) z.beamCd=9;
         z.beamCd -= dt;
-        if(z.beamCd<=0){ z.beamCd=3.5;
+        if(z.beamCd<=0){ z.beamCd=9;
           beams.push({ r:z.r, x:z.x, t:0, life:0.5 });
-          if(rowShield[z.r]<=0){ for(const p of plants){ if(p.r===z.r && p.hp>0){ p.hp-=125; if(p.hp<=0) p.dead=true; } } }
+          // 钛金属土豆盾常驻挡鸣人(无需开无敌); 或本行无敌护盾激活时也挡
+          const titanium = plants.some(p=>p.type==="potatoshield" && p.fused && p.r===z.r && p.hp>0);
+          if(rowShield[z.r]<=0 && !titanium){ for(const p of plants){ if(p.r===z.r && p.hp>0){ p.hp-=125; if(p.hp<=0) p.dead=true; } } }
         }
       }
 
@@ -398,7 +400,8 @@
             z.grabT -= dt;
             if(z.grabT<=0){
               const idx = plants.findIndex(pl=>pl.r===z.r && pl.c===z.col);
-              if(idx>=0){ z.carry = plants[idx]; spawnParticles(z.x, z.y, "#caa", 10); plants.splice(idx,1); }
+              // 钛金属土豆盾太重, 偷不走
+              if(idx>=0 && !(plants[idx].type==="potatoshield" && plants[idx].fused)){ z.carry = plants[idx]; spawnParticles(z.x, z.y, "#caa", 10); plants.splice(idx,1); }
               z.phase = "lift";
             }
           } else { // lift
