@@ -33,7 +33,13 @@
     }
     if(d.door!=null){ z.doorHp = d.door; }                                             // 铁门护盾值
     if(d.shield!=null){ z.shieldHp = Math.round(d.shield*mult); z.shieldMax = z.shieldHp; }   // 盾牌巨人: 只能被穿刺打破
-    if(d.burrow){ z.phase = "dig"; z.burrowing = true; z.surfaceX = cellCenterX(4); }          // 盾穿山甲: 地底潜行至第5格
+    if(d.burrow){   // 盾穿山甲: 随机锁定本行一株植物, 最远钻到第5格
+      z.phase = "dig"; z.burrowing = true;
+      const rowPlants = plants.filter(pl=>pl.r===row);
+      let col = 4;   // 默认第5格(列index4)
+      if(rowPlants.length){ const tgt = rowPlants[Math.floor(Math.random()*rowPlants.length)]; col = Math.max(tgt.c, 4); }
+      z.surfaceX = cellCenterX(col);
+    }
     if(d.beam){ z.beam = true; z.beamCd = 9; z.invulnT = 8; }                            // 鸣人: 能量极光(每9秒) + 出场8秒无敌(期间免疫冰冻)
     if(d.buff){ z.buff = true; z.buffCd = 5; }                                         // 女巫: 群体增益
     if(d.heal){ z.heal = true; z.healCd = 5; }                                          // 骷髅祭祀: 群体回血

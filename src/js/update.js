@@ -477,9 +477,12 @@
             if(Math.random()<0.5) spawnParticles(z.x+10, cellCenterY(z.r)+30, "#9c7a4a", 1, 80);  // 土屑
             if(z.x <= z.surfaceX){ z.x = z.surfaceX; z.phase = "surface"; z.surfT = 0.5; z.burrowing = false;
               spawnParticles(z.x, cellCenterY(z.r)+12, "#b9a06a", 18, 240); SFX.play("chomp", 0.1);
-              // 出土破坏当前格植物
+              // 出土破坏当前格植物 (5级及以上土豆盾抗破坏, 不会被顶破)
               const c = colAtX(z.x), pi = plants.findIndex(pl=>pl.r===z.r && pl.c===c);
-              if(pi>=0){ const pl=plants[pi]; spawnParticles(pl.x, pl.y, PLANTS[pl.type].color, 16, 240); explode(pl.x, pl.y, 6, 0, "#caa"); pl.dead = true; }
+              if(pi>=0){ const pl=plants[pi];
+                if(pl.type==="potatoshield" && (pl.up||0)>=5){ spawnParticles(z.x, pl.y, "#9fb6cf", 12, 200); }   // 顶不破
+                else { spawnParticles(pl.x, pl.y, PLANTS[pl.type].color, 16, 240); explode(pl.x, pl.y, 6, 0, "#caa"); pl.dead = true; }
+              }
             }
           } else { // surface 出土动画
             z.surfT -= dt; if(z.surfT<=0) z.phase = "walk";
@@ -489,7 +492,8 @@
       }
 
       // 橄榄球僵尸: 边走边向前方植物投掷橄榄球(远程伤害)
-      if(z.type==="football" && !frozen){
+      // 投掷橄榄球 — 30波后才解锁(前期橄榄球只冲撞, 坚果/土豆盾可正面挡住)
+      if(z.type==="football" && !frozen && waveNum>=30){
         if(z.throwCd==null) z.throwCd = 2 + Math.random()*1.5;
         z.throwCd -= dt;
         if(z.throwCd<=0){
