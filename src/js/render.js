@@ -122,41 +122,42 @@
 
   function plantInfoLines(p){
     const def = PLANTS[p.type];
-    const lines = ["血量 "+Math.round(Math.max(0,p.hp))+"/"+Math.round(p.maxHp)];
+    const lines = ["HP "+Math.round(Math.max(0,p.hp))+"/"+Math.round(p.maxHp)];
+    const stat = [];
     if(p.kind==="shooter" || p.kind==="shooter3"){
-      const interval = def.rate / rowAttackMult(p.r);
+      const ownMult = p.type==="threepeater"?threepeaterAtkMult(p):(p.type==="bigcactus"?bigcactusAtkMult(p):1);
+      const interval = def.rate / (rowAttackMult(p.r)*ownMult);
       const shots = def.shots||1;
-      lines.push("攻速 "+(shots/interval).toFixed(1)+" 发/秒");
-      lines.push("伤害 "+def.dmg+(def.freeze?"·冰冻":"")+(p.kind==="shooter3"?"·三连":""));
-      if(def.freeze) lines.push("冰冻 "+(1.5+0.2*(p.up||0)).toFixed(1)+"s"+(p.up>0?" Lv"+p.up:""));
+      stat.push("AC"+def.dmg);
+      stat.push("SP"+(shots/interval).toFixed(1));
     } else if(p.kind==="producer"){
-      const val = (p.up>=7)?250:Math.round(25*(1+0.4*p.up));
-      lines.push("产阳光 "+val+"/7秒 (≈"+(val/7).toFixed(1)+"/s)");
-      if(p.up>0) lines.push(upgradeLabel(p));
-    } else if(p.kind==="defense"){
-      if(p.type==="potatoshield" && p.up>0) lines.push("护甲 Lv"+p.up+" (+"+(p.up*50)+"%血)");
-      else lines.push("肉盾");
-    } else if(p.kind==="torch"){ lines.push("豌豆穿过 +30%·火焰溅射");
-    } else if(p.kind==="bomb"){ lines.push("范围秒杀");
-    } else if(p.kind==="rowbomb"){ lines.push("烧光一整行");
-    } else if(p.kind==="mine"){ lines.push(p.armed?"已激活·炸一只":"激活中…"); }
+      const val = p.fused ? 2500*(p.fuseLevel||1) : ((p.up>=7)?250:Math.round(25*(1+0.4*p.up)));
+      stat.push("☀"+Math.round(val/7)+"/s");
+    } else if(p.kind==="defense" && p.type==="potatoshield" && p.up>0){
+      stat.push("AC+"+(p.up*50)+"%HP");
+    }
+    // LV: 融合显示 ★等级, 普通显示升级等级
+    const lv = p.fused ? ("LV"+(p.fuseLevel||1)+"★") : (p.up>0 ? ("LV"+p.up) : "");
+    if(lv) stat.push(lv);
+    if(stat.length) lines.push(stat.join(" "));
     return lines;
   }
   function drawPlantInfo(){
     if(!showInfo) return;
     ctx.save();
-    ctx.font="10px 'PingFang SC',Arial"; ctx.textBaseline="top";
+    ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textBaseline="top";
     for(const p of plants){
       const lines = plantInfoLines(p);
       let w=0; for(const l of lines) w=Math.max(w, ctx.measureText(l).width);
-      w+=10; const h=lines.length*12+6;
-      let bx=p.x-w/2, by=cellY(p.r)-h-1;
-      if(by < TOPBAR_H+2) by = cellY(p.r)+GRID.ch-h-2;   // no room above -> show below
+      w+=8; const h=lines.length*12+5;
+      // 直接显示在植物身上(居中)
+      let bx=p.x-w/2, by=p.y-h/2;
       bx = Math.max(2, Math.min(bx, W-w-2));
-      ctx.fillStyle="rgba(14,18,28,.88)"; roundRect(bx,by,w,h,5); ctx.fill();
-      ctx.strokeStyle="rgba(120,200,255,.45)"; ctx.lineWidth=1; ctx.stroke();
+      by = Math.max(TOPBAR_H+2, Math.min(by, H-h-46));
+      ctx.fillStyle="rgba(14,18,28,.82)"; roundRect(bx,by,w,h,5); ctx.fill();
+      ctx.strokeStyle="rgba(120,200,255,.5)"; ctx.lineWidth=1; ctx.stroke();
       ctx.fillStyle="#e3eef8"; ctx.textAlign="left";
-      lines.forEach((l,i)=> ctx.fillText(l, bx+5, by+4+i*12));
+      lines.forEach((l,i)=> ctx.fillText(l, bx+4, by+3+i*12));
     }
     // hint
     ctx.fillStyle="rgba(255,255,255,.8)"; ctx.font="bold 12px 'PingFang SC',Arial"; ctx.textAlign="left";
