@@ -35,6 +35,14 @@
       const s=suns[i];
       if(Math.hypot(mx-s.x,my-s.y)<24){ sun+=s.value; suns.splice(i,1); spawnParticles(s.x,s.y,"#ffe680",8); SFX.play("sun"); return; }
     }
+    // 左上角阳光计数区: 双击快速收取; 50波后连点4次切换自动收取
+    if(mx>=14 && mx<=118 && my>=18 && my<=82){
+      if(gameTime - sunClickLast > 0.5) sunClickN = 0;
+      sunClickN++; sunClickLast = gameTime;
+      if(sunClickN>=4 && waveNum>=50){ autoCollectSun = !autoCollectSun; sunClickN = 0; showBanner(autoCollectSun?"☀ 自动收取阳光: 开启":"☀ 自动收取阳光: 关闭"); }
+      else if(sunClickN>=2){ collectAllSun(); }   // 双击收取全部阳光
+      return;
+    }
     if(my<TOPBAR_H){
       // shovel button
       if(mx>=SHOVEL.x&&mx<=SHOVEL.x+SHOVEL.w&&my>=SHOVEL.y&&my<=SHOVEL.y+SHOVEL.h){

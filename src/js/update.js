@@ -600,6 +600,11 @@
       if(s.life<=0) s.dead = true;
     }
     suns = suns.filter(s=>!s.dead);
+    // 自动收取阳光(50波后开启)
+    if(autoCollectSun && suns.length){
+      for(const s of suns){ sun += s.value; spawnParticles(s.x, s.y, "#ffe680", 3); }
+      suns = []; SFX.play("sun", 0.3);
+    }
 
     for(const pt of particles){ pt.t+=dt; pt.x+=pt.vx*dt; pt.y+=pt.vy*dt; pt.vy+=(pt.shard?520:200)*dt; if(pt.shard) pt.rot+=pt.vrot*dt; }
     particles = particles.filter(p=>p.t<p.life);

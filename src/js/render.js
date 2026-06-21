@@ -209,10 +209,14 @@
 
     ctx.save();
     roundRect(14,18,104,64,12); ctx.fillStyle="#f4e8c1"; ctx.fill();
-    ctx.strokeStyle="#b89b5e"; ctx.lineWidth=3; ctx.stroke();
+    ctx.strokeStyle = autoCollectSun ? "#3aa55a" : "#b89b5e"; ctx.lineWidth=3; ctx.stroke();
     drawSunIcon(40,50,15);
     ctx.fillStyle="#5a4327"; ctx.font="bold 24px Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
     ctx.fillText(fmtNum(sun), 86, 50);
+    if(autoCollectSun){   // 自动收取标识
+      ctx.fillStyle="#3aa55a"; roundRect(78,68,38,13,4); ctx.fill();
+      ctx.fillStyle="#fff"; ctx.font="bold 9px 'PingFang SC',Arial"; ctx.fillText("自动", 97, 75);
+    }
     ctx.restore();
 
     CARD_ORDER.forEach((key,i)=> drawCard(key, CARD_X0 + i*CARD_STRIDE, CARD_Y));

@@ -5,6 +5,7 @@
     rowShield = [0,0,0,0,0];
     rowBerserk = [0,0,0,0,0];
     autoSkill = false;
+    autoCollectSun = false; sunClickN = 0;
     mowers = [];
     for(let r=0;r<ROWS;r++) mowers.push({ r, x:GRID.x-34, y:cellCenterY(r)+20, active:false, used:false, t:0 });
     startWave = Math.max(0, startWave|0);

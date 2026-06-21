@@ -66,6 +66,8 @@
   let rowShield;   // 每行无敌护盾剩余秒数(终极土豆盾技能)
   let rowBerserk;  // 每行狂暴(攻速+100%)剩余秒数(攻速流终极向日葵技能)
   let autoSkill;   // 土豆盾技能是否自动释放(false=手动点击释放)
+  let autoCollectSun;   // 是否自动收取阳光(50波后连点阳光区4次开启)
+  let sunClickN = 0, sunClickLast = -9;   // 阳光区连点计数/计时
   let sun, selected, lastCardUse, gameTime, shovelMode;
   let running = false, lastTs = 0;
   let mouse = { x:0, y:0 };
