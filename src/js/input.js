@@ -62,7 +62,7 @@
       if(b){
         const sp = upgradeMenu.p;
         if(plants.indexOf(sp)>=0 && sun>=250 && sp.up===0){
-          sun -= 250; sp.branch = b; sp.up = 1;
+          sun -= 250; sp.branch = b; sp.up = 1; sp.selfHpMult = 1.25;   // 升级也提升自身最大血量
           spawnParticles(sp.x, sp.y, b==="hp"?"#7fd0ff":"#ff9a3c", 18, 220);
           SFX.play("upgrade");
           showBanner("🌻 "+upgradeLabel(sp)+"！");
@@ -80,9 +80,9 @@
           if(sp.type==="sunflower" && sp.up===0){ upgradeMenu = { p:sp }; }   // choose a branch first
           else {
             sun -= cost; sp.up++;
+            sp.selfHpMult = 1 + (sp.type==="potatoshield"?0.5:0.25)*sp.up;   // 每次升级提升自身最大血量(土豆盾+50%/级, 其余+25%/级)
             SFX.play(sp.up>=7?"ultimate":"upgrade");
             if(sp.type==="potatoshield"){
-              sp.selfHpMult = 1 + 0.5*sp.up;             // 每级 +50% 血量
               spawnParticles(sp.x, sp.y, "#9fb6cf", 16, 200);
               showBanner("🥔 土豆盾 Lv"+sp.up+"！");
             } else if(sp.type==="snowpea"){
