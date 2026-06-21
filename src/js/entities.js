@@ -190,7 +190,7 @@
   function upgradeMenuRects(){
     if(!upgradeMenu) return null;
     const p=upgradeMenu.p, bw=72, bh=30, gap=10, totalW=bw*2+gap;
-    const y=Math.max(GRID.y+2, cellY(p.r)-42);
+    const y=Math.max(TOPBAR_H+24, cellY(p.r)-12);   // 紧贴花头上方(标题留在顶栏下方)
     let x0=p.x-totalW/2;
     x0=Math.max(GRID.x+2, Math.min(x0, GRID.x+COLS*GRID.cw-totalW-2));
     return { atk:{x:x0,y,w:bw,h:bh}, hp:{x:x0+bw+gap,y,w:bw,h:bh}, cx:x0+totalW/2, ty:y-18 };

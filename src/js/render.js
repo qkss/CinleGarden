@@ -162,7 +162,7 @@
   }
 
   function drawUpgradeHint(){
-    if(selected||shovelMode || mouse.y<GRID.y) return;
+    if(selected||shovelMode || upgradeMenu || mouse.y<GRID.y) return;
     const c=colAtX(mouse.x), r=rowAtY(mouse.y);
     if(c<0||r<0) return;
     const sp=plants.find(p=>p.r===r&&p.c===c&&(p.type==="sunflower"||p.type==="potatoshield"||p.type==="snowpea"||p.type==="threepeater"||p.type==="campfire"||p.type==="bigcactus"));
