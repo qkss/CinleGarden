@@ -120,9 +120,11 @@
     ctx.restore();
   }
 
+  // 紧凑数字: 超过1000用K, 超过百万用M
+  function fmtK(n){ n=Math.round(n); if(n>=1e6) return +(n/1e6).toFixed(2)+"M"; if(n>=1000) return +(n/1000).toFixed(1)+"K"; return ""+n; }
   function plantInfoLines(p){
     const def = PLANTS[p.type];
-    const lines = ["HP "+Math.round(Math.max(0,p.hp))+"/"+Math.round(p.maxHp)];
+    const lines = ["HP "+fmtK(Math.max(0,p.hp))+"/"+fmtK(p.maxHp)];
     const stat = [];
     if(p.kind==="shooter" || p.kind==="shooter3"){
       const ownMult = p.type==="threepeater"?threepeaterAtkMult(p):(p.type==="bigcactus"?bigcactusAtkMult(p):1);
@@ -132,7 +134,7 @@
       stat.push("SP"+(shots/interval).toFixed(1));
     } else if(p.kind==="producer"){
       const val = p.fused ? 2500*(p.fuseLevel||1) : ((p.up>=7)?250:Math.round(25*(1+0.4*p.up)));
-      stat.push("☀"+Math.round(val/7)+"/s");
+      stat.push("☀"+fmtK(val/7)+"/s");
     } else if(p.kind==="defense" && p.type==="potatoshield" && p.up>0){
       stat.push("AC+"+(p.up*50)+"%HP");
     }
