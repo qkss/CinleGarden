@@ -33,7 +33,7 @@
     cherrybomb:{ name:"樱桃",  cost:150, cooldown:22, hp:60,  kind:"bomb",     color:"#e0413f" },
     potatomine:{ name:"地雷",  cost:25,  cooldown:18, hp:60,  kind:"mine",     color:"#b58a4c" },
   };
-  const CARD_ORDER = ["sunflower","peashooter","snowpea","repeater","threepeater","cactus","bigcactus","campfire","wallnut","potatoshield","jalapeno","cherrybomb","potatomine"];
+  const CARD_ORDER = ["sunflower","peashooter","repeater","snowpea","threepeater","cactus","bigcactus","campfire","wallnut","potatoshield","jalapeno","cherrybomb","potatomine"];
 
   // ---------- Zombie definitions ----------
   const ZTYPES = {
