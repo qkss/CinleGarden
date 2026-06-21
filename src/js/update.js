@@ -256,12 +256,25 @@
             SFX.play("hit", 0.12);
             pea.dead = true; break;
           }
-          z.hp -= pea.dmg;
+          // 融化反应: 终极点燃弹(Lv5篝火)击中冰冻僵尸 -> 伤害+200%(x3) + 解冻 + 蒸汽
+          const meltMain = pea.ignite && z.freezeT>0;
+          if(meltMain){
+            z.freezeT=0; z.freezeImmune=0;
+            explosions.push({ x:pea.x, y:pea.y, r:0, max:56, t:0, life:0.38, color:"#ffd9a0" });
+            spawnParticles(z.x, z.y-10, "#eaf6fb", 16, 220); spawnParticles(z.x, z.y-10, "#ffb14e", 8, 200);
+            SFX.play("explode", 0.05);
+          }
+          z.hp -= meltMain ? pea.dmg*3 : pea.dmg;
           if(pea.fire){
-            // 爆裂(范围)伤害：溅射到同行附近的僵尸
+            // 爆裂(范围)伤害：溅射到同行附近的僵尸 (冰冻者同样触发融化)
             explosions.push({ x:pea.x, y:pea.y, r:0, max:44, t:0, life:0.3, color:"#ff7a1e" });
             for(const z2 of zombies){
-              if(z2!==z && z2.r===pea.r && Math.abs(z2.x-pea.x)<48 && z2.hp>0){ z2.hp -= pea.dmg*0.5; if(pea.ignite) ignite(z2); }
+              if(z2!==z && z2.r===pea.r && Math.abs(z2.x-pea.x)<48 && z2.hp>0){
+                const meltS = pea.ignite && z2.freezeT>0;
+                if(meltS){ z2.freezeT=0; z2.freezeImmune=0; spawnParticles(z2.x, z2.y-10, "#eaf6fb", 8, 180); }
+                z2.hp -= meltS ? pea.dmg*1.5 : pea.dmg*0.5;
+                if(pea.ignite) ignite(z2);
+              }
             }
             if(pea.ignite) ignite(z);                    // Lv5篝火: 点燃, 持续5秒灼伤
             spawnParticles(pea.x, pea.y, "#ff7a1e", 9, 170);
