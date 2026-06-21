@@ -543,6 +543,12 @@
     }
     else if(p.type==="potatoshield") drawPotatoShieldArt(0,0,p.hp/p.maxHp,p.up);
     else if(p.type==="snowpea") drawSnowpeaArt(0,0,p.t,p.recoil||0,p.up);
+    else if(p.type==="peashooter"||p.type==="repeater"||p.type==="threepeater"){
+      const ps = p.type==="peashooter" ? 0.82 : (p.type==="threepeater" ? 1.2 : 1.0);  // 一豆小·二豆中·三豆大
+      ctx.save(); ctx.translate(0, 36*(1-ps)); ctx.scale(ps,ps);   // 以根部为锚
+      drawPlantArt(p.type, 0,0, p.t, p.recoil||0, p.hp/p.maxHp, false);
+      ctx.restore();
+    }
     else drawPlantArt(p.type, 0,0, p.t, p.recoil||0, p.hp/p.maxHp, false);
     // 三豆射手 / 寒冰 升级等级角标
     if(p.up>0 && (p.type==="threepeater" || p.type==="snowpea")){
