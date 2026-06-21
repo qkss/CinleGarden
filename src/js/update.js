@@ -492,8 +492,8 @@
       }
 
       // 橄榄球僵尸: 边走边向前方植物投掷橄榄球(远程伤害)
-      // 投掷橄榄球 — 30波后才解锁(前期橄榄球只冲撞, 坚果/土豆盾可正面挡住)
-      if(z.type==="football" && !frozen && waveNum>=30){
+      // 投掷橄榄球 — 10波后解锁(前期增加难度; 坚果/土豆盾仍可正面挡冲撞与吸收投掷)
+      if(z.type==="football" && !frozen && waveNum>=10){
         if(z.throwCd==null) z.throwCd = 2 + Math.random()*1.5;
         z.throwCd -= dt;
         if(z.throwCd<=0){
