@@ -1128,17 +1128,27 @@
     ctx.restore();
   }
   function drawBeanbombs(){
+    const tt = performance.now();
     for(const bb of beanbombs){
-      ctx.save(); ctx.translate(bb.x, bb.y); ctx.rotate(bb.rot);
-      // 火焰拖尾光晕
-      ctx.save(); ctx.globalCompositeOperation="lighter";
-      ctx.fillStyle="rgba(255,120,30,.5)"; ctx.beginPath(); ctx.arc(0,0,18,0,Math.PI*2); ctx.fill();
+      const vx=bb.vx||0, vy=bb.vy||1, ang=Math.atan2(vy,vx);
+      ctx.save(); ctx.translate(bb.x, bb.y);
+      // 火球彗尾(指向运动反方向)
+      ctx.save(); ctx.rotate(ang); ctx.globalCompositeOperation="lighter";
+      const fl=1+Math.sin(tt/50)*0.25, TL=90*fl;
+      const grd=ctx.createLinearGradient(0,0,-TL,0);
+      grd.addColorStop(0,"rgba(255,170,60,.9)"); grd.addColorStop(0.5,"rgba(255,90,20,.5)"); grd.addColorStop(1,"rgba(255,90,20,0)");
+      ctx.fillStyle=grd; ctx.beginPath(); ctx.moveTo(0,-18); ctx.quadraticCurveTo(-TL,0,0,18); ctx.closePath(); ctx.fill();
       ctx.restore();
-      // 巨型豌豆(绿核+火焰外壳)
-      ctx.fillStyle="#ff5a1e"; ctx.beginPath(); ctx.arc(0,0,14,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle="#6cc24a"; ctx.beginPath(); ctx.arc(0,0,10,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle="#ffb14e"; ctx.beginPath(); ctx.arc(-3,-3,4,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle="#fff2c2"; ctx.beginPath(); ctx.arc(-4,-4,2,0,Math.PI*2); ctx.fill();
+      // 巨型豌豆火球 (体积放大~5倍)
+      ctx.save(); ctx.globalCompositeOperation="lighter";
+      ctx.fillStyle="rgba(255,120,30,.55)"; ctx.beginPath(); ctx.arc(0,0,42*fl,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+      ctx.rotate(bb.rot);
+      ctx.fillStyle="#ff5a1e"; ctx.beginPath(); ctx.arc(0,0,32,0,Math.PI*2); ctx.fill();   // 火焰外壳
+      ctx.fillStyle="#ffb14e"; ctx.beginPath(); ctx.arc(0,0,26,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle="#6cc24a"; ctx.beginPath(); ctx.arc(0,0,20,0,Math.PI*2); ctx.fill();    // 豌豆绿核
+      ctx.fillStyle="#3f8e2a"; ctx.beginPath(); ctx.arc(6,4,7,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle="rgba(255,255,255,.5)"; ctx.beginPath(); ctx.arc(-7,-7,6,0,Math.PI*2); ctx.fill();
       ctx.restore();
     }
   }

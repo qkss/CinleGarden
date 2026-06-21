@@ -64,9 +64,11 @@
         p.beanCd -= dt;
         if(p.beanCd<=0){ p.beanCd=10;
           const fl = p.fuseLevel||1;
-          const targets = zombies.filter(z=>z.hp>0 && !z.burrowing).sort((a,b)=>b.hp-a.hp).slice(0, 5+(fl-1));   // 融合等级越高弹数越多
+          // 最多攻击7格距离内的目标(血量优先)
+          const targets = zombies.filter(z=>z.hp>0 && !z.burrowing && z.x>p.x && (z.x-p.x)<=7*GRID.cw).sort((a,b)=>b.hp-a.hp).slice(0, 5+(fl-1));
           for(const z of targets){
-            beanbombs.push({ x:z.x, y:TOPBAR_H-20, targetY:cellCenterY(z.r), r:z.r, vy:140+Math.random()*70, g:780, rot:0, vrot:(Math.random()-.5)*10, dmg:600*fl });
+            // 斜向下坠落: 从目标左后上方抛出, 带水平速度
+            beanbombs.push({ x:z.x-80, y:TOPBAR_H-20, targetY:cellCenterY(z.r), r:z.r, vx:160, vy:120+Math.random()*40, g:760, rot:0, vrot:(Math.random()-.5)*8, dmg:600*fl });
           }
           if(targets.length){ showBanner("🌿 撒豆成兵！"); SFX.play("ultimate"); }
         }
@@ -603,10 +605,10 @@
     footballs = footballs.filter(f=>!f.dead);
     // 撒豆成兵: 巨型点燃豌豆火球从天而降, 落地大范围爆炸+点燃
     for(const bb of beanbombs){
-      bb.vy += bb.g*dt; bb.y += bb.vy*dt; bb.rot += bb.vrot*dt;
-      if(Math.random()<0.7) particles.push({ x:bb.x+(Math.random()*10-5), y:bb.y-8, vx:0, vy:-30, life:0.35, t:0, color:Math.random()<0.5?"#ff7a1e":"#ffb14e", size:3 });
+      bb.vy += bb.g*dt; bb.y += bb.vy*dt; bb.x += (bb.vx||0)*dt; bb.rot += bb.vrot*dt;
+      if(Math.random()<0.9) particles.push({ x:bb.x+(Math.random()*14-7), y:bb.y+(Math.random()*10-5), vx:-(bb.vx||0)*0.3, vy:-40-Math.random()*30, life:0.4, t:0, color:Math.random()<0.5?"#ff5a1e":"#ffb14e", size:3.5+Math.random()*2 });
       if(bb.y >= bb.targetY){
-        explode(bb.x, bb.targetY, GRID.cw*1.05, bb.dmg, "#ff5a1e");
+        explode(bb.x, bb.targetY, GRID.cw*1.3, bb.dmg, "#ff5a1e");
         for(const z of zombies){ if(z.hp>0 && Math.hypot(z.x-bb.x, z.y-bb.targetY) < GRID.cw*1.05) ignite(z); }
         spawnShards(bb.x, bb.targetY, 8, ["#9be36b","#3f9e3f"], "tri");
         bb.dead = true;
