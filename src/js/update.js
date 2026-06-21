@@ -177,8 +177,12 @@
       } else if(p.kind==="mine"){
         if(!p.armed){ p.arm -= dt; if(p.arm<=0) p.armed = true; }
         else {
-          const z = zombies.find(z=> z.r===p.r && Math.abs(z.x-p.x)<42 && z.hp>0);
-          if(z){ explode(p.x, p.y, GRID.cw*0.9, 1800, "#ffcaa0"); p.dead = true; }
+          // 地雷只对地面/地底单位起效(飞行的狮鹫/气球飞越, 不触发)
+          const z = zombies.find(z=> z.r===p.r && Math.abs(z.x-p.x)<42 && z.hp>0 && !z.fly);
+          if(z){
+            if(z.burrowing){ z.burrowing=false; z.phase="surface"; z.surfT=0.5; spawnParticles(z.x, cellCenterY(z.r)+10, "#b9a06a", 16, 240); }  // 把地底穿山甲炸出地面再受伤
+            explode(p.x, p.y, GRID.cw*0.9, 1800, "#ffcaa0"); p.dead = true;
+          }
         }
       }
     }
