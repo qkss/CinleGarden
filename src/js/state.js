@@ -24,7 +24,7 @@
   }
 
   // 僵尸出场最早波数 (气球10波后、巨人20波后、女巫80波后、鸣人Boss 100波后、钢盔巨人100波后)
-  const ZMINWAVE = { balloon:11, gargantuar:20, pangolin:16, shieldgiant:30, giantrider:60, witch:81, mingzombie:101, irongarg:101, armorboss:110 };
+  const ZMINWAVE = { balloon:11, gargantuar:20, pangolin:16, shieldgiant:30, giantrider:60, griffin:50, witch:81, mingzombie:101, irongarg:101, armorboss:110 };
   // pool of zombie types by wave (difficulty ramps; heavies unlock progressively, no cap)
   function poolForWave(n){
     let pool;
@@ -35,8 +35,8 @@
     else if(n<=13) pool=["cone","bucket","polevault","ironclad","football","spider","balloon","screendoor"];
     else if(n<=18) pool=["bucket","polevault","ironclad","football","ironclad","pangolin","spider","balloon","screendoor"];
     else if(n<=26) pool=["bucket","ironclad","football","ironclad","gargantuar","pangolin","polevault","spider","balloon","screendoor"];
-    else if(n<=99) pool=["ironclad","football","gargantuar","ironclad","football","bucket","gargantuar","shieldgiant","pangolin","giantrider","polevault","spider","balloon","screendoor","witch"];
-    else           pool=["ironclad","football","gargantuar","irongarg","gargantuar","irongarg","football","bucket","shieldgiant","pangolin","giantrider","armorboss","polevault","spider","balloon","screendoor","mingzombie","witch"];
+    else if(n<=99) pool=["ironclad","football","gargantuar","ironclad","football","bucket","gargantuar","shieldgiant","pangolin","giantrider","griffin","polevault","spider","balloon","screendoor","witch"];
+    else           pool=["ironclad","football","gargantuar","irongarg","gargantuar","irongarg","football","bucket","shieldgiant","pangolin","giantrider","griffin","armorboss","polevault","spider","balloon","screendoor","mingzombie","witch"];
     pool = pool.filter(tt => n >= (ZMINWAVE[tt]||0));   // 未到出场波数则剔除
     return pool.length ? pool : ["basic"];
   }

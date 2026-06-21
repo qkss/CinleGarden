@@ -1115,11 +1115,54 @@
     ctx.restore();
     drawHealthBar(z.x, z.y-64, z.hp/z.maxHp, 88, "#c0392b");
   }
+  function drawGriffin(z){
+    const slowed = z.slowT>0 || z.freezeT>0;
+    // 地面投影(强调飞行)
+    ctx.save(); ctx.fillStyle="rgba(0,0,0,.15)";
+    ctx.beginPath(); ctx.ellipse(z.x, cellCenterY(z.r)+28, 22, 6, 0, 0, Math.PI*2); ctx.fill(); ctx.restore();
+    ctx.save(); ctx.translate(z.x, z.y); ctx.scale(1.7,1.7);
+    const flap = Math.sin(z.t*8);
+    const fur=slowed?"#9fc6cf":"#c89a4a", fur2=slowed?"#8ab2bb":"#a87f34", feather=slowed?"#aebcc8":"#8a6a3a";
+    // 远侧翼
+    ctx.save(); ctx.translate(4,-2); ctx.rotate(-0.5+flap*0.3);
+    ctx.fillStyle=feather; ctx.beginPath(); ctx.ellipse(10,-2,16,7,0.3,0,Math.PI*2); ctx.fill(); ctx.restore();
+    // 狮身
+    ctx.fillStyle=fur; ctx.beginPath(); ctx.ellipse(0,2,16,9,0,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle=fur2; ctx.lineWidth=4; ctx.lineCap="round";
+    ctx.beginPath(); ctx.moveTo(10,8); ctx.lineTo(13,16); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(6,9); ctx.lineTo(7,16); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(15,2); ctx.quadraticCurveTo(26,0,26,10); ctx.stroke();   // 尾
+    ctx.fillStyle=fur2; ctx.beginPath(); ctx.arc(26,11,3,0,Math.PI*2); ctx.fill();
+    // 鹰头颈(朝左)
+    ctx.fillStyle=feather; ctx.beginPath(); ctx.moveTo(-12,-2); ctx.lineTo(-22,-10); ctx.lineTo(-14,-2); ctx.closePath(); ctx.fill();
+    ctx.fillStyle=slowed?"#dfeef5":"#e8e0d0"; ctx.beginPath(); ctx.arc(-22,-11,6,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="#ffcf33"; ctx.beginPath(); ctx.moveTo(-27,-11); ctx.lineTo(-33,-9); ctx.lineTo(-27,-7); ctx.closePath(); ctx.fill();  // 喙
+    ctx.fillStyle="#2a1a10"; ctx.beginPath(); ctx.arc(-23,-12,1.4,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle="#ffcf33"; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(-8,8); ctx.lineTo(-10,16); ctx.stroke();   // 前爪
+    // 近侧翼(大, 拍动)
+    ctx.save(); ctx.translate(-2,-4); ctx.rotate(-0.7+flap*0.5);
+    ctx.fillStyle=feather; ctx.beginPath(); ctx.ellipse(8,0,20,9,0.2,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle=fur2; ctx.lineWidth=1; for(let i=0;i<3;i++){ ctx.beginPath(); ctx.moveTo(2+i*6,-4); ctx.lineTo(4+i*6,6); ctx.stroke(); }
+    ctx.restore();
+    // 骑手(僵尸)
+    ctx.save(); ctx.translate(2,-10);
+    const sk=slowed?"#9fc6cf":"#8fb06a", sk2=slowed?"#8ab2bb":"#7a9e5e", shirt=slowed?"#7e93b2":"#6d7a8a";
+    ctx.fillStyle=shirt; roundRect(-6,-4,12,12,4); ctx.fill();
+    ctx.strokeStyle=sk; ctx.lineWidth=3; ctx.lineCap="round"; ctx.beginPath(); ctx.moveTo(-4,0); ctx.lineTo(-12,2); ctx.stroke();
+    ctx.fillStyle=sk; ctx.beginPath(); ctx.arc(0,-9,6,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=sk2; ctx.beginPath(); ctx.arc(2,-8,3.4,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="#2a1a10"; ctx.beginPath(); ctx.arc(-2,-10,1.2,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(2,-10,1.2,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+    if(z.freezeT>0){ ctx.fillStyle="rgba(150,220,250,.35)"; roundRect(-32,-26,60,50,8); ctx.fill(); }
+    ctx.restore();
+    drawHealthBar(z.x, z.y-40, z.hp/z.maxHp, 56, "#c0392b");
+  }
   function drawZombie(z){
     if(z.type==="spider"){ drawSpider(z); return; }
     if(z.type==="pangolin"){ drawPangolin(z); return; }
     if(z.type==="giantrider"){ drawGiantRider(z); return; }
     if(z.type==="armorboss"){ drawArmorBoss(z); return; }
+    if(z.type==="griffin"){ drawGriffin(z); return; }
     ctx.save(); ctx.translate(z.x, z.y);
     if(z.big) ctx.scale(1.95,1.95);               // 巨人放大
     if(z.slowT>0||z.freezeT>0){ ctx.save(); } // marker; tint handled per part via slow flag
