@@ -65,7 +65,12 @@
       if(p.type==="potatoshield" && (p.up||0)>=10){
         if(p.skillCd==null) p.skillCd=20;
         if(!p.skillReady){ p.skillCd -= dt; if(p.skillCd<=0){ p.skillCd=0; p.skillReady=true; } }
-        if(p.skillReady && autoSkill) firePotatoSkill(p);   // 自动释放
+        if(p.skillReady && autoSkill && rowShield[p.r]<=0){
+          // 自动模式: 智能格挡 — 本行鸣人即将发射激光, 或本行有僵尸啃食时, 自动释放护盾
+          const beamSoon = zombies.some(z=> z.beam && z.r===p.r && z.hp>0 && (z.beamCd!=null?z.beamCd:9) < 0.45);
+          const underAttack = zombies.some(z=> z.r===p.r && z.hp>0 && z.eating);
+          if(beamSoon || underAttack) firePotatoSkill(p);
+        }
       }
 
       // 血量光环(血量分支 + 钢化) × 自身升级(土豆盾)：动态调整最大血量
