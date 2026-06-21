@@ -173,7 +173,7 @@
         p.fuse -= dt;
         if(p.fuse<=0){
           const cy = cellCenterY(p.r);
-          for(const z of zombies){ if(z.r===p.r && !(z.shieldHp>0) && !z.burrowing) z.hp = 0; }   // 盾牌巨人未破盾 / 地底潜行免疫
+          for(const z of zombies){ if(z.r===p.r && !z.burrowing) z.hp = 0; }   // 烧光本行(盾牌巨人也怕火, 地底潜行免疫)
           // 火线特效
           for(let gx=GRID.x+20; gx<GRID.x+COLS*GRID.cw; gx+=46){
             explosions.push({ x:gx, y:cy, r:0, max:40, t:0, life:0.45, color:"#ff5a1e" });

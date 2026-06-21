@@ -235,7 +235,7 @@
     if(dmg>0) SFX.play("explode", 0.05);
     explosions.push({ x, y, r:0, max:radius, t:0, life:0.5, color:color||"#ff8a1e" });
     for(const z of zombies){
-      if(z.shieldHp>0 || z.burrowing) continue;   // 盾牌巨人未破盾 / 地底潜行: 免疫爆炸
+      if(z.burrowing) continue;   // 地底潜行免疫爆炸 (盾牌巨人的盾挡不住爆炸/火焰, 可被炸伤)
       if(Math.hypot(z.x-x, z.y-y) < radius){ z.hp -= dmg; }
     }
     spawnParticles(x,y,"#ffb14e",24,300);
