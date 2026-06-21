@@ -135,11 +135,25 @@
   }
   function ultimateActive(){ return plants.some(p=>p.type==="sunflower" && p.up>=7); }
   const FUSE_COST = 10000;
-  // 同流派满级(终极)向日葵达5棵 -> 可融合
+  // 可融合: 向日葵需同流派5棵终极; 寒冰/三豆需5棵满级
   function fusionEligible(p){
-    if(!(p && p.type==="sunflower" && p.up>=7 && p.branch && !p.fused)) return false;
-    let n=0; for(const q of plants){ if(q.type==="sunflower" && q.up>=7 && q.branch===p.branch && !q.fused) n++; }
-    return n>=5;
+    if(!p || p.fused) return false;
+    if(p.type==="sunflower"){
+      if(!(p.up>=7 && p.branch)) return false;
+      let n=0; for(const q of plants){ if(q.type==="sunflower" && q.up>=7 && q.branch===p.branch && !q.fused) n++; }
+      return n>=5;
+    }
+    if(p.type==="snowpea" || p.type==="threepeater"){
+      if(nextUpgradeCost(p)!==null) return false;   // 必须满级(Lv10)
+      let n=0; for(const q of plants){ if(q.type===p.type && nextUpgradeCost(q)===null && !q.fused) n++; }
+      return n>=5;
+    }
+    return false;
+  }
+  // 是否为可参与融合的满级植物(被吞并的判定)
+  function fusionMember(q){
+    if(q.type==="sunflower") return q.up>=7;
+    return nextUpgradeCost(q)===null;
   }
   function nextUpgradeCost(p){
     if(!p) return null;

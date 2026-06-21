@@ -75,16 +75,19 @@
       const c=colAtX(mx), r=rowAtY(my);
       const sp = plants.find(p=>p.r===r&&p.c===c&&(p.type==="sunflower"||p.type==="potatoshield"||p.type==="snowpea"||p.type==="threepeater"||p.type==="campfire"||p.type==="bigcactus"));
       if(sp){
-        // 向日葵融合: 同流派5棵满级, 点击其一消耗1万阳光融合为王冠向日葵
+        // 植物融合: 5棵满级(向日葵需同流派), 点击其一消耗1万阳光融合为王冠植物
         if(fusionEligible(sp)){
           if(sun>=FUSE_COST){
             sun -= FUSE_COST;
             let removed=0;
-            for(const q of plants){ if(q!==sp && q.type==="sunflower" && q.up>=7 && q.branch===sp.branch && !q.fused && removed<4){ q.dead=true; spawnParticles(q.x,q.y-8,"#ffd700",14,220); removed++; } }
+            for(const q of plants){ if(q!==sp && q.type===sp.type && !q.fused && removed<4 && (sp.type!=="sunflower" || q.branch===sp.branch) && fusionMember(q)){ q.dead=true; spawnParticles(q.x,q.y-8,"#ffd700",14,220); removed++; } }
             sp.fused = true; sp.selfHpMult = 10;   // 10倍生命值
             spawnParticles(sp.x, sp.y-10, "#ffd700", 36, 300); spawnShards(sp.x, sp.y-10, 12, ["#ffe680","#ffd23f"], "tri");
             SFX.play("ultimate");
-            showBanner("👑 向日葵融合 · 王冠"+(sp.branch==="atk"?"狂暴":"回血")+"(全屏)！");
+            const fname = sp.type==="sunflower" ? ("王冠向日葵·"+(sp.branch==="atk"?"狂暴(全屏)":"回血(全屏)"))
+                        : sp.type==="snowpea" ? "王冠寒冰·冰霜雪雨灼烧"
+                        : "王冠三豆·撒豆成兵";
+            showBanner("👑 "+fname+"！");
           }
           return;
         }

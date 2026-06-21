@@ -44,6 +44,10 @@
       }
       // 期间保持冰冻(新刷出的僵尸也冻住)
       for(const z of zombies){ if(z.hp>0 && z.freezeT<frostRainT){ if(z.burnT>0) meltBurn(z); z.freezeT=frostRainT; z.slowT=0; } }
+      // 王冠寒冰: 冰霜雪雨持续按最大血量造成百分比伤害(5秒共10% -> 2%/秒)
+      if(plants.some(p=>p.type==="snowpea" && p.fused)){
+        for(const z of zombies){ if(z.hp>0 && !z.burrowing){ z.hp -= z.maxHp * 0.02 * dt; if(Math.random()<0.05) spawnParticles(z.x, z.y-8, "#bfe9fb", 1, 60); } }
+      }
     }
 
     // plants
@@ -52,6 +56,19 @@
       if(p.recoil>0) p.recoil -= dt;
       if(p.glowT>0) p.glowT -= dt;
       const def = PLANTS[p.type];
+
+      // 王冠三豆: 撒豆成兵 — 每10秒从天降下最多5个巨型点燃豌豆火球, 砸向血量最高的目标
+      if(p.type==="threepeater" && p.fused){
+        if(p.beanCd==null) p.beanCd=10;
+        p.beanCd -= dt;
+        if(p.beanCd<=0){ p.beanCd=10;
+          const targets = zombies.filter(z=>z.hp>0 && !z.burrowing).sort((a,b)=>b.hp-a.hp).slice(0,5);
+          for(const z of targets){
+            beanbombs.push({ x:z.x, y:TOPBAR_H-20, targetY:cellCenterY(z.r), r:z.r, vy:140+Math.random()*70, g:780, rot:0, vrot:(Math.random()-.5)*10, dmg:600 });
+          }
+          if(targets.length){ showBanner("🌿 撒豆成兵！"); SFX.play("ultimate"); }
+        }
+      }
 
       // 巨仙掌(Lv10): 每20秒发动地刺, 击退本行前方僵尸2格
       if(p.type==="bigcactus" && (p.up||0)>=10){
@@ -559,5 +576,17 @@
       } else if(fb.x < -20){ fb.dead = true; }
     }
     footballs = footballs.filter(f=>!f.dead);
+    // 撒豆成兵: 巨型点燃豌豆火球从天而降, 落地大范围爆炸+点燃
+    for(const bb of beanbombs){
+      bb.vy += bb.g*dt; bb.y += bb.vy*dt; bb.rot += bb.vrot*dt;
+      if(Math.random()<0.7) particles.push({ x:bb.x+(Math.random()*10-5), y:bb.y-8, vx:0, vy:-30, life:0.35, t:0, color:Math.random()<0.5?"#ff7a1e":"#ffb14e", size:3 });
+      if(bb.y >= bb.targetY){
+        explode(bb.x, bb.targetY, GRID.cw*1.05, bb.dmg, "#ff5a1e");
+        for(const z of zombies){ if(z.hp>0 && Math.hypot(z.x-bb.x, z.y-bb.targetY) < GRID.cw*1.05) ignite(z); }
+        spawnShards(bb.x, bb.targetY, 8, ["#9be36b","#3f9e3f"], "tri");
+        bb.dead = true;
+      }
+    }
+    beanbombs = beanbombs.filter(b=>!b.dead);
     // endless: no win condition — survive as long as possible
   }

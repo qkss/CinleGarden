@@ -17,6 +17,7 @@
     drawGroundSpikes();
     for(const pea of peas) drawPea(pea);
     drawFootballs();
+    drawBeanbombs();
     [...zombies].sort((a,b)=>a.y-b.y).forEach(drawZombie);
     drawBeams();
     drawSuns();
@@ -562,14 +563,28 @@
       ctx.restore();
     }
     else drawPlantArt(p.type, 0,0, p.t, p.recoil||0, p.hp/p.maxHp, false);
-    // 三豆射手 / 寒冰 升级等级角标
+    // 三豆射手 / 寒冰 升级等级角标 / 融合王冠 / 可融合提示
     if(p.up>0 && (p.type==="threepeater" || p.type==="snowpea")){
-      const lbl = nextUpgradeCost(p)===null ? "Lv MAX" : (p.type==="threepeater" ? "x"+(1+0.4*p.up).toFixed(1) : "Lv"+p.up);
-      ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
-      const bw=ctx.measureText(lbl).width+10;
-      ctx.fillStyle="rgba(0,0,0,.6)"; roundRect(-bw/2,-46,bw,13,5); ctx.fill();
-      ctx.fillStyle = p.type==="threepeater" ? "#caff9a" : "#bfe9fb";
-      ctx.fillText(lbl, 0, -39);
+      if(p.fused){
+        const gp=0.5+0.5*Math.sin(p.t*5);
+        ctx.save(); ctx.globalCompositeOperation="lighter";
+        ctx.fillStyle="rgba(255,215,80,"+(0.16+0.1*gp).toFixed(3)+")"; ctx.beginPath(); ctx.arc(0,-12,30,0,Math.PI*2); ctx.fill();
+        ctx.restore();
+        drawCrown(0,-48);
+      } else {
+        const lbl = nextUpgradeCost(p)===null ? "Lv MAX" : (p.type==="threepeater" ? "x"+(1+0.4*p.up).toFixed(1) : "Lv"+p.up);
+        ctx.font="bold 10px 'PingFang SC',Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
+        const bw=ctx.measureText(lbl).width+10;
+        ctx.fillStyle="rgba(0,0,0,.6)"; roundRect(-bw/2,-46,bw,13,5); ctx.fill();
+        ctx.fillStyle = p.type==="threepeater" ? "#caff9a" : "#bfe9fb";
+        ctx.fillText(lbl, 0, -39);
+        if(fusionEligible(p)){
+          const pl=0.5+0.5*Math.sin(p.t*6);
+          ctx.font="bold 10px 'PingFang SC',Arial"; const txt="👑 可融合", bw2=ctx.measureText(txt).width+10;
+          ctx.fillStyle="rgba(120,60,0,"+(0.7+0.3*pl).toFixed(2)+")"; roundRect(-bw2/2,-64,bw2,14,6); ctx.fill();
+          ctx.fillStyle="#ffe680"; ctx.fillText(txt,0,-57);
+        }
+      }
     }
     // 巨仙掌 地刺就绪: 脚下泛起地刺微光
     if(p.type==="bigcactus" && (p.up||0)>=10 && p.spikeCd<=0){
@@ -1037,6 +1052,31 @@
     ctx.restore();
   }
 
+  function drawCrown(x,y){
+    ctx.save(); ctx.translate(x,y);
+    ctx.fillStyle="#ffd23f"; ctx.strokeStyle="#c8901a"; ctx.lineWidth=1.2;
+    ctx.beginPath();
+    ctx.moveTo(-13,4); ctx.lineTo(-13,-6); ctx.lineTo(-6,1); ctx.lineTo(0,-9); ctx.lineTo(6,1); ctx.lineTo(13,-6); ctx.lineTo(13,4); ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle="#ff6b7a"; ctx.beginPath(); ctx.arc(0,-1,1.8,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="#7fd0ff"; ctx.beginPath(); ctx.arc(-13,-6,1.6,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(13,-6,1.6,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+  function drawBeanbombs(){
+    for(const bb of beanbombs){
+      ctx.save(); ctx.translate(bb.x, bb.y); ctx.rotate(bb.rot);
+      // 火焰拖尾光晕
+      ctx.save(); ctx.globalCompositeOperation="lighter";
+      ctx.fillStyle="rgba(255,120,30,.5)"; ctx.beginPath(); ctx.arc(0,0,18,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+      // 巨型豌豆(绿核+火焰外壳)
+      ctx.fillStyle="#ff5a1e"; ctx.beginPath(); ctx.arc(0,0,14,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle="#6cc24a"; ctx.beginPath(); ctx.arc(0,0,10,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle="#ffb14e"; ctx.beginPath(); ctx.arc(-3,-3,4,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle="#fff2c2"; ctx.beginPath(); ctx.arc(-4,-4,2,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+  }
   function drawFootballs(){
     for(const fb of footballs){
       ctx.save(); ctx.translate(fb.x, fb.y); ctx.rotate(fb.rot);

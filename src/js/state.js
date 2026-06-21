@@ -1,7 +1,7 @@
 "use strict";
   function reset(startWave){
     state = "playing";
-    plants = []; zombies = []; peas = []; suns = []; particles = []; explosions = []; debris = []; mashes = []; beams = []; floats = []; gspikes = []; footballs = [];
+    plants = []; zombies = []; peas = []; suns = []; particles = []; explosions = []; debris = []; mashes = []; beams = []; floats = []; gspikes = []; footballs = []; beanbombs = [];
     rowShield = [0,0,0,0,0];
     rowBerserk = [0,0,0,0,0];
     autoSkill = false;
