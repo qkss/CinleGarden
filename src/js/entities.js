@@ -128,10 +128,7 @@
   function nextUpgradeCost(p){
     if(!p) return null;
     if(p.type==="sunflower"){
-      if(p.up<5) return 250;
-      if(p.up===5) return 1000;          // Lv6 钢化
-      if(p.up===6) return 1500;          // Lv7 终极
-      return null;
+      return p.up<7 ? 250*(p.up+1) : null;   // 线性: 250/500/750/1000/1250(Lv1-5)/1500(钢化)/1750(终极)
     }
     // 其余植物: 升级阳光随等级线性增加 base*(等级+1)
     if(p.type==="potatoshield"){ return p.up<10 ? 250*(p.up+1) : null; }   // 250,500...2500 最高Lv10
