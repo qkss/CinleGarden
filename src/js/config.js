@@ -46,15 +46,15 @@
     football:  { name:"橄榄球", hp:1100, body:200, speed:23,  accessory:"football" },  // 头盔护甲加厚, 本体也更厚
     gargantuar:{ name:"巨人", hp:3400, body:3400, speed:8,    accessory:"garg", big:true, eat:70 },
     irongarg:  { name:"钢盔巨人", hp:13600, body:13600, speed:8, accessory:"irongarg", big:true, eat:70 },  // 100波后, 血量再翻倍
-    shieldgiant:{ name:"盾牌巨人", hp:1500, body:1500, speed:8, accessory:"shieldgiant", big:true, eat:70, shield:600 },  // 盾牌只能被穿刺打破, 免疫豌豆, 破盾后才可击杀
+    shieldgiant:{ name:"盾牌巨人", hp:3400, body:3400, speed:8, accessory:"shieldgiant", big:true, eat:70, shield:1500 },  // 盾牌只能被穿刺打破, 免疫豌豆, 破盾后才可击杀
     pangolin:  { name:"盾穿山甲", hp:900, body:360, speed:13, accessory:"pangolin", burrow:true },  // 地底潜行(不可攻击)最多钻到第5格, 厚甲高防御
     giantrider:{ name:"巨人骑兵", hp:17000, body:17000, speed:11, accessory:"giantrider", big:true, eat:70 },   // 5倍普通巨人血量, 骑乘战马较快
     armorboss: { name:"装甲车", hp:68000, body:68000, speed:6, accessory:"armorboss", big:true, eat:140 },       // BOSS: 20倍巨人血量, 车顶坐巨人, 同屏最多2个
     spider:    { name:"蜘蛛", hp:150,  body:150,  speed:0,    accessory:"spider", fly:true },   // 空降偷植物 — 判定空中, 仅对空可击
     balloon:   { name:"气球", hp:90,   body:90,   speed:17,   accessory:"balloon", fly:true },     // 飞行,需对空
-    griffin:   { name:"狮鹫骑士", hp:1500, body:1500, speed:15, accessory:"griffin", fly:true },   // 骑乘狮鹫的强大空中僵尸, 需对空/爆炸
+    griffin:   { name:"狮鹫骑士", hp:3600, body:3600, speed:15, accessory:"griffin", fly:true },   // 骑乘狮鹫的强大空中僵尸, 需对空/爆炸
     screendoor:{ name:"铁门", hp:110,  body:110,  speed:11,   accessory:"screendoor", door:420 },  // 铁门挡豌豆,怕火/爆炸
-    mingzombie:{ name:"鸣人", hp:6000, body:6000, speed:7,    accessory:"ming", big:true, eat:140, beam:true },  // 100波后Boss: 能量极光穿透整行
+    mingzombie:{ name:"鸣人", hp:32000, body:32000, speed:7,    accessory:"ming", big:true, eat:140, beam:true },  // 120波后Boss: 能量极光穿透整行, 同屏最多2个
     witch:     { name:"女巫", hp:1300, body:1300, speed:11,   accessory:"witch", buff:true },  // 80波后: 每5秒给周围僵尸+500%血2秒
   };
 

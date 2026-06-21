@@ -24,7 +24,7 @@
   }
 
   // 僵尸出场最早波数 (气球10波后、巨人20波后、女巫80波后、鸣人Boss 100波后、钢盔巨人100波后)
-  const ZMINWAVE = { balloon:11, gargantuar:20, pangolin:16, shieldgiant:30, giantrider:90, griffin:50, witch:81, mingzombie:101, irongarg:101, armorboss:110 };
+  const ZMINWAVE = { balloon:11, gargantuar:20, pangolin:16, shieldgiant:30, giantrider:90, griffin:50, witch:81, mingzombie:120, irongarg:101, armorboss:150 };
   // pool of zombie types by wave (difficulty ramps; heavies unlock progressively, no cap)
   function poolForWave(n){
     let pool;
@@ -53,13 +53,13 @@
     const aliveCount = (t)=> zombies.reduce((s,z)=> s+((z.type===t&&z.hp>0)?1:0), 0);
     const spawn = (type)=>{
       if(state!=="playing" || runId!==rid) return;
-      if(type==="mingzombie" && aliveCount("mingzombie") >= 1) type = "irongarg";   // 鸣人Boss同时最多1个
+      if(type==="mingzombie" && aliveCount("mingzombie") >= 2) type = "irongarg";   // 鸣人Boss同屏最多2个
       if(type==="armorboss" && aliveCount("armorboss") >= 2) type = "giantrider";   // 装甲车BOSS同屏最多2个
       addZombie(type, rRow());
     };
     // big wave: a powerful leader (or two) charges in first
     if(big){
-      const leader = n>=100 ? (Math.random()<0.5 ? "mingzombie" : "irongarg") : (n>=20 ? "gargantuar" : (n>=10 ? "ironclad" : "bucket"));
+      const leader = n>=120 ? (Math.random()<0.5 ? "mingzombie" : "irongarg") : (n>=100 ? "irongarg" : (n>=20 ? "gargantuar" : (n>=10 ? "ironclad" : "bucket")));
       const leaders = n>=30 ? 3 : (n>=15 ? 2 : 1);
       for(let L=0; L<leaders; L++)
         setTimeout(()=> spawn(leader), L*260);
