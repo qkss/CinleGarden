@@ -145,10 +145,10 @@
   function bigcactusAtkMult(p){ return 1 + 0.1 * Math.min(p.up||0, 10); }
   // 地刺(巨仙掌Lv10): 在攻击目标格钻出一根巨型仙人掌(斜向前), 击退2格 + 穿刺伤害
   function fireGroundSpikes(p){
-    // 找本行前方最近可命中目标 (含地底潜行的穿山甲: 地刺能把它撞出来)
+    // 找本行前方4格内最近可命中目标 (含地底潜行的穿山甲: 地刺能把它撞出来)
     let target=null, best=Infinity;
     for(const z of zombies){
-      if(z.r===p.r && z.hp>0 && z.x>p.x && !z.fly){ const d=z.x-p.x; if(d<best){ best=d; target=z; } }
+      if(z.r===p.r && z.hp>0 && z.x>p.x && !z.fly){ const d=z.x-p.x; if(d<best && d<=4*GRID.cw){ best=d; target=z; } }
     }
     if(!target) return false;
     const tx = target.x;
