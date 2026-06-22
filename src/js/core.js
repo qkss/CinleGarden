@@ -5,59 +5,37 @@
 
   // 开始界面攻略内容(点"查看攻略"展开)
   const GUIDE_HTML = L(`
-    <p>顶部点击卡片选植物（或按快捷键 <b>1-9 0 - + =</b> 依次对应各卡），再点击草坪格子种下。点击阳光收集，或按 <b>空格</b>一键拾取全部阳光 ☀️。<b>~</b> 键或右上角 <b>🛠️铲子</b>（或右键）铲除植物以便更换。</p>
+    <p><b>🎮 操作</b>：顶部点击卡片选植物（或快捷键 <b>1-9 0 - + =</b>），再点击草坪格子种下。点击阳光收集，或按 <b>空格</b>一键拾取全部阳光 ☀️。<b>~</b> 键 / 右上角 <b>🛠️铲子</b> / 右键可铲除植物。右下角：<b>🔊音效</b>(M) · <b>重开</b> · <b>暂停</b>(P) · <b>快进</b>(F)。按住 <b>Alt</b> 查看植物属性。</p>
     <div class="legend">
-      🌻 <b>向日葵</b> 产阳光 · 🟢 <b>豌豆射手</b> 基础输出 · ❄️ <b>寒冰射手</b> 投掷冰冻·可升级延长冻结(40波解锁) ·
-      🔁 <b>双发射手</b> 双倍火力(10波解锁) · 🌿 <b>三豆射手</b> 连发3颗(50波解锁) · 🌵 <b>仙人掌</b> 穿透尖刺(贯穿整行·后方有僵尸会向后射击) · 🌵 <b>巨仙掌</b> 穿透尖刺·可打空中·克制气球(10波解锁·可升级到Lv10·每级加攻速·Lv10解锁地刺每20秒在目标格钻出巨型地刺·击退2格·可把潜行穿山甲撞出地面) · 🔥 <b>篝火</b> 豌豆附魔火焰·穿铁门(10波解锁·50波后可升级·每级加火伤·Lv5点燃僵尸灼伤5秒·点燃弹击中冰冻僵尸触发融化·伤害+200%) ·
-      🟤 <b>坚果墙</b> 肉盾 · 🥔 <b>土豆盾</b> 超级肉盾·可升级·摧毁爆炸(5级留土豆泥减速·Lv10每20秒给本行2秒无敌护盾) ·
-      🌶️ <b>辣椒</b> 烧光一整横排(20波解锁) · 🍒 <b>樱桃炸弹</b> 范围秒杀 · 💣 <b>土豆地雷</b> 埋雷炸一只<br>
-      敌人(护甲会先被打掉再变普通)：普通 / 🚧 路障 / 🪣 铁桶 / 🛡️ 钢盔铁甲 /
-      🦘 撑杆(快·跳过第一株) / 🏈 橄榄球(快·10波后投掷橄榄球远程砸植物·可用坚果/土豆盾挡) / 🦣 巨人(一拳碎植物·死亡爆炸) / 🐴 巨人骑兵(5倍血·较快) / 🚙 装甲车BOSS(20倍血·车顶坐巨人·同屏最多2个) /
-      🕷️ 空降蜘蛛(偷植物·只落右侧4列) / 🎈 气球(飞行·需仙人掌/炸弹) / 🦅 狮鹫骑士(强大空中僵尸·高血·需对空/爆炸) / 🚪 铁门(挡豌豆·用火焰/爆炸破) / 🛡️ 盾牌巨人(免疫豌豆·盾牌只能被仙人掌穿刺打破·但怕辣椒/炸弹) / 🦔 盾穿山甲(地底潜行不可攻击·随机锁定本行一株植物·最远钻到第5格出土破坏·5级土豆盾顶不破)<br>
-      <b>Boss</b>：🌀 鸣人(120波后·能量极光穿透整行·持续5秒·高血高伤·出场8秒无敌且免疫冰冻) / 🚙 装甲车(150波后·超高血·装甲格挡穿甲子弹·尖刺无法穿透) / 🧙 女巫(80波后·每5秒给周围僵尸+500%血2秒) / 💀 骷髅祭祀(130波后·每5秒治疗周围僵尸) / ❄️ 暗夜王(160波后·骷髅战马+暗夜王之剑·免疫冰冻·刀光剑影远程·同屏最多1)<br>
-      <b>终极技能</b>：🌻终极向日葵(攻速流)每10秒触发⚡狂暴·本行攻速+100%持续4秒 / 🌻终极向日葵(血量流)每10秒给本行植物回血20% · 🥔终极土豆盾(Lv10)蓄力满后身上出现护盾图标·点击释放给本行植物套上闪电护盾5秒无敌(可切换手动/自动·自动模式会智能格挡鸣人激光) ·❄️终极寒冰(Lv5)每20秒冰霜雪雨·全屏冻结5秒<br>
-      🛒 每行左侧有<b>小推车</b>：僵尸到底线自动冲出清空整行，但<b>每行仅一次</b>！
+      <b>🌱 植物</b>（多数可升级，满级后还有更强的进阶玩法，等你探索）<br>
+      🌻 <b>向日葵</b> 产阳光 · 🟢 <b>豌豆射手</b> 基础输出 · ❄️ <b>寒冰射手</b> 冰冻减速(40波) ·
+      🔁 <b>双发射手</b> 双倍火力(10波) · 🌿 <b>三豆射手</b> 三行连发(50波) · 🌵 <b>仙人掌</b> 穿透整行尖刺 · 🌵 <b>巨仙掌</b> 穿透·可打空中·克制气球(10波) · 🔥 <b>篝火</b> 豌豆附魔火焰·穿铁门(10波) ·
+      🟤 <b>坚果墙</b> 肉盾 · 🥔 <b>土豆盾</b> 超级肉盾·摧毁时爆炸 ·
+      🌶️ <b>辣椒</b> 烧光一整横排(20波) · 🍒 <b>樱桃炸弹</b> 范围秒杀 · 💣 <b>土豆地雷</b> 埋雷炸一只
     </div>
-    <p>🔁 <b>无尽模式</b>：波数越高越难，每 5 波是<b>巨潮</b>(强力僵尸带队)。尽量活久、拿高分！<br>
-       📍 <b>关卡选择</b>：每通过 10 波解锁一个检查点(第10/20/30…波)，可从该波直接开局，并获得筹备阳光与更长布防时间。<br>
-       右下角：<b>🔊音效/🔇静音</b>(M) / <b>重开</b> / <b>暂停</b>(P) / <b>快进 1x/2x/3x</b>(F)。最高分自动记录到本机排行榜(前 10)。<br>
-       按住 <b>Alt</b> 查看所有植物属性。</p>
-    <p style="font-size:14px">🌻 <b>第 5 波后点击向日葵升级</b>，二选一分支(费用线性递增 250/500/750/1000/1250)：⚡攻速(满级本行攻速翻倍) 或 🛡血量(每级 +50% 本行血量)；
-       Lv5 后合流 → Lv6 钢化(2500，本行+100%血) → Lv7 终极(5000，全场CD−50%·产阳光×10)。
-       🥔 土豆盾 / ❄️ 寒冰 也可点击升级。<br>
-       ✨ <b>植物融合</b>：同类 <b>5 棵满级</b>(向日葵需同流派)时出现"可融合"提示，点击其一消耗 <b>10000 阳光</b>融合。融合体脚下出现<b>椭圆光环</b>(颜色表示融合等级)。<b>两个同级融合体可再"二合一"</b>升级，属性随等级提升。光环颜色：白→绿→蓝→金→黑→暗红(Lv1~6)。<br>
-       🌻 <b>融合向日葵</b>：10倍生命值与阳光产量，狂暴/回血技能变<b>全屏</b>。<br>
-       ❄️ <b>融合寒冰</b>：冰霜雪雨期间<b>持续按最大血量造成伤害</b>(每级10%)，可触发融化。<br>
-       🌿 <b>融合三豆</b>：技能<b>撒豆成兵</b>——每10秒从天降<b>巨型点燃豌豆火球</b>，造成大量伤害(数量/威力随等级)。<br>
-       🥔 <b>钛金属土豆盾</b>：超高血量、太重不会被蜘蛛偷走，<b>不开技能也常驻挡住本行鸣人激光</b>。<br>
-       🌵 <b>融合巨仙掌</b>：技能<b>暴雨梨花</b>——每15秒持续5秒向前倾泻最多<b>50发高轨穿刺</b>(粉白花瓣·轨道偏高)。</p>`,
+    <div class="legend">
+      <b>🧟 僵尸</b>（护甲会先被打掉再变普通）<br>
+      普通 · 🚧 路障 · 🪣 铁桶 · 🛡️ 钢盔铁甲 · 🦘 撑杆(快·跳过第一株) · 🏈 橄榄球(快·远程砸植物) · 🦣 巨人(一拳碎植物·死亡爆炸) · 🐴 巨人骑兵(高血·较快) · 🚙 装甲车BOSS(超高血·车顶坐巨人) ·
+      🕷️ 空降蜘蛛(偷植物) · 🎈 气球(飞行·需对空) · 🦅 狮鹫骑士(强大空中·高血) · 🚪 铁门(挡豌豆·用火焰/爆炸破) · 🛡️ 盾牌巨人(免疫豌豆·只能被穿刺破盾) · 🦔 盾穿山甲(地底潜行·钻出破坏植物)<br>
+      <b>Boss</b>：🌀 鸣人(能量极光穿透整行) · 🚙 装甲车(超高血·装甲格挡穿甲) · 🧙 女巫(给周围僵尸加血) · 💀 骷髅祭祀(治疗周围僵尸) · ❄️ 暗夜王(免疫冰冻·远程刀光剑影)
+    </div>
+    <p>🛒 每行左侧有<b>小推车</b>：僵尸冲到底线时自动清空整行，但<b>每行仅一次</b>！波数越高越难，每 5 波是<b>巨潮</b>——活得越久、分数越高。其余的升级、融合与终极技能，留给你在战斗中慢慢探索 🌟</p>`,
   `
-    <p>Click a card up top to pick a plant (or hotkeys <b>1-9 0 - + =</b> in order), then click a lawn cell to plant it. Click suns to collect, or press <b>Space</b> to grab all suns ☀️. Press <b>~</b> or the <b>🛠️ shovel</b> (top-right) / right-click to dig up a plant.</p>
+    <p><b>🎮 Controls</b>: Click a card up top to pick a plant (or hotkeys <b>1-9 0 - + =</b>), then click a lawn cell to plant it. Click suns to collect, or press <b>Space</b> to grab all suns ☀️. Press <b>~</b> / the <b>🛠️ shovel</b> (top-right) / right-click to dig up a plant. Bottom-right: <b>🔊 Sound</b> (M) · <b>Restart</b> · <b>Pause</b> (P) · <b>Fast-forward</b> (F). Hold <b>Alt</b> to view plant stats.</p>
     <div class="legend">
-      🌻 <b>Sunflower</b> makes sun · 🟢 <b>Peashooter</b> basic damage · ❄️ <b>Snow Pea</b> lobs freeze, upgradeable freeze (unlock W40) ·
-      🔁 <b>Repeater</b> double fire (unlock W10) · 🌿 <b>Threepeater</b> 3 lanes (unlock W50) · 🌵 <b>Cactus</b> piercing spike (whole row · fires backward if a zombie is behind) · 🌵 <b>Big Cactus</b> piercing · hits air · counters balloons (unlock W10 · up to Lv10 · +fire rate per level · Lv10 ground-spike every 20s erupts at the target cell, knockback 2 · surfaces burrowing pangolins) · 🔥 <b>Torch</b> enchants peas to fire · burns through screen doors (unlock W10 · upgradeable after W50 · +fire dmg/level · Lv5 ignites zombies for 5s · ignited shots on a frozen zombie trigger Melt, +200% dmg) ·
-      🟤 <b>Wall-nut</b> tank · 🥔 <b>Potato Shield</b> super tank · upgradeable · explodes when destroyed (Lv5 leaves a slowing mash · Lv10 gives the row a 2s invincible shield every 20s) ·
-      🌶️ <b>Jalapeno</b> burns a whole lane (unlock W20) · 🍒 <b>Cherry Bomb</b> area instakill · 💣 <b>Potato Mine</b> buries a one-shot bomb<br>
-      Enemies (armor is stripped first, then they become normal): Basic / 🚧 Conehead / 🪣 Buckethead / 🛡️ Knight /
-      🦘 Pole Vault (fast · vaults the first plant) / 🏈 Football (fast · after W10 throws footballs at range · block with wall-nut/potato) / 🦣 Gargantuar (one-punch crush · death blast) / 🐴 Giant Rider (5× HP · faster) / 🚙 Armor Tank BOSS (20× HP · giant on top · max 2 on screen) /
-      🕷️ Spider (drops in · steals plants · only lands in the right 4 columns) / 🎈 Balloon (flying · needs cactus/bombs) / 🦅 Griffin Rider (strong flier · high HP · anti-air/explosives) / 🚪 Screen Door (blocks peas · break with fire/explosion) / 🛡️ Shield Giant (immune to peas · shield only broken by cactus spikes · but fears jalapeno/bombs) / 🦔 Pangolin (burrows underground untargetable · randomly locks a plant in its row · surfaces by the 5th cell to destroy it · a Lv5 potato shield can't be broken)<br>
-      <b>Bosses</b>: 🌀 Beam Boss (after W120 · energy beam pierces the whole row · lasts 5s · high HP/dmg · 8s spawn invincibility + freeze-immune) / 🚙 Armor Tank (after W150 · huge HP · armor blocks piercing shots) / 🧙 Witch (after W80 · every 5s gives nearby zombies +500% HP for 2s) / 💀 Skeleton Priest (after W130 · heals nearby zombies every 5s) / ❄️ Night King (after W160 · skeletal horse + Night King's sword · freeze-immune · ranged sword slashes · max 1 on screen)<br>
-      <b>Ultimate skills</b>: 🌻 Ultimate Sunflower (atk) every 10s triggers ⚡ Berserk · row +100% fire rate for 4s / 🌻 Ultimate Sunflower (hp) heals the row 20% every 10s · 🥔 Ultimate Potato (Lv10) shows a shield icon when charged · click to cloak the row in a 5s invincible lightning shield (toggle manual/auto · auto smartly blocks the Beam Boss) · ❄️ Ultimate Snow Pea (Lv5) every 20s a frost storm freezes the whole field for 5s<br>
-      🛒 Each lane has a <b>lawn-mower</b> on the left: it auto-clears the lane when a zombie reaches the house, but <b>only once per lane</b>!
+      <b>🌱 Plants</b> (most can be upgraded — stronger plays unlock at max level, for you to discover)<br>
+      🌻 <b>Sunflower</b> makes sun · 🟢 <b>Peashooter</b> basic damage · ❄️ <b>Snow Pea</b> freeze & slow (W40) ·
+      🔁 <b>Repeater</b> double fire (W10) · 🌿 <b>Threepeater</b> 3 lanes (W50) · 🌵 <b>Cactus</b> piercing spike through the row · 🌵 <b>Big Cactus</b> piercing · hits air · counters balloons (W10) · 🔥 <b>Torch</b> enchants peas to fire · burns through screen doors (W10) ·
+      🟤 <b>Wall-nut</b> tank · 🥔 <b>Potato Shield</b> super tank · explodes when destroyed ·
+      🌶️ <b>Jalapeno</b> burns a whole lane (W20) · 🍒 <b>Cherry Bomb</b> area instakill · 💣 <b>Potato Mine</b> one-shot buried bomb
     </div>
-    <p>🔁 <b>Endless mode</b>: harder every wave; every 5th wave is a <b>Huge Wave</b> (led by elites). Survive long, score high!<br>
-       📍 <b>Level select</b>: every 10 waves cleared unlocks a checkpoint (W10/20/30…); start from there with bonus prep-sun and longer setup time.<br>
-       Bottom-right: <b>🔊 Sound/🔇 Mute</b> (M) / <b>Restart</b> / <b>Pause</b> (P) / <b>Fast-forward 1x/2x/3x</b> (F). Top scores save to a local leaderboard (top 10).<br>
-       Hold <b>Alt</b> to view all plant stats.</p>
-    <p style="font-size:14px">🌻 <b>After W5, click a sunflower to upgrade</b> — pick a branch (cost ramps 250/500/750/1000/1250): ⚡ Attack (max = double row fire rate) or 🛡 Health (+50% row HP per level);
-       after Lv5 they merge → Lv6 Steeled (2500, +100% row HP) → Lv7 Ultimate (5000, all cooldowns −50% · sun ×10).
-       🥔 Potato Shield / ❄️ Snow Pea can also be clicked to upgrade.<br>
-       ✨ <b>Plant Fusion</b>: with <b>5 max-level</b> of the same plant (sunflower needs same branch) a "Fuse" prompt appears; click one and spend <b>10000 sun</b> to fuse. The fused plant gets a <b>ground halo</b> (color = fusion level). <b>Two same-level fused plants can fuse again</b> (2-in-1) for higher stats. Halo colors: white→green→blue→gold→black→dark red (Lv1~6).<br>
-       🌻 <b>Fused Sunflower</b>: 10× HP and sun output; Berserk/Heal skill becomes <b>full-screen</b>.<br>
-       ❄️ <b>Fused Snow Pea</b>: during the frost storm, <b>deals % max-HP damage</b> over time (10% per level), can trigger Melt.<br>
-       🌿 <b>Fused Threepeater</b>: skill <b>Bean Barrage</b> — every 10s drops <b>giant ignited pea-fireballs</b> for big damage (count/power scale with level).<br>
-       🥔 <b>Titanium Potato Shield</b>: huge HP, too heavy to be stolen by spiders, and <b>blocks the Beam Boss in its row even without activating its skill</b>.<br>
-       🌵 <b>Fused Big Cactus</b>: skill <b>Pear-Blossom Storm</b> — every 15s pours up to <b>50 high-track piercing spikes</b> forward for 5s (pink-white petals · higher trajectory).</p>`);
+    <div class="legend">
+      <b>🧟 Zombies</b> (armor is stripped first, then they turn normal)<br>
+      Basic · 🚧 Conehead · 🪣 Buckethead · 🛡️ Knight · 🦘 Pole Vault (fast · vaults the first plant) · 🏈 Football (fast · throws footballs at range) · 🦣 Gargantuar (one-punch crush · death blast) · 🐴 Giant Rider (high HP · faster) · 🚙 Armor Tank BOSS (huge HP · giant on top) ·
+      🕷️ Spider (steals plants) · 🎈 Balloon (flying · needs anti-air) · 🦅 Griffin Rider (strong flier · high HP) · 🚪 Screen Door (blocks peas · break with fire/explosion) · 🛡️ Shield Giant (immune to peas · shield only broken by cactus spikes) · 🦔 Pangolin (burrows underground · surfaces to destroy a plant)<br>
+      <b>Bosses</b>: 🌀 Beam Boss (energy beam pierces the whole row) · 🚙 Armor Tank (huge HP · armor blocks piercing) · 🧙 Witch (buffs nearby zombies) · 💀 Skeleton Priest (heals nearby zombies) · ❄️ Night King (freeze-immune · ranged sword slashes)
+    </div>
+    <p>🛒 Each lane has a <b>lawn-mower</b> on the left: it auto-clears the lane when a zombie reaches the house, but <b>only once per lane</b>! It gets harder every wave, and every 5th is a <b>Huge Wave</b> — survive long, score high. Upgrades, fusion and ultimate skills are left for you to discover in battle 🌟</p>`);
 
   function showMenu(){
     overlay.classList.remove("hidden");

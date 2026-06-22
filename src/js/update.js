@@ -66,9 +66,11 @@
           const fl = p.fuseLevel||1;
           // 最多攻击7格距离内的目标(血量优先)
           const targets = zombies.filter(z=>z.hp>0 && !z.burrowing && z.x>p.x && (z.x-p.x)<=7*GRID.cw).sort((a,b)=>b.hp-a.hp).slice(0, 5+(fl-1));
+          // 火球体积随融合等级增大: fl1=1x ... 最大8倍体积(半径≈2x)
+          const ballScale = Math.min(1 + (fl-1)*0.2, 2);
           for(const z of targets){
             // 斜向下坠落: 从目标左后上方抛出, 带水平速度
-            beanbombs.push({ x:z.x-80, y:TOPBAR_H-20, targetY:cellCenterY(z.r), r:z.r, vx:160, vy:120+Math.random()*40, g:760, rot:0, vrot:(Math.random()-.5)*8, dmg:600*fl });
+            beanbombs.push({ x:z.x-80, y:TOPBAR_H-20, targetY:cellCenterY(z.r), r:z.r, vx:160, vy:120+Math.random()*40, g:760, rot:0, vrot:(Math.random()-.5)*8, dmg:600*fl, scale:ballScale });
           }
           if(targets.length){ showBanner(L("🌿 撒豆成兵！","🌿 Bean Barrage!")); SFX.play("ultimate"); }
         }

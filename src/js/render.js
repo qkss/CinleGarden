@@ -1141,19 +1141,20 @@
     const tt = performance.now();
     for(const bb of beanbombs){
       const vx=bb.vx||0, vy=bb.vy||1, ang=Math.atan2(vy,vx);
+      const s=bb.scale||1;   // 融合等级越高火球越大
       ctx.save(); ctx.translate(bb.x, bb.y);
       // 火球彗尾(指向运动反方向)
       ctx.save(); ctx.rotate(ang); ctx.globalCompositeOperation="lighter";
-      const fl=1+Math.sin(tt/50)*0.25, TL=90*fl;
+      const fl=1+Math.sin(tt/50)*0.25, TL=90*fl*s;
       const grd=ctx.createLinearGradient(0,0,-TL,0);
       grd.addColorStop(0,"rgba(255,170,60,.9)"); grd.addColorStop(0.5,"rgba(255,90,20,.5)"); grd.addColorStop(1,"rgba(255,90,20,0)");
-      ctx.fillStyle=grd; ctx.beginPath(); ctx.moveTo(0,-18); ctx.quadraticCurveTo(-TL,0,0,18); ctx.closePath(); ctx.fill();
+      ctx.fillStyle=grd; ctx.beginPath(); ctx.moveTo(0,-18*s); ctx.quadraticCurveTo(-TL,0,0,18*s); ctx.closePath(); ctx.fill();
       ctx.restore();
-      // 巨型豌豆火球 (体积放大~5倍)
+      // 巨型豌豆火球 (体积随融合等级最高放大到8倍)
       ctx.save(); ctx.globalCompositeOperation="lighter";
-      ctx.fillStyle="rgba(255,120,30,.55)"; ctx.beginPath(); ctx.arc(0,0,42*fl,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle="rgba(255,120,30,.55)"; ctx.beginPath(); ctx.arc(0,0,42*fl*s,0,Math.PI*2); ctx.fill();
       ctx.restore();
-      ctx.rotate(bb.rot);
+      ctx.rotate(bb.rot); ctx.scale(s,s);
       ctx.fillStyle="#ff5a1e"; ctx.beginPath(); ctx.arc(0,0,32,0,Math.PI*2); ctx.fill();   // 火焰外壳
       ctx.fillStyle="#ffb14e"; ctx.beginPath(); ctx.arc(0,0,26,0,Math.PI*2); ctx.fill();
       ctx.fillStyle="#6cc24a"; ctx.beginPath(); ctx.arc(0,0,20,0,Math.PI*2); ctx.fill();    // 豌豆绿核

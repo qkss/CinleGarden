@@ -187,8 +187,8 @@
     if(!p) return null;
     if(p.type==="sunflower"){
       if(p.up<5) return 250*(p.up+1);   // 线性: 250/500/750/1000/1250 (Lv1-5)
-      if(p.up===5) return 2500;          // Lv6 钢化
-      if(p.up===6) return 5000;          // Lv7 终极
+      if(p.up===5) return 1800;          // Lv6 钢化
+      if(p.up===6) return 3000;          // Lv7 终极
       return null;
     }
     // 其余植物: 升级阳光随等级线性增加 base*(等级+1)
